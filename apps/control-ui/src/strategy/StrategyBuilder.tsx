@@ -146,13 +146,13 @@ function ConditionGroupEditor({ group, onChange, defaultTimeframe, depth = 0 }: 
   </div>;
 }
 
-export default function StrategyBuilder() {
-  const [draft, setDraft] = useState<StrategyDefinition>(() => createDraft());
+export default function StrategyBuilder({ initialDraft, onBack }: { initialDraft?: StrategyDefinition; onBack?: () => void }) {
+  const [draft, setDraft] = useState<StrategyDefinition>(() => initialDraft ? structuredClone(initialDraft) : createDraft());
   const [step, setStep] = useState<Step>("identity");
   const [notice, setNotice] = useState("");
-  const [tagsInput, setTagsInput] = useState("draft");
-  const [symbolsInput, setSymbolsInput] = useState("");
-  const [idsInput, setIdsInput] = useState("");
+  const [tagsInput, setTagsInput] = useState(() => initialDraft?.metadata.tags.join(", ") ?? "draft");
+  const [symbolsInput, setSymbolsInput] = useState(() => initialDraft?.universe.underlying_symbols.join(", ") ?? "");
+  const [idsInput, setIdsInput] = useState(() => initialDraft?.universe.product_ids.join(", ") ?? "");
   const fileInput = useRef<HTMLInputElement>(null);
   const issues = useMemo(() => validateStrategy(draft), [draft]);
   const serialized = useMemo(() => JSON.stringify(draft, null, 2), [draft]);
@@ -457,6 +457,7 @@ export default function StrategyBuilder() {
     }
   })();
   return <div className="sb-root">
+    {onBack && <div className="sb-backline"><button type="button" onClick={onBack}><ArrowLeft size={15}/> Back to strategy templates</button></div>}
     <div className="sb-topline">
       <div><div className="sb-eyebrow">STRATEGIES / NO-CODE EDITOR</div><h2>Strategy Builder</h2><p>Build multi-asset, multi-timeframe rules visually. Export for review; no live execution.</p></div>
       <div className="sb-top-buttons"><input type="file" ref={fileInput} accept=".json,application/json" onChange={importJSON} hidden/>

@@ -1,6 +1,6 @@
 # Enterprise milestone plan
 
-All work is sequential and test-gated. Each run: inspect current repository and latest PR/CI -> select next unblocked milestone or smallest issue -> implement on a feature branch -> test -> publish PR/evidence -> record remaining blockers. No credentials, trading or production changes without explicit human authorization.
+All work is sequential and test-gated. Each run: inspect `develop` and latest PR/CI -> select next unblocked milestone -> implement on a feature branch -> test -> publish PR/evidence -> merge green development-only work into `develop` -> record blockers. The user authorized autonomous merging to `develop`, NOT `main` or deployment/live execution. No credentials, trading or production changes without explicit human authorization.
 
 | ID | Milestone | Exit criteria |
 |---|---|---|

@@ -31,3 +31,11 @@ go run ./cmd/control-api
 ```
 
 Read [architecture](docs/ARCHITECTURE.md), [milestones](docs/MILESTONES.md), [security](docs/SECURITY.md), [UX standards](docs/UI_UX.md), [performance](docs/PERFORMANCE.md), and [Delta contracts](docs/DELTA_API.md).
+
+## Development branch and agent handbook
+
+**`develop` is the active integration branch.** Read [AGENTS.md](AGENTS.md), [codex/AGENTS.md](codex/AGENTS.md), [product requirements](codex/PRODUCT_REQUIREMENTS.md), [strategy builder specification](codex/STRATEGY_BUILDER_SPEC.md), and [feature status matrix](docs/FEATURE_MATRIX.md) before changing code.
+
+The **Strategies → Configure Strategy** workspace lets users start from a blank/template draft, configure no-code multi-timeframe conditions, risk and option selection, then validate/export JSON. It is an **offline editor**, not a running trading strategy or backtest.
+
+Autonomous agents may merge tested development PRs **into `develop`**. Merge/release into `main`, production deployment and real trades require separately explicit approval.
