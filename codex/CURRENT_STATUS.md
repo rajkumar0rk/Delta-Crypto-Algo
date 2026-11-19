@@ -74,3 +74,9 @@
 - PR #29: https://github.com/rajkumar0rk/Delta-Crypto-Algo/pull/29 remains open; prior head `a22ce40f8ef97fc0204a6552da209c7bc4278557` failed Go formatting in https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44598902964 (UI passed, vet/race/build skipped).
 - Applied Go formatting fixes in `store.go` and `store_test.go` on the existing feature branch, latest commit `03dc9c98035a2efb1cd2e3555d819e7b05384372`. Do not claim green CI until the latest exact commit has completed checks. No merge until all checks and review pass.
 - Domain cache remains metadata-only, not a trading authorization. M2 still needs authoritative Delta India product mapping, fixtures, capabilities, refresh orchestration and Configure Strategy integration.
+
+## M2 atomic cache formatting follow-up (2026-11-20 IST)
+- PR #29 latest previously failed run https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44608788630: Go formatting failed specifically on `internal/domain/catalog/store_test.go`; UI passed and Go vet/race/build were skipped.
+- Reproduced the formatting diff with local `gofmt -d`: missing spaces around multiplication in the 24-hour expiry test and concurrent publisher duration. Corrected both in commit `ab7a86b626fe0da513b592c9219676846ff291d1`.
+- CI for the corrected code is https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44620199443; result was queued when recorded. Do NOT merge before exact-head checks and review pass.
+- M2 still lacks authoritative Delta India field mapping, venue contract fixtures, capability/margin/fee checks, refresh orchestration and UI integration. No live trading or `main` changes.
