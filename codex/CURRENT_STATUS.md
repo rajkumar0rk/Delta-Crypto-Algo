@@ -62,3 +62,10 @@
 - Public catalog now measures the entire HTTP response body before JSON decoding and rejects bodies exceeding 4 MiB, including valid JSON followed by excess whitespace. Incomplete fetches return no partial products.
 - Added regression fixture for valid JSON plus excessive whitespace. CI must verify Go formatting, tests/race/vet/build and UI/schema before merge; no local test execution claimed.
 - M2 still needs authoritative venue field mapping, margin/fee/capability verification, atomic refresh/freshness and UI integration. No private API, credentials, live orders or deployment.
+
+## M2 atomic validated snapshot cache (2026-11-19, PR pending)
+- Branched from `develop` commit `60fb41ed034ad86fe401623472d3d81b67d116bf`.
+- Added `internal/domain/catalog.Store` with mutex-protected atomic publication of complete validated snapshots, strictly increasing snapshot timestamps, defensive copies of product slices and expiry pointers, and fail-closed uninitialized/stale tradeability.
+- Tests cover incomplete refresh retention, timestamp rollback rejection, input/output alias protection, pointer alias protection and concurrent readers/writers; GitHub CI must validate Go race, vet, build and UI checks before merge.
+- **NOT DONE:** real Delta product-field mapping, verified venue fixtures, capability/margin/fee rules, refresh scheduler and UI integration. This cache is metadata-only and cannot authorize live trading.
+- Open documentation PRs #25/#28 remain separate and should not be duplicated. No live orders, credentials, deployment or `main` changes.
