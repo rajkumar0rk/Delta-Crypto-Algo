@@ -100,7 +100,7 @@ func TestPublicCatalogRejectsUnsafeConfiguration(t *testing.T) {
 		}
 	}
 	_, err := (PublicCatalog{}).Fetch(nil)
-	if !errors.Is(err,ErrCatalogIncomplete) {
+	if !errors.Is(err, ErrCatalogIncomplete) {
 		t.Fatal(err)
 	}
 }
