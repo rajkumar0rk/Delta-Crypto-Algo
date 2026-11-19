@@ -10,8 +10,8 @@ func fixture() Snapshot {
 	now := time.Date(2026, 11, 19, 9, 0, 0, 0, time.UTC)
 	expiry := now.Add(24 * time.Hour)
 	return Snapshot{
-		Source: "delta-india",
-		AsOf: now,
+		Source:   "delta-india",
+		AsOf:     now,
 		Complete: true,
 		Products: []Product{
 			{ID: 10, Symbol: "ANY-RWA-PERP", Underlying: "ANY-RWA", Kind: Perpetual, Status: Active, TickSize: "0.00000001", LotSize: "0.01", ContractMultiplier: "1", QuoteCurrency: "USD", SettlementCurrency: "USD"},
