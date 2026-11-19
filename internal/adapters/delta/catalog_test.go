@@ -67,6 +67,7 @@ func TestPublicCatalogFailClosed(t *testing.T) {
 		{"page limit", `{"success":true,"result":[{"id":1}],"meta":{"after":"next"}}`, 200, 1, 0},
 		{"product limit", `{"success":true,"result":[{"id":1},{"id":2}]}`, 200, 0, 1},
 		{"oversized body", strings.Repeat("x", maxPageBytes+1), 200, 0, 0},
+		{"valid JSON plus oversized whitespace", `{"success":true,"result":[{"id":1}]}` + strings.Repeat(" ", maxPageBytes), 200, 0, 0},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
