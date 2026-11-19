@@ -1,4 +1,4 @@
-import StrategyBuilder from "./strategy/StrategyBuilder";
+import StrategyWorkspace from "./strategy/StrategyWorkspace";
 import { useEffect, useState } from "react";
 import {
   Activity, AlertTriangle, BarChart3, BookOpenCheck, Boxes, ChevronDown,
@@ -176,7 +176,7 @@ export default function App() {
               <div className="table-footnote"><Database size={14} /> Search and filters will apply to the complete Delta instrument catalog once connected.</div>
             </section>
           ) : page === "Strategies" ? (
-            <StrategyBuilder />
+            <StrategyWorkspace />
           ) : (
             <section className="surface route-placeholder">
               <div className="surface-heading"><div><h2>{page} workspace</h2><p>Full implementation scheduled in the project roadmap</p></div></div>
