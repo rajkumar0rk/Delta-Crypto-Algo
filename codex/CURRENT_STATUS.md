@@ -62,3 +62,10 @@
 - Public catalog now measures the entire HTTP response body before JSON decoding and rejects bodies exceeding 4 MiB, including valid JSON followed by excess whitespace. Incomplete fetches return no partial products.
 - Added regression fixture for valid JSON plus excessive whitespace. CI must verify Go formatting, tests/race/vet/build and UI/schema before merge; no local test execution claimed.
 - M2 still needs authoritative venue field mapping, margin/fee/capability verification, atomic refresh/freshness and UI integration. No private API, credentials, live orders or deployment.
+
+## M2 decimal syntax hardening (2026-11-20; pending CI)
+- Feature branch `feature/m2-strict-decimal-catalog-validation` branched from current `develop`; tightened `catalog.positiveDecimal` to plain, unsigned base-10 decimal strings only. `big.Rat` remains the exact numeric check after bounded lexical validation. This prevents accepting alternate encodings (hex/binary, separators, signs) as exchange contract tick/lot/multiplier/option strike.
+- Added valid/invalid decimal and snapshot regression tests, including overlong input. Latest implementation commit `7cd4a79cf181cdee191bb2b4265c4e29e2c476e1`.
+- **CI not yet verified**. Local Git clone/test unavailable due to container DNS resolution failure; do not merge without green GitHub Go formatting/vet/race/build and UI/schema checks plus review.
+- Separate PR #29 atomic cache work is not changed by this branch. M2 still requires authoritative Delta India product fixtures, mapping, margin/fee capabilities and catalog/UI integration.
+- No live credentials, trading, deployment or `main` changes.
