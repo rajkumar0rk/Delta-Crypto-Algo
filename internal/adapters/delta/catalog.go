@@ -42,7 +42,7 @@ type RawSnapshot struct {
 type pageResponse struct {
 	Success *bool             `json:"success"`
 	Result  []json.RawMessage `json:"result"`
-	Meta struct {
+	Meta    struct {
 		After json.RawMessage `json:"after"`
 	} `json:"meta"`
 }
