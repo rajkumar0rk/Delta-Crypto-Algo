@@ -119,7 +119,6 @@ func TestPublicCatalogRejectsRedirectsWithoutFollowing(t *testing.T) {
 	client := origin.Client()
 	client.Timeout = time.Second
 	// The caller's client must remain unchanged.
-	originalRedirect := client.CheckRedirect
 	got, err := (PublicCatalog{BaseURL: origin.URL, Client: client}).Fetch(context.Background())
 	if !errors.Is(err, ErrCatalogIncomplete) || len(got.Products) != 0 {
 		t.Fatalf("redirect must fail closed: %+v %v", got, err)
@@ -127,7 +126,7 @@ func TestPublicCatalogRejectsRedirectsWithoutFollowing(t *testing.T) {
 	if redirected != 0 {
 		t.Fatalf("redirect followed to unexpected origin: %d", redirected)
 	}
-	if client.CheckRedirect != originalRedirect {
+	if client.CheckRedirect != nil {
 		t.Fatal("caller HTTP client mutated")
 	}
 }
