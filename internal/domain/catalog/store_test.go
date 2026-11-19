@@ -8,11 +8,18 @@ import (
 )
 
 func testSnapshot(t time.Time) Snapshot {
-	return Snapshot{Source: "fixture", AsOf: t, Complete: true, Products: []Product{{
-		ID: 1, Symbol: "TEST-PERP", Underlying: "TEST", Kind: Perpetual,
-		Status: Active, TickSize: "0.01", LotSize: "1",
-		ContractMultiplier: "1", QuoteCurrency: "USD", SettlementCurrency: "USD",
-	}}}
+	p := Product{}
+	p.ID = 1
+	p.Symbol = "TEST-PERP"
+	p.Underlying = "TEST"
+	p.Kind = Perpetual
+	p.Status = Active
+	p.TickSize = "0.01"
+	p.LotSize = "1"
+	p.ContractMultiplier = "1"
+	p.QuoteCurrency = "USD"
+	p.SettlementCurrency = "USD"
+	return Snapshot{Source: "fixture", AsOf: t, Complete: true, Products: []Product{p}}
 }
 
 func TestStoreFailClosedAndAtomic(t *testing.T) {
