@@ -49,6 +49,7 @@ func TestStoreExpiryPointerIsolation(t *testing.T) {
 	var store Store
 	now := time.Now().UTC()
 	exp := now.Add(24*time.Hour)
+	expectedExpiry := exp
 	snap := testSnapshot(now)
 	snap.Products[0].Kind = CallOption
 	snap.Products[0].Strike = "100"
@@ -56,7 +57,7 @@ func TestStoreExpiryPointerIsolation(t *testing.T) {
 	if err := store.Publish(snap); err != nil { t.Fatal(err) }
 	*snap.Products[0].Expiry = now.Add(-time.Hour)
 	out, _ := store.Snapshot()
-	if !out.Products[0].Expiry.Equal(exp) { t.Fatal("input expiry pointer aliased") }
+	if !out.Products[0].Expiry.Equal(expectedExpiry) { t.Fatal("input expiry pointer aliased") }
 	*out.Products[0].Expiry = now.Add(-time.Hour)
 	if err := store.Tradeable(1, now.Add(time.Second), time.Minute); err != nil { t.Fatalf("output expiry pointer aliased: %v", err) }
 }
