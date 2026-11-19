@@ -62,3 +62,10 @@
 - Public catalog now measures the entire HTTP response body before JSON decoding and rejects bodies exceeding 4 MiB, including valid JSON followed by excess whitespace. Incomplete fetches return no partial products.
 - Added regression fixture for valid JSON plus excessive whitespace. CI must verify Go formatting, tests/race/vet/build and UI/schema before merge; no local test execution claimed.
 - M2 still needs authoritative venue field mapping, margin/fee/capability verification, atomic refresh/freshness and UI integration. No private API, credentials, live orders or deployment.
+
+## M2 full-body byte limit — verified merge (2026-11-19)
+- PR #26 merged into `develop` as `60fb41ed034ad86fe401623472d3d81b67d116bf`: https://github.com/rajkumar0rk/Delta-Crypto-Algo/pull/26.
+- Exact PR head `d4448645fe7c47d029f8e4b7b177eefe9166f94a` passed GitHub Actions: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44566768234. Pre-merge checks green; post-merge `develop` CI not yet verified in this handoff.
+- `PublicCatalog.Fetch` now enforces 4 MiB on the complete HTTP page body, including trailing whitespace, before JSON decode; oversized pages fail closed without returning partial products. Added regression test.
+- M2 remains incomplete: authoritative real Delta India product mapping and fixtures, product-specific margin/fee/capability provenance, atomic freshness/cache and UI integration. Open issue #3 tracks acceptance.
+- No credentials, live orders, production deployment or `main` changes.
