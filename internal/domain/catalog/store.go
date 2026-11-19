@@ -14,7 +14,9 @@ var ErrCatalogUnavailable = errors.New("validated catalog unavailable")
 // This is metadata storage, NOT an exchange authorization or live trading gate.
 type Store struct {
 	mu sync.RWMutex
+
 	current Snapshot
+
 	ready bool
 }
 
