@@ -37,3 +37,8 @@
 - Inspect latest `develop` HEAD and CI to ensure this status is not stale.
 - Implement the smallest unblocked part of M2 or M5 with actual tests, target a PR to `develop`, and merge only after gates pass.
 - Maintain strict live-trading lock and no real credentials/deployments. Never claim benchmark or production readiness without measurements.
+
+## M2 public REST pagination follow-up (2026-11-19)
+- PR #22: https://github.com/rajkumar0rk/Delta-Crypto-Algo/pull/22 adds a read-only HTTPS-only `GET /v2/products` transport, bounded pagination, strict envelope/error handling, TLS fixture tests and design notes. CI must be checked on the exact head before merge; no live Delta fixture verified yet.
+- Transport deliberately returns raw JSON only. Contract mapping, authoritative classification, freshness/atomic cache, capability rules, full venue fixture verification and UI integration are NOT done. No credentials, orders or VPS deployment.
+- Next step after green CI: verified Delta India product response mapping with strict fail-closed unknown fields and typed catalog validation.
