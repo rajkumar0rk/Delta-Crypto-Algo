@@ -53,8 +53,26 @@ type Snapshot struct {
 
 var ErrNotTradeable = errors.New("product not confirmed tradeable")
 
+// positiveDecimal accepts only plain base-10 decimals. big.Rat.SetString also
+// accepts non-venue representations (such as fractions and base-prefixed
+// integers), so validate the lexical form before parsing exactly.
 func positiveDecimal(s string) bool {
-	if s == "" || strings.TrimSpace(s) != s || strings.ContainsAny(s, "eE/") {
+	if s == "" || len(s) > 128 {
+		return false
+	}
+	dot := false
+	digits := 0
+	for _, ch := range s {
+		switch {
+		case ch >= '0' && ch <= '9':
+			digits++
+		case ch == '.' && !dot:
+			dot = true
+		default:
+			return false
+		}
+	}
+	if digits == 0 || s[0] == '.' || s[len(s)-1] == '.' {
 		return false
 	}
 	r, ok := new(big.Rat).SetString(s)
