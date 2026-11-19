@@ -3,8 +3,8 @@
 package delta
 
 import (
-	"context"
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
