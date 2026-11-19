@@ -324,7 +324,7 @@
             "max_dte_hours",
             "strike_selection",
             "strike_offset",
-            "option_side"
+            "direction_map"
           ],
           "properties": {
             "expiry_selection": {
@@ -362,12 +362,21 @@
               "type": "string",
               "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
             },
-            "option_side": {
-              "enum": [
-                "follow_signal",
-                "call_only",
-                "put_only"
-              ]
+            "direction_map": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "long",
+                "short"
+              ],
+              "properties": {
+                "long": {
+                  "$ref": "#/$defs/optionOrderMapping"
+                },
+                "short": {
+                  "$ref": "#/$defs/optionOrderMapping"
+                }
+              }
             }
           }
         }
@@ -632,9 +641,6 @@
                     "type": "number"
                   },
                   {
-                    "type": "integer"
-                  },
-                  {
                     "type": "boolean"
                   },
                   {
@@ -779,6 +785,52 @@
         "value": {
           "type": "string",
           "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+        },
+        "basis": {
+          "enum": [
+            "contract_entry_price",
+            "underlying_entry_price",
+            "option_entry_premium",
+            "account_equity"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "mode": {
+                "const": "percent"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "basis"
+            ]
+          }
+        }
+      ]
+    },
+    "optionOrderMapping": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "option_type",
+        "action"
+      ],
+      "properties": {
+        "option_type": {
+          "enum": [
+            "call",
+            "put"
+          ]
+        },
+        "action": {
+          "enum": [
+            "buy_to_open",
+            "sell_to_open"
+          ]
         }
       }
     }

@@ -50,3 +50,6 @@ Sidebar navigation > Strategies > Strategy Builder. Two-column desktop editor: s
 - UI: keyboard, SR labels, 360/768/1280/1920px, 200% zoom, no clipped risk controls, mobile action bar, import malformed/oversized JSON safely.
 - Audit: roundtrip export/import, stable IDs, safe defaults, no leaking credentials, no actual orders.
 - Runtime later: order uncertainty, risk halt, partial fills, slow feed, stale quotes and restart at candle boundary.
+
+## Explicit option direction and risk percent basis
+Each signal direction maps independently to a CALL/PUT and an explicit BUY-to-open/SELL-to-open action. Selling options requires additional exchange-confirmed margin and account risk checks. Percent-based SL/TP explicitly identifies its reference: contract entry price, underlying entry price, option entry premium, or equity. Venue adapters must calculate adverse movements correctly for both BUY and SELL positions; this draft does not do that calculation.

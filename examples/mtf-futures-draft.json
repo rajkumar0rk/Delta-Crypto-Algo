@@ -160,7 +160,16 @@
       "max_dte_hours": 336,
       "strike_selection": "atm",
       "strike_offset": 0,
-      "option_side": "follow_signal"
+      "direction_map": {
+        "long": {
+          "option_type": "call",
+          "action": "buy_to_open"
+        },
+        "short": {
+          "option_type": "put",
+          "action": "buy_to_open"
+        }
+      }
     }
   },
   "risk": {

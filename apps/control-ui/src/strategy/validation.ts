@@ -52,6 +52,13 @@ export function validateStrategy(input: unknown): ValidationIssue[] {
   }
   (["long_entry", "short_entry", "long_exit", "short_exit"] as const).forEach(side => examine(draft.signals[side], "/signals/" + side, 0));
   if (total > 120) add("/signals", "Too many rule nodes; maximum 120");
+  const optionsEnabled = draft.universe.product_types.some(kind => kind.endsWith("_option"));
+  if (draft.risk.stop_loss.mode === "percent" && draft.risk.stop_loss.basis === "option_entry_premium" && !optionsEnabled) {
+    add("/risk/stop_loss/basis", "Premium basis requires an option contract type");
+  }
+  if (draft.risk.take_profit.mode === "percent" && draft.risk.take_profit.basis === "option_entry_premium" && !optionsEnabled) {
+    add("/risk/take_profit/basis", "Premium basis requires an option contract type");
+  }
   if (draft.execution.options.min_dte_hours > draft.execution.options.max_dte_hours) {
     add("/execution/options", "Maximum DTE must not be below minimum DTE");
   }

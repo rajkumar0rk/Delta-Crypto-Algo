@@ -49,10 +49,10 @@ function DecimalField({ label, value, onChange, hint }: {
 }) {
   return <Field label={label} hint={hint}><input type="text" inputMode="decimal" value={value} onChange={event => onChange(event.target.value)} placeholder="0"/></Field>;
 }
-function CheckRow({ label, checked, onChange, hint }: {
-  label: string; checked: boolean; onChange: (value: boolean) => void; hint?: string
+function CheckRow({ label, checked, onChange, hint, disabled = false }: {
+  label: string; checked: boolean; onChange: (value: boolean) => void; hint?: string; disabled?: boolean
 }) {
-  return <label className="sb-check"><input type="checkbox" checked={checked} onChange={event => onChange(event.target.checked)}/>
+  return <label className="sb-check"><input type="checkbox" checked={checked} disabled={disabled} onChange={event => onChange(event.target.checked)}/>
     <span><strong>{label}</strong>{hint && <small>{hint}</small>}</span></label>;
 }
 function OperandEditor({ label, value, onChange, defaultTimeframe }: {
@@ -285,7 +285,7 @@ export default function StrategyBuilder() {
           <Field label="Session timezone" hint="IANA timezone; validated by the backend when execution is added"><input value={draft.session.timezone}
             onChange={event => session({ timezone: event.target.value })}/></Field>
         </div>
-        <div className="sb-checkbox-grid"><CheckRow checked={draft.clock.confirm_on_close} label="Confirm signal on candle close" hint="Required to prevent lookahead"
+        <div className="sb-checkbox-grid"><CheckRow checked={draft.clock.confirm_on_close} disabled label="Confirm signal on candle close" hint="Required to prevent lookahead"
           onChange={() => {}}/><CheckRow checked={draft.clock.intrabar_protective_exits} label="Intrabar protective exits"
           hint="Monitored separately from signal closes" onChange={value => clock({ intrabar_protective_exits: value })}/></div>
         <div className="sb-section-label">Trading weekdays</div>
@@ -342,7 +342,7 @@ export default function StrategyBuilder() {
           <CheckRow label="Post-only (maker preference)" checked={draft.execution.post_only} hint="Requires limit + GTC; may reject on crossing"
             onChange={value => execution({ post_only: value, order_type: value ? "limit" : draft.execution.order_type,
               time_in_force: value ? "gtc" : draft.execution.time_in_force })}/>
-          <CheckRow label="Reduce-only exits" checked={draft.execution.reduce_only_exits} hint="Always required" onChange={() => {}}/>
+          <CheckRow label="Reduce-only exits" checked={draft.execution.reduce_only_exits} disabled hint="Always required" onChange={() => {}}/>
         </div>
         {hasOptions && <div className="sb-subpanel"><div className="sb-form-heading"><h3>Option contract selection</h3><p>Applies to call/put options; no fixed strike or expiry assumptions.</p></div>
           <div className="sb-grid two">
@@ -363,9 +363,21 @@ export default function StrategyBuilder() {
               onChange={value => execution({ options: { ...draft.execution.options, strike_offset: value } })}/>}
             {draft.execution.options.strike_selection === "target_delta" && <DecimalField label="Target absolute delta" value={draft.execution.options.target_delta ?? "0.5"}
               onChange={value => execution({ options: { ...draft.execution.options, target_delta: value } })}/>}
-            <SelectField label="Call / put policy" value={draft.execution.options.option_side}
-              options={choicesFrom(["follow_signal","call_only","put_only"])}
-              onChange={value => execution({ options: { ...draft.execution.options, option_side: value as StrategyDefinition["execution"]["options"]["option_side"] } })}/>
+            {(["long","short"] as const).map(signal => <div className="sb-option-map" key={signal}>
+              <div className="sb-section-label">{signal === "long" ? "Long signal option mapping" : "Short signal option mapping"}</div>
+              <SelectField label="Contract" value={draft.execution.options.direction_map[signal].option_type}
+                options={[{value:"call",label:"CALL"},{value:"put",label:"PUT"}]}
+                onChange={value => execution({ options: { ...draft.execution.options, direction_map: {
+                  ...draft.execution.options.direction_map,
+                  [signal]: { ...draft.execution.options.direction_map[signal], option_type: value as "call"|"put" }
+                } } })}/>
+              <SelectField label="Trade action" value={draft.execution.options.direction_map[signal].action}
+                options={[{value:"buy_to_open",label:"Buy to open"},{value:"sell_to_open",label:"Sell to open"}]}
+                onChange={value => execution({ options: { ...draft.execution.options, direction_map: {
+                  ...draft.execution.options.direction_map,
+                  [signal]: { ...draft.execution.options.direction_map[signal], action: value as "buy_to_open"|"sell_to_open" }
+                } } })}/>
+            </div>)}
           </div>
         </div>}
       </>;
@@ -393,10 +405,18 @@ export default function StrategyBuilder() {
               onChange={value => risk({ stop_loss: { ...draft.risk.stop_loss, mode: value as StrategyDefinition["risk"]["stop_loss"]["mode"] } })}/>
             <DecimalField label="Stop-loss value" value={draft.risk.stop_loss.value} hint="0 for disabled or signal-candle mode"
               onChange={value => risk({ stop_loss: { ...draft.risk.stop_loss, value } })}/>
+            {draft.risk.stop_loss.mode === "percent" && <SelectField label="Stop-loss percent basis" value={draft.risk.stop_loss.basis ?? "contract_entry_price"}
+              options={choicesFrom(["contract_entry_price","underlying_entry_price","option_entry_premium","account_equity"])}
+              onChange={value => risk({ stop_loss: { ...draft.risk.stop_loss, basis: value as NonNullable<StrategyDefinition["risk"]["stop_loss"]["basis"]> } })}/>}
+
             <SelectField label="Take-profit mode" value={draft.risk.take_profit.mode} options={Object.entries(choices.protection).map(([value,label]) => ({value,label}))}
               onChange={value => risk({ take_profit: { ...draft.risk.take_profit, mode: value as StrategyDefinition["risk"]["take_profit"]["mode"] } })}/>
             <DecimalField label="Take-profit value" value={draft.risk.take_profit.value}
               onChange={value => risk({ take_profit: { ...draft.risk.take_profit, value } })}/>
+            {draft.risk.take_profit.mode === "percent" && <SelectField label="Take-profit percent basis" value={draft.risk.take_profit.basis ?? "contract_entry_price"}
+              options={choicesFrom(["contract_entry_price","underlying_entry_price","option_entry_premium","account_equity"])}
+              onChange={value => risk({ take_profit: { ...draft.risk.take_profit, basis: value as NonNullable<StrategyDefinition["risk"]["take_profit"]["basis"]> } })}/>}
+
           </div>
         </div>
         <div className="sb-subpanel"><CheckRow label="Enable trailing protective stop" checked={draft.risk.trailing_stop.enabled}
@@ -411,8 +431,8 @@ export default function StrategyBuilder() {
           </div>}
         </div>
         <div className="sb-checkbox-grid">
-          <CheckRow checked={draft.risk.halt_on_stale_data} label="Halt on stale data" hint="Mandatory, cannot disable" onChange={() => {}}/>
-          <CheckRow checked={draft.risk.halt_on_reconciliation_gap} label="Halt on account reconciliation gap" hint="Mandatory, cannot disable" onChange={() => {}}/>
+          <CheckRow checked={draft.risk.halt_on_stale_data} disabled label="Halt on stale data" hint="Mandatory, cannot disable" onChange={() => {}}/>
+          <CheckRow checked={draft.risk.halt_on_reconciliation_gap} disabled label="Halt on account reconciliation gap" hint="Mandatory, cannot disable" onChange={() => {}}/>
         </div>
       </>;
       case "review": return <>

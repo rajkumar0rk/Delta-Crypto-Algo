@@ -65,7 +65,7 @@ export type StrategyDefinition = {
       expiry_utc?: string; min_dte_hours: number; max_dte_hours: number;
       strike_selection: "atm" | "offset_strikes" | "target_delta";
       strike_offset: number; target_delta?: string;
-      option_side: "follow_signal" | "call_only" | "put_only";
+      direction_map: { long: OptionOrderMapping; short: OptionOrderMapping };
     };
   };
   risk: {
@@ -76,7 +76,8 @@ export type StrategyDefinition = {
     halt_on_stale_data: true; halt_on_reconciliation_gap: true;
   };
 };
-export type Protection = { mode: "off" | "percent" | "price_ticks" | "atr_multiple" | "signal_candle"; value: string };
+export type Protection = { mode: "off" | "percent" | "price_ticks" | "atr_multiple" | "signal_candle"; value: string; basis?: "contract_entry_price" | "underlying_entry_price" | "option_entry_premium" | "account_equity" };
+export type OptionOrderMapping = { option_type: "call" | "put"; action: "buy_to_open" | "sell_to_open" };
 
 export const ruleId = (): string => "rule_" + crypto.randomUUID().replaceAll("-", "").slice(0, 16);
 export function makeOperand(kind: Operand["kind"], timeframe: Timeframe): Operand {
@@ -106,12 +107,12 @@ export function createDraft(): StrategyDefinition {
     execution: {
       order_type: "limit", time_in_force: "gtc", post_only: false, reduce_only_exits: true, max_slippage_bps: 20,
       sizing: { mode: "fixed_lots", value: "1" },
-      options: { expiry_selection: "nearest_eligible", min_dte_hours: 24, max_dte_hours: 336, strike_selection: "atm", strike_offset: 0, option_side: "follow_signal" }
+      options: { expiry_selection: "nearest_eligible", min_dte_hours: 24, max_dte_hours: 336, strike_selection: "atm", strike_offset: 0, direction_map: { long: { option_type: "call", action: "buy_to_open" }, short: { option_type: "put", action: "buy_to_open" } } }
     },
     risk: {
       max_open_positions: 1, max_orders_per_minute: 6, max_daily_loss_pct: 2, max_drawdown_pct: 10,
       max_consecutive_losses: 4, max_notional_quote: "2000", min_margin_buffer_pct: 30,
-      stop_loss: { mode: "percent", value: "1" }, take_profit: { mode: "off", value: "0" },
+      stop_loss: { mode: "percent", value: "1", basis: "contract_entry_price" }, take_profit: { mode: "off", value: "0" },
       trailing_stop: { enabled: false, activation: "1", distance: "0.5", unit: "percent" },
       halt_on_stale_data: true, halt_on_reconciliation_gap: true
     }
