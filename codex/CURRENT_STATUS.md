@@ -50,9 +50,9 @@
 - Next: verify authoritative Delta India product response fixtures, field-by-field mapping into `internal/domain/catalog`, venue capability matrix, atomic cache/freshness checks and contract tests. Review redirects/origin constraints before allowing configurable hosts.
 - No credentials, live orders, deployment or changes to `main`.
 
-## M2 redirect safety hardening (2026-11-19, pending PR validation)
+## M2 redirect safety hardening (2026-11-19, merged PR #24)
 - Feature branch `feature/m2-reject-catalog-redirects` branched from verified `develop` HEAD `2746cfa4153fc7e9647422162ed444d96fa0ddae`.
 - Catalog transport now rejects HTTP 3xx without following redirects, including cross-origin redirects. It copies the configured HTTP client instead of changing caller policy. TLS fixture test asserts no redirected request reaches the target and partial results remain empty.
-- **Not yet verified by CI at this handoff.** Do not merge without checking exact PR head Go/race/vet/build and UI/schema CI.
+- PR #24 merged into `develop` as `f21a3751ea974353eeeefef10029d890b948499d`: https://github.com/rajkumar0rk/Delta-Crypto-Algo/pull/24. Exact PR head `aea5c64760973bc85073289c4f0bc3153585d07d` passed Go formatting/vet/race/build and UI/schema checks: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44545342932. Post-merge `develop` CI was queued at handoff: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44555231442.
 - M2 remains open: authoritative Delta India product fixture mapping, product capability/margin/fee accuracy, freshness/cache, UI integration, contract acceptance tests.
 - No credentials, orders, deployment or `main` changes.
