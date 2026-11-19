@@ -4,6 +4,7 @@ package delta
 
 import (
 	"context"
+	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -101,18 +102,24 @@ func (c PublicCatalog) Fetch(ctx context.Context) (RawSnapshot, error) {
 			resp.Body.Close()
 			return empty, fmt.Errorf("%w: HTTP %d", ErrCatalogIncomplete, resp.StatusCode)
 		}
+		// Enforce the byte limit independently of JSON parsing. A valid JSON
+		// document followed by excess whitespace must not bypass the cap.
+		body, readErr := io.ReadAll(io.LimitReader(resp.Body, maxPageBytes+1))
+		closeErr := resp.Body.Close()
+		if readErr != nil || closeErr != nil || len(body) > maxPageBytes {
+			return empty, fmt.Errorf("%w: oversized or unreadable page: %v %v", ErrCatalogIncomplete, readErr, closeErr)
+		}
 		var data pageResponse
-		decoder := json.NewDecoder(io.LimitReader(resp.Body, maxPageBytes+1))
+		decoder := json.NewDecoder(bytes.NewReader(body))
 		err = decoder.Decode(&data)
 		if err == nil {
 			var extra json.RawMessage
 			if trailing := decoder.Decode(&extra); trailing != io.EOF {
-				err = errors.New("trailing or oversized response")
+				err = errors.New("trailing response")
 			}
 		}
-		closeErr := resp.Body.Close()
-		if err != nil || closeErr != nil {
-			return empty, fmt.Errorf("%w: invalid JSON or response size: %v %v", ErrCatalogIncomplete, err, closeErr)
+		if err != nil {
+			return empty, fmt.Errorf("%w: invalid JSON: %v", ErrCatalogIncomplete, err)
 		}
 		if data.Success == nil || !*data.Success || len(data.Result) == 0 {
 			return empty, fmt.Errorf("%w: failed or empty page", ErrCatalogIncomplete)
