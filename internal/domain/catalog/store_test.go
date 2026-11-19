@@ -69,7 +69,7 @@ func TestStoreFailClosedAndAtomic(t *testing.T) {
 func TestStoreExpiryPointerIsolation(t *testing.T) {
 	var store Store
 	now := time.Now().UTC()
-	exp := now.Add(24*time.Hour)
+	exp := now.Add(24 * time.Hour)
 	expectedExpiry := exp
 	snap := testSnapshot(now)
 	snap.Products[0].Kind = CallOption
@@ -113,7 +113,7 @@ func TestStoreConcurrentReadersAndPublishers(t *testing.T) {
 	go func() {
 		defer wg.Done()
 		for i := 1; i <= 100; i++ {
-			if err := store.Publish(testSnapshot(start.Add(time.Duration(i)*time.Second))); err != nil {
+			if err := store.Publish(testSnapshot(start.Add(time.Duration(i) * time.Second))); err != nil {
 				t.Error(err)
 				return
 			}
