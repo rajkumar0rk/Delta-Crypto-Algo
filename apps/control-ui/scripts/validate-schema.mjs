@@ -13,8 +13,18 @@ const validate = ajv.compile(schema);
 
 const example = readJSON("examples/mtf-futures-draft.json");
 if (!validate(example)) {
-  throw new Error("Sample strategy invalid: " + JSON.stringify(validate.errors));
+  throw new Error("Futures draft invalid: " + JSON.stringify(validate.errors));
 }
+const optionsDraft = readJSON("examples/stoch-rsi-options-draft.json");
+if (!validate(optionsDraft)) {
+  throw new Error("Options draft invalid: " + JSON.stringify(validate.errors));
+}
+const missingMapping = structuredClone(optionsDraft);
+delete missingMapping.execution.options.direction_map;
+if (validate(missingMapping)) throw new Error("Option action mapping was not required");
+const missingPremiumBasis = structuredClone(optionsDraft);
+delete missingPremiumBasis.risk.stop_loss.basis;
+if (validate(missingPremiumBasis)) throw new Error("Percent SL basis was not required");
 const unknown = structuredClone(example);
 unknown.untrusted_code = "process.exit(0)";
 if (validate(unknown)) throw new Error("Unexpected property was accepted");
@@ -27,4 +37,4 @@ if (validate(liveOverride)) throw new Error("Unconfirmed candle execution was ac
 const numericPrice = structuredClone(example);
 numericPrice.execution.sizing.value = 0.5;
 if (validate(numericPrice)) throw new Error("Binary float money sizing was accepted");
-console.log("Strategy Schema validation passed: valid sample + 4 rejection cases.");
+console.log("Strategy Schema validation passed: 2 valid samples + 6 rejection cases.");
