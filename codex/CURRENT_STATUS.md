@@ -1,14 +1,21 @@
 # Project status — verified integration
 
-**Date:** 2026-11-19 (IST). This file is a handoff snapshot; always check GitHub `develop`, new PRs and Actions before acting.
+**Date:** 2026-11-19 (IST), M2 catalog domain merge. This file is a handoff snapshot; always check GitHub `develop`, new PRs and Actions before acting.
 
 ## Verified repository state
-- **`develop`** is the unified development integration branch. After PR #18 merge, HEAD is `20ad8854340015ad9838bab108caec28f9f4cfd1`.
+- **`develop`** is the unified development integration branch. After PR #20 merge, HEAD is `44df6ed85058fca8af5095b0eb24418e23d4cd94`.
 - M1 foundation, initial M5 offline Strategy Builder, and the real Configure Strategy workspace/agent handbook are reachable from `develop`.
 - **PR #18 merged**: https://github.com/rajkumar0rk/Delta-Crypto-Algo/pull/18
 - GitHub Actions on `develop` HEAD **passed** (Go tests/race/static/build; UI typecheck/build; strategy JSON schema tests): https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44479713873
 - Former PR #1 and #17 were closed as superseded; do not attempt to merge their already integrated commits again.
 - User authorized autonomous **development-only merges to `develop`** after green CI and safety review. No automatic merging to `main`.
+
+## M2 catalog domain integration (verified)
+- PR #20 merged into `develop`: https://github.com/rajkumar0rk/Delta-Crypto-Algo/pull/20 (merge commit `44df6ed85058fca8af5095b0eb24418e23d4cd94`).
+- Exact PR head `10e2ec4fcc51d5fcfa306e733ca24a5f4b052cc5` passed Go formatting, vet, race tests, build and UI/schema CI: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44506163654
+- `internal/domain/catalog` now validates typed futures/options and crypto/RWA-capable metadata with exact decimal strings, expiry, duplicate IDs/symbols, complete snapshots, and fail-closed freshness/product-state checks.
+- This is only the domain model. **No actual Delta Exchange India REST catalog, pagination, account eligibility, exchange margin, or live order routing exists.** `Snapshot.Tradeable` is a metadata precondition, not permission to trade.
+- Next M2 slice: public read-only Delta catalog fetch with bounded pagination, mapping, fixture contract tests, strict rejection of incomplete/stale data and unknown product capabilities.
 
 ## Current Configure Strategy experience
 - Navigation **Strategies** opens the strategy workspace, with visible **Configure Strategy** button.
