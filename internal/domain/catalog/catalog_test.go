@@ -2,6 +2,7 @@ package catalog
 
 import (
 	"errors"
+	"strings"
 	"testing"
 	"time"
 )
@@ -46,7 +47,7 @@ func TestSnapshotAndTradeability(t *testing.T) {
 		{"leading decimal point", func(s *Snapshot) { s.Products[0].LotSize = ".5" }},
 		{"trailing decimal point", func(s *Snapshot) { s.Products[0].LotSize = "5." }},
 		{"multiple decimal points", func(s *Snapshot) { s.Products[0].LotSize = "1.2.3" }},
-		{"overlong decimal", func(s *Snapshot) { s.Products[0].LotSize = "1" + string(make([]byte, 128)) }},
+		{"overlong decimal", func(s *Snapshot) { s.Products[0].LotSize = strings.Repeat("1", 129) }},
 		{"missing option expiry", func(s *Snapshot) { s.Products[1].Expiry = nil }},
 		{"missing option strike", func(s *Snapshot) { s.Products[1].Strike = "" }},
 		{"unknown product type", func(s *Snapshot) { s.Products[0].Kind = "mystery" }},
