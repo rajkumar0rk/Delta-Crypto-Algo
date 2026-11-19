@@ -104,3 +104,29 @@ func TestPublicCatalogRejectsUnsafeConfiguration(t *testing.T) {
 		t.Fatal(err)
 	}
 }
+
+func TestPublicCatalogRejectsRedirectsWithoutFollowing(t *testing.T) {
+	redirected := 0
+	target := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		redirected++
+		fmt.Fprint(w, `{"success":true,"result":[{"id":1}]}`)
+	}))
+	defer target.Close()
+	origin := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, target.URL+"/v2/products", http.StatusTemporaryRedirect)
+	}))
+	defer origin.Close()
+	client := origin.Client()
+	client.Timeout = time.Second
+	// The caller's client must remain unchanged.
+	got, err := (PublicCatalog{BaseURL: origin.URL, Client: client}).Fetch(context.Background())
+	if !errors.Is(err, ErrCatalogIncomplete) || len(got.Products) != 0 {
+		t.Fatalf("redirect must fail closed: %+v %v", got, err)
+	}
+	if redirected != 0 {
+		t.Fatalf("redirect followed to unexpected origin: %d", redirected)
+	}
+	if client.CheckRedirect != nil {
+		t.Fatal("caller HTTP client mutated")
+	}
+}

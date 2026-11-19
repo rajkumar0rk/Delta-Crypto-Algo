@@ -86,7 +86,14 @@ func (c PublicCatalog) Fetch(ctx context.Context) (RawSnapshot, error) {
 			return empty, fmt.Errorf("%w: request: %v", ErrCatalogIncomplete, err)
 		}
 		req.Header.Set("Accept", "application/json")
-		resp, err := c.Client.Do(req)
+		// Never follow redirects: a configurable HTTPS origin must not be able
+		// to redirect catalog reads to another host (or an untrusted path).
+		// Copy the client to preserve caller configuration without mutation.
+		client := *c.Client
+		client.CheckRedirect = func(*http.Request, []*http.Request) error {
+			return http.ErrUseLastResponse
+		}
+		resp, err := client.Do(req)
 		if err != nil {
 			return empty, fmt.Errorf("%w: transport: %v", ErrCatalogIncomplete, err)
 		}
