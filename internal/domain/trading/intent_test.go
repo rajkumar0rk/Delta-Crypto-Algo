@@ -8,7 +8,7 @@ func TestIntentValidation(t *testing.T) {
 		t.Fatal(err)
 	}
 	for _, tc := range []struct {
-		name string
+		name   string
 		mutate func(*OrderIntent)
 	}{
 		{"product", func(o *OrderIntent) { o.ProductID = 0 }},
