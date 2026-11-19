@@ -1,0 +1,786 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/rajkumar0rk/Delta-Crypto-Algo/schemas/strategy.v1.schema.json",
+  "title": "Delta Crypto Algo Strategy Definition v1",
+  "description": "Declarative, draft-only immutable strategy definition. Server validation, versioning, approvals and runtime capabilities are separate gates.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "revision",
+    "metadata",
+    "universe",
+    "clock",
+    "session",
+    "signals",
+    "execution",
+    "risk"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]{2,63}$"
+    },
+    "revision": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "description",
+        "tags"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 120
+        },
+        "description": {
+          "type": "string",
+          "maxLength": 2000
+        },
+        "tags": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "maxLength": 32
+          }
+        }
+      }
+    },
+    "universe": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "selection",
+        "product_types",
+        "underlying_symbols",
+        "product_ids",
+        "max_products"
+      ],
+      "properties": {
+        "selection": {
+          "enum": [
+            "dynamic_filter",
+            "product_ids"
+          ]
+        },
+        "product_types": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "perpetual_future",
+              "dated_future",
+              "call_option",
+              "put_option"
+            ]
+          }
+        },
+        "underlying_symbols": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 200,
+          "items": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9_.-]{1,32}$"
+          }
+        },
+        "product_ids": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 500,
+          "items": {
+            "type": "integer",
+            "minimum": 1
+          }
+        },
+        "max_products": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "selection": {
+                "const": "product_ids"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "product_ids": {
+                "minItems": 1
+              }
+            }
+          }
+        }
+      ]
+    },
+    "clock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "signal_timeframe",
+        "execution_timeframe",
+        "confirm_on_close",
+        "intrabar_protective_exits",
+        "max_price_age_ms"
+      ],
+      "properties": {
+        "signal_timeframe": {
+          "type": "string",
+          "enum": [
+            "1m",
+            "3m",
+            "5m",
+            "10m",
+            "15m",
+            "30m",
+            "1h",
+            "2h",
+            "4h",
+            "6h",
+            "12h",
+            "1d",
+            "1w"
+          ]
+        },
+        "execution_timeframe": {
+          "type": "string",
+          "enum": [
+            "1m",
+            "3m",
+            "5m",
+            "10m",
+            "15m",
+            "30m",
+            "1h",
+            "2h",
+            "4h",
+            "6h",
+            "12h",
+            "1d",
+            "1w"
+          ]
+        },
+        "confirm_on_close": {
+          "const": true
+        },
+        "intrabar_protective_exits": {
+          "type": "boolean"
+        },
+        "max_price_age_ms": {
+          "type": "integer",
+          "minimum": 100,
+          "maximum": 120000
+        }
+      }
+    },
+    "session": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "timezone",
+        "weekdays",
+        "windows"
+      ],
+      "properties": {
+        "timezone": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 64
+        },
+        "weekdays": {
+          "type": "array",
+          "uniqueItems": true,
+          "minItems": 1,
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 7
+          }
+        },
+        "windows": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 12,
+          "items": {
+            "$ref": "#/$defs/timeWindow"
+          }
+        }
+      }
+    },
+    "signals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "long_entry",
+        "short_entry",
+        "long_exit",
+        "short_exit",
+        "conflict_policy"
+      ],
+      "properties": {
+        "long_entry": {
+          "$ref": "#/$defs/node"
+        },
+        "short_entry": {
+          "$ref": "#/$defs/node"
+        },
+        "long_exit": {
+          "$ref": "#/$defs/node"
+        },
+        "short_exit": {
+          "$ref": "#/$defs/node"
+        },
+        "conflict_policy": {
+          "enum": [
+            "skip_both",
+            "prefer_long",
+            "prefer_short"
+          ]
+        }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "order_type",
+        "time_in_force",
+        "post_only",
+        "reduce_only_exits",
+        "max_slippage_bps",
+        "sizing",
+        "options"
+      ],
+      "properties": {
+        "order_type": {
+          "enum": [
+            "market",
+            "limit"
+          ]
+        },
+        "time_in_force": {
+          "enum": [
+            "gtc",
+            "ioc",
+            "fok"
+          ]
+        },
+        "post_only": {
+          "type": "boolean"
+        },
+        "reduce_only_exits": {
+          "const": true
+        },
+        "max_slippage_bps": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 1000
+        },
+        "sizing": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "value"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                "fixed_lots",
+                "fixed_quote_notional",
+                "risk_pct_equity"
+              ]
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+            }
+          }
+        },
+        "options": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "expiry_selection",
+            "min_dte_hours",
+            "max_dte_hours",
+            "strike_selection",
+            "strike_offset",
+            "option_side"
+          ],
+          "properties": {
+            "expiry_selection": {
+              "enum": [
+                "nearest_eligible",
+                "fixed_expiry",
+                "furthest_eligible"
+              ]
+            },
+            "expiry_utc": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "min_dte_hours": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "max_dte_hours": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "strike_selection": {
+              "enum": [
+                "atm",
+                "offset_strikes",
+                "target_delta"
+              ]
+            },
+            "strike_offset": {
+              "type": "integer",
+              "minimum": -100,
+              "maximum": 100
+            },
+            "target_delta": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+            },
+            "option_side": {
+              "enum": [
+                "follow_signal",
+                "call_only",
+                "put_only"
+              ]
+            }
+          }
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "post_only": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "order_type": {
+                "const": "limit"
+              },
+              "time_in_force": {
+                "const": "gtc"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "options": {
+                "properties": {
+                  "expiry_selection": {
+                    "const": "fixed_expiry"
+                  }
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "options": {
+                "required": [
+                  "expiry_utc"
+                ]
+              }
+            }
+          }
+        }
+      ]
+    },
+    "risk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_open_positions",
+        "max_orders_per_minute",
+        "max_daily_loss_pct",
+        "max_drawdown_pct",
+        "max_consecutive_losses",
+        "max_notional_quote",
+        "min_margin_buffer_pct",
+        "stop_loss",
+        "take_profit",
+        "trailing_stop",
+        "halt_on_stale_data",
+        "halt_on_reconciliation_gap"
+      ],
+      "properties": {
+        "max_open_positions": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "max_orders_per_minute": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "max_daily_loss_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "max_drawdown_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "max_consecutive_losses": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "max_notional_quote": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+        },
+        "min_margin_buffer_pct": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
+        },
+        "stop_loss": {
+          "$ref": "#/$defs/protection"
+        },
+        "take_profit": {
+          "$ref": "#/$defs/protection"
+        },
+        "trailing_stop": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "enabled",
+            "activation",
+            "distance",
+            "unit"
+          ],
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "activation": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+            },
+            "distance": {
+              "type": "string",
+              "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+            },
+            "unit": {
+              "enum": [
+                "price_ticks",
+                "percent",
+                "atr_multiple"
+              ]
+            }
+          }
+        },
+        "halt_on_stale_data": {
+          "const": true
+        },
+        "halt_on_reconciliation_gap": {
+          "const": true
+        }
+      }
+    }
+  },
+  "$defs": {
+    "timeWindow": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "start",
+        "end"
+      ],
+      "properties": {
+        "start": {
+          "type": "string",
+          "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+        },
+        "end": {
+          "type": "string",
+          "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$"
+        }
+      }
+    },
+    "operand": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "value"
+          ],
+          "properties": {
+            "kind": {
+              "const": "constant"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "field",
+            "timeframe",
+            "offset"
+          ],
+          "properties": {
+            "kind": {
+              "const": "price"
+            },
+            "field": {
+              "enum": [
+                "open",
+                "high",
+                "low",
+                "close",
+                "volume",
+                "bid",
+                "ask",
+                "mark",
+                "last",
+                "open_interest",
+                "funding_rate"
+              ]
+            },
+            "timeframe": {
+              "type": "string",
+              "enum": [
+                "1m",
+                "3m",
+                "5m",
+                "10m",
+                "15m",
+                "30m",
+                "1h",
+                "2h",
+                "4h",
+                "6h",
+                "12h",
+                "1d",
+                "1w"
+              ]
+            },
+            "offset": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 500
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "indicator",
+            "parameters",
+            "output",
+            "timeframe",
+            "offset"
+          ],
+          "properties": {
+            "kind": {
+              "const": "indicator"
+            },
+            "indicator": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]{1,63}$"
+            },
+            "parameters": {
+              "type": "object",
+              "maxProperties": 24,
+              "additionalProperties": {
+                "oneOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "boolean"
+                  },
+                  {
+                    "type": "string",
+                    "maxLength": 120
+                  }
+                ]
+              }
+            },
+            "output": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 64
+            },
+            "timeframe": {
+              "type": "string",
+              "enum": [
+                "1m",
+                "3m",
+                "5m",
+                "10m",
+                "15m",
+                "30m",
+                "1h",
+                "2h",
+                "4h",
+                "6h",
+                "12h",
+                "1d",
+                "1w"
+              ]
+            },
+            "offset": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 500
+            }
+          }
+        }
+      ]
+    },
+    "node": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/group"
+        },
+        {
+          "$ref": "#/$defs/comparison"
+        }
+      ]
+    },
+    "group": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "id",
+        "join",
+        "children"
+      ],
+      "properties": {
+        "type": {
+          "const": "group"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "join": {
+          "enum": [
+            "all",
+            "any"
+          ]
+        },
+        "children": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 64,
+          "items": {
+            "$ref": "#/$defs/node"
+          }
+        }
+      }
+    },
+    "comparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "id",
+        "left",
+        "operator",
+        "right"
+      ],
+      "properties": {
+        "type": {
+          "const": "compare"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80
+        },
+        "left": {
+          "$ref": "#/$defs/operand"
+        },
+        "operator": {
+          "enum": [
+            "gt",
+            "gte",
+            "lt",
+            "lte",
+            "eq",
+            "neq",
+            "crosses_above",
+            "crosses_below"
+          ]
+        },
+        "right": {
+          "$ref": "#/$defs/operand"
+        }
+      }
+    },
+    "protection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "value"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "off",
+            "percent",
+            "price_ticks",
+            "atr_multiple",
+            "signal_candle"
+          ]
+        },
+        "value": {
+          "type": "string",
+          "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+        }
+      }
+    }
+  }
+}

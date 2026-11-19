@@ -47,5 +47,7 @@ jobs:
           node-version: '22'
       - name: Install UI dependencies (M1; lockfile planned for M2)
         run: npm install --no-audit --no-fund
+      - name: Validate strategy JSON Schema and examples
+        run: npm run validate:schema
       - name: Type-check and build
         run: npm run build

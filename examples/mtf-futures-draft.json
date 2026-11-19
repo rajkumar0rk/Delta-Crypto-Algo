@@ -1,0 +1,191 @@
+{
+  "schema_version": "1.0.0",
+  "id": "mtf_trend_01",
+  "revision": 1,
+  "metadata": {
+    "name": "Multi-timeframe trend + pullback",
+    "description": "Illustrative offline draft: 1h trend filter, 15m pullback, 5m protective monitoring. Not backtested or ready for trading.",
+    "tags": [
+      "draft",
+      "multi-timeframe",
+      "futures"
+    ]
+  },
+  "universe": {
+    "selection": "dynamic_filter",
+    "product_types": [
+      "perpetual_future",
+      "dated_future"
+    ],
+    "underlying_symbols": [],
+    "product_ids": [],
+    "max_products": 10
+  },
+  "clock": {
+    "signal_timeframe": "15m",
+    "execution_timeframe": "5m",
+    "confirm_on_close": true,
+    "intrabar_protective_exits": true,
+    "max_price_age_ms": 2000
+  },
+  "session": {
+    "timezone": "Asia/Kolkata",
+    "weekdays": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "windows": [
+      {
+        "start": "00:00",
+        "end": "23:59"
+      }
+    ]
+  },
+  "signals": {
+    "long_entry": {
+      "type": "group",
+      "id": "entry-long",
+      "join": "all",
+      "children": [
+        {
+          "type": "compare",
+          "id": "rule-1",
+          "left": {
+            "kind": "indicator",
+            "indicator": "ema",
+            "parameters": {
+              "period": 50,
+              "source": "close"
+            },
+            "output": "value",
+            "timeframe": "1h",
+            "offset": 0
+          },
+          "operator": "gt",
+          "right": {
+            "kind": "indicator",
+            "indicator": "ema",
+            "parameters": {
+              "period": 200,
+              "source": "close"
+            },
+            "output": "value",
+            "timeframe": "1h",
+            "offset": 0
+          }
+        },
+        {
+          "type": "compare",
+          "id": "rule-2",
+          "left": {
+            "kind": "price",
+            "field": "low",
+            "timeframe": "15m",
+            "offset": 0
+          },
+          "operator": "lte",
+          "right": {
+            "kind": "indicator",
+            "indicator": "ema",
+            "parameters": {
+              "period": 20,
+              "source": "close"
+            },
+            "output": "value",
+            "timeframe": "15m",
+            "offset": 0
+          }
+        }
+      ]
+    },
+    "short_entry": {
+      "type": "group",
+      "id": "entry-short",
+      "join": "all",
+      "children": []
+    },
+    "long_exit": {
+      "type": "group",
+      "id": "exit-long",
+      "join": "any",
+      "children": [
+        {
+          "type": "compare",
+          "id": "rule-3",
+          "left": {
+            "kind": "price",
+            "field": "close",
+            "timeframe": "15m",
+            "offset": 0
+          },
+          "operator": "lt",
+          "right": {
+            "kind": "indicator",
+            "indicator": "ema",
+            "parameters": {
+              "period": 20,
+              "source": "close"
+            },
+            "output": "value",
+            "timeframe": "15m",
+            "offset": 0
+          }
+        }
+      ]
+    },
+    "short_exit": {
+      "type": "group",
+      "id": "exit-short",
+      "join": "any",
+      "children": []
+    },
+    "conflict_policy": "skip_both"
+  },
+  "execution": {
+    "order_type": "limit",
+    "time_in_force": "gtc",
+    "post_only": false,
+    "reduce_only_exits": true,
+    "max_slippage_bps": 20,
+    "sizing": {
+      "mode": "risk_pct_equity",
+      "value": "0.5"
+    },
+    "options": {
+      "expiry_selection": "nearest_eligible",
+      "min_dte_hours": 36,
+      "max_dte_hours": 336,
+      "strike_selection": "atm",
+      "strike_offset": 0,
+      "option_side": "follow_signal"
+    }
+  },
+  "risk": {
+    "max_open_positions": 1,
+    "max_orders_per_minute": 6,
+    "max_daily_loss_pct": 2,
+    "max_drawdown_pct": 10,
+    "max_consecutive_losses": 4,
+    "max_notional_quote": "2000",
+    "min_margin_buffer_pct": 30,
+    "stop_loss": {
+      "mode": "atr_multiple",
+      "value": "2"
+    },
+    "take_profit": {
+      "mode": "off",
+      "value": "0"
+    },
+    "trailing_stop": {
+      "enabled": true,
+      "activation": "3",
+      "distance": "1",
+      "unit": "atr_multiple"
+    },
+    "halt_on_stale_data": true,
+    "halt_on_reconciliation_gap": true
+  }
+}
