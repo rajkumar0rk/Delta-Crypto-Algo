@@ -17,8 +17,8 @@ import (
 
 const (
 	maxPageBytes = 4 << 20
-	maxPages = 100
-	maxProducts = 100000
+	maxPages     = 100
+	maxProducts  = 100000
 )
 
 var ErrCatalogIncomplete = errors.New("delta catalog incomplete")
@@ -27,21 +27,21 @@ var ErrCatalogIncomplete = errors.New("delta catalog incomplete")
 // raw product records: a separate, verified contract mapper must classify and
 // validate venue fields before anything can enter the tradeability catalog.
 type PublicCatalog struct {
-	BaseURL string
-	Client *http.Client
-	MaxPages int
+	BaseURL     string
+	Client      *http.Client
+	MaxPages    int
 	MaxProducts int
 }
 
 type RawSnapshot struct {
-	AsOf time.Time
+	AsOf     time.Time
 	Products []json.RawMessage
-	Pages int
+	Pages    int
 }
 
 type pageResponse struct {
-	Success *bool `json:"success"`
-	Result []json.RawMessage `json:"result"`
+	Success *bool             `json:"success"`
+	Result  []json.RawMessage `json:"result"`
 	Meta struct {
 		After json.RawMessage `json:"after"`
 	} `json:"meta"`
@@ -60,9 +60,13 @@ func (c PublicCatalog) Fetch(ctx context.Context) (RawSnapshot, error) {
 		return empty, fmt.Errorf("%w: HTTP client requires explicit timeout", ErrCatalogIncomplete)
 	}
 	pageLimit := c.MaxPages
-	if pageLimit == 0 { pageLimit = maxPages }
+	if pageLimit == 0 {
+		pageLimit = maxPages
+	}
 	productLimit := c.MaxProducts
-	if productLimit == 0 { productLimit = maxProducts }
+	if productLimit == 0 {
+		productLimit = maxProducts
+	}
 	if pageLimit < 1 || pageLimit > maxPages || productLimit < 1 || productLimit > maxProducts {
 		return empty, fmt.Errorf("%w: invalid bounded limits", ErrCatalogIncomplete)
 	}
@@ -73,13 +77,19 @@ func (c PublicCatalog) Fetch(ctx context.Context) (RawSnapshot, error) {
 		endpoint := *base
 		endpoint.Path = "/v2/products"
 		q := url.Values{}
-		if cursor != "" { q.Set("after", cursor) }
+		if cursor != "" {
+			q.Set("after", cursor)
+		}
 		endpoint.RawQuery = q.Encode()
 		req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint.String(), nil)
-		if err != nil { return empty, fmt.Errorf("%w: request: %v", ErrCatalogIncomplete, err) }
+		if err != nil {
+			return empty, fmt.Errorf("%w: request: %v", ErrCatalogIncomplete, err)
+		}
 		req.Header.Set("Accept", "application/json")
 		resp, err := c.Client.Do(req)
-		if err != nil { return empty, fmt.Errorf("%w: transport: %v", ErrCatalogIncomplete, err) }
+		if err != nil {
+			return empty, fmt.Errorf("%w: transport: %v", ErrCatalogIncomplete, err)
+		}
 		if resp.StatusCode != http.StatusOK {
 			resp.Body.Close()
 			return empty, fmt.Errorf("%w: HTTP %d", ErrCatalogIncomplete, resp.StatusCode)

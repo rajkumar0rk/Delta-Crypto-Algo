@@ -20,10 +20,14 @@ func TestPublicCatalogPagination(t *testing.T) {
 			t.Errorf("unexpected request %s %s", r.Method, r.URL)
 		}
 		if requests == 1 {
-			if r.URL.Query().Has("after") { t.Error("first page has cursor") }
+			if r.URL.Query().Has("after") {
+				t.Error("first page has cursor")
+			}
 			fmt.Fprint(w, `{"success":true,"result":[{"id":1}],"meta":{"after":"next cursor"}}`)
 		} else {
-			if r.URL.Query().Get("after") != "next cursor" { t.Errorf("cursor not encoded: %s", r.URL) }
+			if r.URL.Query().Get("after") != "next cursor" {
+				t.Errorf("cursor not encoded: %s", r.URL)
+			}
 			fmt.Fprint(w, `{"success":true,"result":[{"id":2}],"meta":{"after":null}}`)
 		}
 	}))
@@ -31,7 +35,9 @@ func TestPublicCatalogPagination(t *testing.T) {
 	client := PublicCatalog{BaseURL: server.URL, Client: server.Client()}
 	client.Client.Timeout = time.Second
 	result, err := client.Fetch(context.Background())
-	if err != nil { t.Fatal(err) }
+	if err != nil {
+		t.Fatal(err)
+	}
 	if requests != 2 || result.Pages != 2 || len(result.Products) != 2 || result.AsOf.IsZero() {
 		t.Fatalf("incomplete result: %+v requests=%d", result, requests)
 	}
@@ -42,7 +48,13 @@ func TestPublicCatalogPagination(t *testing.T) {
 }
 
 func TestPublicCatalogFailClosed(t *testing.T) {
-	cases := []struct{name string; response string; status int; maxPages int; maxProducts int}{
+	cases := []struct {
+		name        string
+		response    string
+		status      int
+		maxPages    int
+		maxProducts int
+	}{
 		{"server error", "{}", 500, 0, 0},
 		{"API failed", `{"success":false,"result":[{"id":1}]}`, 200, 0, 0},
 		{"missing success", `{"result":[{"id":1}]}`, 200, 0, 0},
@@ -65,7 +77,7 @@ func TestPublicCatalogFailClosed(t *testing.T) {
 			defer srv.Close()
 			httpClient := srv.Client()
 			httpClient.Timeout = time.Second
-			c := PublicCatalog{BaseURL:srv.URL,Client:httpClient,MaxPages:tc.maxPages,MaxProducts:tc.maxProducts}
+			c := PublicCatalog{BaseURL: srv.URL, Client: httpClient, MaxPages: tc.maxPages, MaxProducts: tc.maxProducts}
 			got, err := c.Fetch(context.Background())
 			if !errors.Is(err, ErrCatalogIncomplete) || len(got.Products) != 0 {
 				t.Fatalf("must discard partial results: %+v, %v", got, err)
@@ -76,15 +88,19 @@ func TestPublicCatalogFailClosed(t *testing.T) {
 
 func TestPublicCatalogRejectsUnsafeConfiguration(t *testing.T) {
 	for _, tc := range []PublicCatalog{
-		{BaseURL:"http://example.com",Client:&http.Client{Timeout:time.Second}},
-		{BaseURL:"https://example.com/v2/products",Client:&http.Client{Timeout:time.Second}},
-		{BaseURL:"https://example.com",Client:&http.Client{}},
-		{BaseURL:"https://user:secret@example.com",Client:&http.Client{Timeout:time.Second}},
-		{BaseURL:"https://example.com",Client:&http.Client{Timeout:time.Second},MaxPages:101},
+		{BaseURL: "http://example.com", Client: &http.Client{Timeout: time.Second}},
+		{BaseURL: "https://example.com/v2/products", Client: &http.Client{Timeout: time.Second}},
+		{BaseURL: "https://example.com", Client: &http.Client{}},
+		{BaseURL: "https://user:secret@example.com", Client: &http.Client{Timeout: time.Second}},
+		{BaseURL: "https://example.com", Client: &http.Client{Timeout: time.Second}, MaxPages: 101},
 	} {
 		_, err := tc.Fetch(context.Background())
-		if !errors.Is(err, ErrCatalogIncomplete) { t.Fatalf("expected invalid config: %+v, %v",tc,err) }
+		if !errors.Is(err, ErrCatalogIncomplete) {
+			t.Fatalf("expected invalid config: %+v, %v", tc, err)
+		}
 	}
 	_, err := (PublicCatalog{}).Fetch(nil)
-	if !errors.Is(err,ErrCatalogIncomplete) { t.Fatal(err) }
+	if !errors.Is(err,ErrCatalogIncomplete) {
+		t.Fatal(err)
+	}
 }
