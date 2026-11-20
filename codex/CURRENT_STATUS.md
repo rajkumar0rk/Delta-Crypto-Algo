@@ -79,3 +79,9 @@
 - Corrective commit `37e56806e3d1618fd07be018be84e0bc68c05f51` normalizes the test's struct field declarations; local `gofmt -d` of the corrected test showed no changes. **GitHub CI for this exact head has not yet been observed**; PR stays draft/unmerged pending full green CI and independent review.
 - `develop` remains `60fb41ed034ad86fe401623472d3d81b67d116bf` at this inspection. M1 still lacks independent reviews, branch protection, deterministic npm installs, browser a11y/visual tests and security acceptance. M2 catalog work must follow M1 exit gates; no M5 expansion.
 - No live credentials, trading, deployments, main changes or changes to other schedules.
+
+## M1 API security policy formatting correction — 2026-11-20
+- PR #40 remains draft and unmerged: https://github.com/rajkumar0rk/Delta-Crypto-Algo/pull/40
+- Previous exact-head CI `44745102756` **failed Go formatting** in `internal/httpapi/server_security_test.go`; UI passed, Go vet/race/build were skipped: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44745102756
+- Replaced the header map alignment with local `gofmt`-verified spacing in commit `17e8028c9cea4d30a1342a20ef863a37c2d26174`. CI for this commit was not yet available at correction time. Do not merge until exact latest-head CI is green and independent review is complete.
+- `develop` remains `60fb41ed034ad86fe401623472d3d81b67d116bf` at the start of this run; M1 incomplete. Prioritize M1 acceptance and PR consolidation before M2, M3 or M5 expansion.
