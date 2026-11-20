@@ -35,10 +35,14 @@ try {
   assert.deepEqual(validateStrategy(draft), [], "Valid fixture should pass semantic checks");
   run(operand => { operand.indicator = "not_a_real_indicator"; }, "/indicator");
   run(operand => { operand.indicator = "constructor"; }, "/indicator");
+  run(operand => { operand.indicator = "__proto__"; }, "/indicator");
+  run(operand => { operand.indicator = "toString"; }, "/indicator");
   run(operand => { operand.output = "not_an_output"; }, "/output");
   run(operand => { operand.parameters.period = 0; }, "/parameters/period");
   run(operand => { operand.parameters.period = 10001; }, "/parameters/period");
-  console.log("Offline semantic validation: 1 valid fixture + 5 rejection cases passed.");
+  run(operand => { operand.parameters.period = 1.5; }, "/parameters/period");
+  run(operand => { operand.parameters.period = -1; }, "/parameters/period");
+  console.log("Offline semantic validation: 1 valid fixture + 9 rejection cases passed.");
 } finally {
   await rm(temporary, { recursive: true, force: true });
 }
