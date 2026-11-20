@@ -62,3 +62,10 @@
 - Public catalog now measures the entire HTTP response body before JSON decoding and rejects bodies exceeding 4 MiB, including valid JSON followed by excess whitespace. Incomplete fetches return no partial products.
 - Added regression fixture for valid JSON plus excessive whitespace. CI must verify Go formatting, tests/race/vet/build and UI/schema before merge; no local test execution claimed.
 - M2 still needs authoritative venue field mapping, margin/fee/capability verification, atomic refresh/freshness and UI integration. No private API, credentials, live orders or deployment.
+
+## M5 preliminary server indicator registry (2026-11-20; CI unverified)
+- Branch `feature/m5-server-indicator-registry` created from `develop` commit `60fb41ed034ad86fe401623472d3d81b67d116bf`.
+- Added Go `internal/domain/strategy.ValidateIndicator`: explicit supported indicator IDs/outputs and bounded period-only parameters; regression tests include unknown/prototype names, wrong outputs, missing/extra parameters and invalid periods.
+- This is a **draft-only primitive**, not a strategy validation endpoint, full JSON Schema validator, typed unit system, indicator implementation, approved runtime or live-trading gate. The current offline UI remains independent. Full shared registry and parameter-specific semantics (e.g. MACD fast/slow/signal, Supertrend multiplier) remain outstanding.
+- GitHub Actions on exact branch head must be verified before merge. Do not claim local Go tests were run: GitHub connector editing does not provide a local checkout.
+- Next: schema-backed authoritative server validation of complete bounded rule trees and operands, reject lookahead and incompatible units, and add cross-language parity fixtures.
