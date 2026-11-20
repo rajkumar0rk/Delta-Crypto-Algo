@@ -62,3 +62,10 @@
 - Public catalog now measures the entire HTTP response body before JSON decoding and rejects bodies exceeding 4 MiB, including valid JSON followed by excess whitespace. Incomplete fetches return no partial products.
 - Added regression fixture for valid JSON plus excessive whitespace. CI must verify Go formatting, tests/race/vet/build and UI/schema before merge; no local test execution claimed.
 - M2 still needs authoritative venue field mapping, margin/fee/capability verification, atomic refresh/freshness and UI integration. No private API, credentials, live orders or deployment.
+
+## M1 request correlation IDs — proposed (2026-11-20, CI/review pending)
+- Current `develop` base at branch creation: `60fb41ed034ad86fe401623472d3d81b67d116bf`. This section describes **unmerged proposed work**, not integrated milestone completion.
+- Feature branch `feature/m1-server-generated-request-ids` generates a new cryptographically random 128-bit hexadecimal `X-Request-ID` for each HTTP response, including 404/405/503. It never echoes an attacker-controlled incoming correlation ID. Random source failure returns 503 rather than issuing a predictable ID.
+- Added tests for 128 distinct IDs, valid hex format, header spoofing rejection and unavailable/denied routes. CI and independent review are **not yet verified** at this snapshot; do not merge without exact-head checks and review.
+- This is a foundational correlation primitive only. Request-scoped structured logs, tracing, authentication, persistent audit, browser E2E/a11y, CI reproducibility and branch protection remain M1/M4/M12 work. Readiness stays 503; no orders or credentials.
+- Priority remains **finish M1 acceptance**, then **finish M2 catalog**; defer new M5 work until dependencies are ready.
