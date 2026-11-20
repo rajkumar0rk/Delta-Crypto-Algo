@@ -73,3 +73,8 @@
 - PR #32 now includes a bundled Node-based behavioral harness for the existing offline `validateStrategy` implementation. Tests cover a valid multi-timeframe fixture, unknown indicator, prototype-inherited indicator ID, unsupported output and invalid period bounds. `npm run validate:semantic` is required by GitHub Actions UI job.
 - Changes are **unmerged** until the newest exact-head workflow succeeds and review gates are met. The check is client-side only: authoritative server-owned DSL semantics, account/product capabilities, unit compatibility, persistent drafts, browser E2E and independent live risk controls remain absent.
 - No changes to `main`, credentials, exchange orders or production deployment.
+
+## M5 semantic harness CI failure repair (2026-11-20)
+- Exact PR #32 head `7e2afdf3b0e2466b3225ce614c2b2bd173d278f3` failed UI `Validate offline strategy semantics` at https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44654153511. Go job passed. Root cause from job log: `node:fs` callback-style `mkdtemp` invoked without callback, producing `ERR_INVALID_ARG_TYPE`; tests never ran.
+- Changed the harness to import `mkdtemp`/`rm` from `node:fs/promises` and await both, preserving guaranteed temporary-file cleanup. Commit `5b4e0773bdfc0609891e77553828bc123025734e` on the existing focused M5 branch; exact-head CI must run and pass before merge. Do not infer semantic tests passed from the previous failed run.
+- Remaining: review bundled harness and fixture coverage, authoritative server-side validation, full registry/unit semantics, M2 capabilities, E2E, persistence and fail-closed live controls. No production activity.
