@@ -54,6 +54,7 @@ function Placeholder({ label, note }: { label: string; note: string }) {
 }
 export default function App() {
   const [page, setPage] = useState<Page>("Overview");
+  const [editorOpen, setEditorOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [marketType, setMarketType] = useState<(typeof marketTypes)[number]>("All instruments");
   const [marketSearch, setMarketSearch] = useState("");
@@ -61,6 +62,8 @@ export default function App() {
     document.title = `${page} · Delta Crypto Algo`;
   }, [page]);
   function navigate(next: Page) {
+    if (next === page) { setMenuOpen(false); return; }
+    if (editorOpen && !window.confirm("Leave Configure Strategy? Your draft is not saved. Export it before navigating away.")) return;
     setPage(next);
     setMenuOpen(false);
     window.scrollTo({ top: 0, behavior: "instant" });
@@ -176,7 +179,7 @@ export default function App() {
               <div className="table-footnote"><Database size={14} /> Search and filters will apply to the complete Delta instrument catalog once connected.</div>
             </section>
           ) : page === "Strategies" ? (
-            <StrategyWorkspace />
+            <StrategyWorkspace onEditorOpenChange={setEditorOpen} />
           ) : (
             <section className="surface route-placeholder">
               <div className="surface-heading"><div><h2>{page} workspace</h2><p>Full implementation scheduled in the project roadmap</p></div></div>
