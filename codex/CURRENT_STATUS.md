@@ -62,3 +62,9 @@
 - Public catalog now measures the entire HTTP response body before JSON decoding and rejects bodies exceeding 4 MiB, including valid JSON followed by excess whitespace. Incomplete fetches return no partial products.
 - Added regression fixture for valid JSON plus excessive whitespace. CI must verify Go formatting, tests/race/vet/build and UI/schema before merge; no local test execution claimed.
 - M2 still needs authoritative venue field mapping, margin/fee/capability verification, atomic refresh/freshness and UI integration. No private API, credentials, live orders or deployment.
+
+## M1 API response isolation hardening (2026-11-20; PR pending)
+- Branch `feature/m1-api-content-security-policy` was created from verified `develop` HEAD `60fb41ed034ad86fe401623472d3d81b67d116bf`.
+- Added API-only Content-Security-Policy (`default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'`) and Cross-Origin-Resource-Policy (`same-origin`) on all foundation API responses, including missing paths and rejected methods. No browser UI is served by this handler.
+- Added table-driven Go regression tests for liveness, fail-closed readiness, missing paths, and disallowed methods. **GitHub CI and independent review remain required before merging; do not mark M1 complete.**
+- Existing M1 PRs #35–#39 and M2 PRs #29/#30 require safe integration/review. M1 still lacks branch protection, npm lockfile/reproducibility, browser a11y and security acceptance. No trading, credentials, VPS or `main` changes.
