@@ -68,3 +68,8 @@
 - The offline draft validator now rejects unknown indicator IDs and unsupported output names using the UI's existing registry; avoids accepting arbitrary syntactically valid indicator references in imported JSON. Prototype-owned registry is **not** authoritative exchange/runtime validation.
 - Negative cases to verify: unknown indicator, valid indicator with invalid output, inherited prototype names, and valid outputs. CI/behavioral tests still required. Do not merge until review and green checks.
 - Remaining M5 blockers: shared versioned registry, parameter types/units, time alignment and UNKNOWN semantics, server-owned validator, persisted drafts, browser E2E and venue capability checks. No live execution.
+
+## M5 offline semantic regression CI (2026-11-20; pending exact-head CI)
+- PR #32 now includes a bundled Node-based behavioral harness for the existing offline `validateStrategy` implementation. Tests cover a valid multi-timeframe fixture, unknown indicator, prototype-inherited indicator ID, unsupported output and invalid period bounds. `npm run validate:semantic` is required by GitHub Actions UI job.
+- Changes are **unmerged** until the newest exact-head workflow succeeds and review gates are met. The check is client-side only: authoritative server-owned DSL semantics, account/product capabilities, unit compatibility, persistent drafts, browser E2E and independent live risk controls remain absent.
+- No changes to `main`, credentials, exchange orders or production deployment.
