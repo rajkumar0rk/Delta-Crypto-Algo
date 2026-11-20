@@ -23,6 +23,9 @@ func NewHandler() http.Handler {
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.Header().Set("X-Frame-Options", "DENY")
 		w.Header().Set("Referrer-Policy", "no-referrer")
+		// API-only handler: disallow active content, embedding and external resource loading.
+		w.Header().Set("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'")
+		w.Header().Set("Cross-Origin-Resource-Policy", "same-origin")
 		mux.ServeHTTP(w, r)
 	})
 }
