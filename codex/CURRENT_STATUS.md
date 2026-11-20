@@ -1,5 +1,15 @@
 # Project status — verified integration
 
+
+## 2026-11-20 — milestone order reset and M1 listener hardening (feature PR, not integrated)
+
+- **User priority: M1 exit criteria first; M2 next; only then M3/M4/M5 and subsequent milestones.** The offline M5 UI was prototyped early, but do not build new M5 slices while M1 and M2 remain open. Existing #32/#33/#34 are not integrated, and #34 currently has a formatting CI failure.
+- Latest independently checked `develop` HEAD before this branch: `60fb41ed034ad86fe401623472d3d81b67d116bf`; integration CI passed: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44577104990. The older HEAD cited in the historical section below is **not current**.
+- M1 focused branch `feature/m1-strict-listen-port-validation`: `FromEnv` now validates that loopback listen addresses use unsigned ASCII decimal TCP ports 1–65535, rejecting service names, zero, plus/minus signs and overflow before startup. Regression tests cover invalid and boundary values; README documents behavior. **Local isolated config package:** `go test -race -count=1 ./...` and `go vet ./...` passed with Go 1.23.2. **Full repository and latest GitHub Actions CI are still to be verified on this PR's final head; do not merge based only on local tests.**
+- **M1 is NOT complete:** GitHub branch/ruleset protection and independent reviews are still absent; reproducible UI dependency lockfile and `npm ci`, browser visual/a11y testing, CI toolchain governance and hardening remain outstanding. Repository owner/admin support may be required for branch protection.
+- **M2 is NOT complete:** #29 atomic cache and #30 strict decimal metadata are green but unmerged, and authoritative venue-specific contract mapping, expiry/fee/margin/capability checks, verified contract fixtures, refresh/cold-start behavior, and UI catalog integration remain outstanding.
+- No private credentials, live connectivity, order routes, risk bypass, production deploy or `main` changes.
+
 **Date:** 2026-11-19 (IST), M2 catalog domain merge. This file is a handoff snapshot; always check GitHub `develop`, new PRs and Actions before acting.
 
 ## Verified repository state
