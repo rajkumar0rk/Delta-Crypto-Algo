@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Activity, ArrowRight, BarChart3, Boxes, ChevronRight, FileJson, GitBranch, LockKeyhole, Plus, Search, ShieldCheck, } from "lucide-react";
 import StrategyBuilder from "./StrategyBuilder";
 import { createDraft, makeComparison } from "./model";
@@ -76,9 +76,22 @@ function preset(id: Preset): StrategyDefinition {
   ];
   return draft;
 }
-export default function StrategyWorkspace() {
+export default function StrategyWorkspace({ onEditorOpenChange }: { onEditorOpenChange: (open: boolean) => void }) {
   const [activeDraft, setActiveDraft] = useState<StrategyDefinition | null>(null);
   const [query, setQuery] = useState("");
+  useEffect(() => {
+    onEditorOpenChange(activeDraft !== null);
+    return () => onEditorOpenChange(false);
+  }, [activeDraft, onEditorOpenChange]);
+  useEffect(() => {
+    if (!activeDraft) return;
+    const warn = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [activeDraft]);
   const filtered = useMemo(() => templates.filter(item =>
     [item.title, item.subtitle, item.symbol, item.category].some(s => s.toLowerCase().includes(query.trim().toLowerCase()))
   ), [query]);
