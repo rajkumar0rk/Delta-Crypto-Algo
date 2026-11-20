@@ -45,7 +45,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Install UI dependencies (M1; lockfile planned for M2)
+      - name: Reject floating UI dependency versions
+        run: node scripts/check-dependency-pins.mjs
+      - name: Install UI dependencies (M1; lockfile still required)
         run: npm install --no-audit --no-fund
       - name: Validate strategy JSON Schema and examples
         run: npm run validate:schema
