@@ -62,3 +62,9 @@
 - Public catalog now measures the entire HTTP response body before JSON decoding and rejects bodies exceeding 4 MiB, including valid JSON followed by excess whitespace. Incomplete fetches return no partial products.
 - Added regression fixture for valid JSON plus excessive whitespace. CI must verify Go formatting, tests/race/vet/build and UI/schema before merge; no local test execution claimed.
 - M2 still needs authoritative venue field mapping, margin/fee/capability verification, atomic refresh/freshness and UI integration. No private API, credentials, live orders or deployment.
+
+## M1 CI checkout credential isolation — 2026-11-20 (PR pending)
+- Branch `feature/m1-disable-ci-git-credential-persistence` started from `develop` `60fb41ed034ad86fe401623472d3d81b67d116bf`. CI checkout now sets `persist-credentials: false` for both Go and UI jobs. This prevents the checkout action from leaving its token in the local Git configuration during subsequent build/test steps.
+- Acceptance: both GitHub Actions jobs must still pass, and the workflow must not require authenticated git fetch/push after checkout. Negative case: code executed in a later step should not receive a persisted checkout token. This is defense in depth, not a complete supply-chain audit; third-party Actions are not yet pinned by SHA.
+- At handoff this is unmerged and CI unverified; independent review remains required. Existing PR #40 latest observed run `44754421682` failed Go vet after formatting passed (UI passed), so do not merge it; review job output before changing code again. M1 still requires npm lockfile, browser a11y/visual QA, branch protection and security review. M2/M5 are not ready to advance.
+- No live orders, credentials, VPS changes, `main` changes or unrelated schedule edits.
