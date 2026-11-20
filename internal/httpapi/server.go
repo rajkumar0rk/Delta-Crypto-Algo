@@ -1,6 +1,8 @@
 package httpapi
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"net/http"
 )
@@ -19,6 +21,13 @@ func NewHandler() http.Handler {
 		writeJSON(w, http.StatusServiceUnavailable, health{State: "foundation_only", TradeEnabled: false})
 	})
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Generate an unguessable correlation ID. Never trust a caller-supplied ID.
+		var requestID [16]byte
+		if _, err := rand.Read(requestID[:]); err != nil {
+			http.Error(w, "request unavailable", http.StatusServiceUnavailable)
+			return
+		}
+		w.Header().Set("X-Request-ID", hex.EncodeToString(requestID[:]))
 		w.Header().Set("Cache-Control", "no-store")
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.Header().Set("X-Frame-Options", "DENY")
