@@ -1,12 +1,13 @@
 import { strict as assert } from "node:assert";
-import { mkdtemp, rm, readFileSync } from "node:fs";
+import { readFileSync } from "node:fs";
+import { mkdtemp, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve, dirname } from "node:path";
 import { pathToFileURL, fileURLToPath } from "node:url";
 import { build } from "esbuild";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
-const temporary = mkdtemp(join(tmpdir(), "delta-semantic-"));
+const temporary = await mkdtemp(join(tmpdir(), "delta-semantic-"));
 try {
   const output = join(temporary, "validation.mjs");
   await build({
@@ -39,5 +40,5 @@ try {
   run(operand => { operand.parameters.period = 10001; }, "/parameters/period");
   console.log("Offline semantic validation: 1 valid fixture + 5 rejection cases passed.");
 } finally {
-  rm(temporary, { recursive: true, force: true });
+  await rm(temporary, { recursive: true, force: true });
 }
