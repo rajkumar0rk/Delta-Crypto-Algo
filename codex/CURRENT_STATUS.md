@@ -62,3 +62,9 @@
 - Public catalog now measures the entire HTTP response body before JSON decoding and rejects bodies exceeding 4 MiB, including valid JSON followed by excess whitespace. Incomplete fetches return no partial products.
 - Added regression fixture for valid JSON plus excessive whitespace. CI must verify Go formatting, tests/race/vet/build and UI/schema before merge; no local test execution claimed.
 - M2 still needs authoritative venue field mapping, margin/fee/capability verification, atomic refresh/freshness and UI integration. No private API, credentials, live orders or deployment.
+
+## M1 fail-closed HTTP regression coverage (2026-11-20, pending CI/review)
+- Feature branch `feature/m1-deny-trading-route-regressions` created from `develop` HEAD `60fb41ed034ad86fe401623472d3d81b67d116bf`.
+- Added `internal/httpapi/security_test.go` to assert seven representative trading/order/activation paths reject GET/POST/PUT/PATCH/DELETE with 404 and retain security headers; liveness/readiness must explicitly return `trade_enabled: false`, with readiness 503.
+- This is regression coverage for existing safety behavior, **not** a trading feature or independent risk/OMS enforcement. No venue integration or credentials.
+- Exact-head GitHub CI and independent review are required before merge. M1 remains open: owner-controlled branch governance, deterministic UI install, browser/a11y testing and security acceptance. M2 remains next after M1 acceptance.
