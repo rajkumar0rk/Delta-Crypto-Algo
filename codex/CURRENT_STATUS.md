@@ -68,3 +68,8 @@
 - Added API-only Content-Security-Policy (`default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'`) and Cross-Origin-Resource-Policy (`same-origin`) on all foundation API responses, including missing paths and rejected methods. No browser UI is served by this handler.
 - Added table-driven Go regression tests for liveness, fail-closed readiness, missing paths, and disallowed methods. **GitHub CI and independent review remain required before merging; do not mark M1 complete.**
 - Existing M1 PRs #35–#39 and M2 PRs #29/#30 require safe integration/review. M1 still lacks branch protection, npm lockfile/reproducibility, browser a11y and security acceptance. No trading, credentials, VPS or `main` changes.
+
+## M1 PR #40 CI formatting follow-up (2026-11-20)
+- Exact PR head `54f95212bd3bf44471461b29dcd64026f9940dad` failed the Go formatting step; Go vet/race/build were not run, while the UI job passed: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44728377585
+- Corrected the table-field alignment in `internal/httpapi/server_security_test.go` with commit `9b0b4190c7b3b6556e73812f7b9d3b9562225372`; this is a formatting-only correction, not a new feature. CI on the corrected head and independent review must pass before merge.
+- M1 remains incomplete. Do not merge this draft PR or treat the CSP as verified until exact-head CI succeeds; prioritize consolidation/review of existing M1 PRs #35–#40 before starting more overlapping changes.
