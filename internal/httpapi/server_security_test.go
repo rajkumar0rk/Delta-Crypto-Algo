@@ -27,12 +27,12 @@ func TestAPIResponseSecurityHeaders(t *testing.T) {
 				t.Fatalf("status=%d want=%d", rec.Code, tc.wantStatus)
 			}
 			for header, want := range map[string]string{
-				"Cache-Control":                "no-store"
-				"X-Content-Type-Options":       "nosniff"
-				"X-Frame-Options":              "DENY"
-				"Referrer-Policy":              "no-referrer"
-				"Content-Security-Policy":      "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'"
-				"Cross-Origin-Resource-Policy": "same-origin"
+				"Cache-Control":                "no-store",
+				"X-Content-Type-Options":       "nosniff",
+				"X-Frame-Options":              "DENY",
+				"Referrer-Policy":              "no-referrer",
+				"Content-Security-Policy":      "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+				"Cross-Origin-Resource-Policy": "same-origin",
 			} {
 				if got := rec.Header().Get(header); got != want {
 					t.Errorf("%s=%q want=%q", header, got, want)
