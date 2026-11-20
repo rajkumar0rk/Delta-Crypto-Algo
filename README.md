@@ -18,6 +18,7 @@ A dynamic exchange product catalog will cover **every instrument Delta Exchange 
 ## Status
 - Foundation Go HTTP API: `GET /health/live` and `GET /health/ready`.
 - Readiness intentionally returns `503` until backend dependencies and safety controls exist.
+- Startup rejects live mode and non-loopback listening. `DELTA_LISTEN_ADDR` accepts only `127.0.0.1`, `::1` (bracketed), or `localhost` with an ASCII decimal TCP port in `1..65535`; service names, signs, zero, and out-of-range ports fail configuration validation before binding.
 - Domain validation for order intents; no exchange execution implemented.
 - Responsive control-panel prototype with clearly labeled unavailable/live-disabled states.
 - Automatic tests + gated milestone process.
