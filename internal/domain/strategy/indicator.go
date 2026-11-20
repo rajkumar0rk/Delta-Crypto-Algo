@@ -11,8 +11,8 @@ var ErrInvalidIndicator = errors.New("unsupported indicator configuration")
 
 // Indicator describes an untrusted strategy operand; it is never executable code.
 type Indicator struct {
-	ID string
-	Output string
+	ID         string
+	Output     string
 	Parameters map[string]int
 }
 
