@@ -62,3 +62,9 @@
 - Public catalog now measures the entire HTTP response body before JSON decoding and rejects bodies exceeding 4 MiB, including valid JSON followed by excess whitespace. Incomplete fetches return no partial products.
 - Added regression fixture for valid JSON plus excessive whitespace. CI must verify Go formatting, tests/race/vet/build and UI/schema before merge; no local test execution claimed.
 - M2 still needs authoritative venue field mapping, margin/fee/capability verification, atomic refresh/freshness and UI integration. No private API, credentials, live orders or deployment.
+
+## M5 offline indicator allowlist hardening (2026-11-20; CI not yet verified)
+- Branch `feature/m5-reject-unknown-indicator-outputs` based on `develop` `60fb41ed034ad86fe401623472d3d81b67d116bf`; initial change `6c97cc3322cefefce46e6f1d006eb769739b4eda`.
+- The offline draft validator now rejects unknown indicator IDs and unsupported output names using the UI's existing registry; avoids accepting arbitrary syntactically valid indicator references in imported JSON. Prototype-owned registry is **not** authoritative exchange/runtime validation.
+- Negative cases to verify: unknown indicator, valid indicator with invalid output, inherited prototype names, and valid outputs. CI/behavioral tests still required. Do not merge until review and green checks.
+- Remaining M5 blockers: shared versioned registry, parameter types/units, time alignment and UNKNOWN semantics, server-owned validator, persisted drafts, browser E2E and venue capability checks. No live execution.
