@@ -10,8 +10,10 @@ import (
 // executable or embeddable content when consumed by an untrusted browser.
 func TestAPIResponseSecurityHeaders(t *testing.T) {
 	for _, tc := range []struct {
-		name, method, path string
-		wantStatus         int
+		name       string
+		method     string
+		path       string
+		wantStatus int
 	}{
 		{"liveness", http.MethodGet, "/health/live", http.StatusOK},
 		{"unready", http.MethodGet, "/health/ready", http.StatusServiceUnavailable},
