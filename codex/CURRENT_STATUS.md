@@ -62,3 +62,8 @@
 - Public catalog now measures the entire HTTP response body before JSON decoding and rejects bodies exceeding 4 MiB, including valid JSON followed by excess whitespace. Incomplete fetches return no partial products.
 - Added regression fixture for valid JSON plus excessive whitespace. CI must verify Go formatting, tests/race/vet/build and UI/schema before merge; no local test execution claimed.
 - M2 still needs authoritative venue field mapping, margin/fee/capability verification, atomic refresh/freshness and UI integration. No private API, credentials, live orders or deployment.
+
+## M1 direct dependency pin guard (2026-11-21; PR CI pending)
+- Feature branch `feature/m1-enforce-exact-ui-dependency-pins` adds `apps/control-ui/scripts/check-dependency-pins.mjs` and runs it before npm installation in GitHub Actions. It rejects non-exact direct UI dependency versions; this does **not** pin transitive dependencies.
+- `apps/control-ui/package-lock.json` remains absent and CI still uses `npm install`; **M1 reproducible npm installation is NOT accepted**. Generate a real lockfile with registry access, commit it, switch CI to `npm ci`, and verify clean install/build on the exact PR head.
+- CI and independent review of this change are pending. Existing M1 PRs #35–#41 remain subject to review/integration; no live authorization.
