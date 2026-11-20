@@ -49,5 +49,7 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Validate strategy JSON Schema and examples
         run: npm run validate:schema
+      - name: Validate offline strategy semantics
+        run: npm run validate:semantic
       - name: Type-check and build
         run: npm run build

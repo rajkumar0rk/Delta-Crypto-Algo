@@ -1,6 +1,7 @@
 import Ajv2020 from "ajv/dist/2020.js";
 import addFormats from "ajv-formats";
 import schema from "../../../../schemas/strategy.v1.schema.json";
+import { INDICATOR_OUTPUTS } from "./model";
 import type { RuleNode, StrategyDefinition } from "./model";
 
 export type ValidationIssue = { path: string; message: string };
@@ -42,6 +43,15 @@ export function validateStrategy(input: unknown): ValidationIssue[] {
       }
       for (const [side, operand] of [["left", node.left], ["right", node.right]] as const) {
         if (operand.kind === "indicator") {
+          // The offline registry is a strict UI allowlist, NOT server authorization.
+          // Never accept a syntactically valid but unknown indicator/output pair.
+          const outputs = Object.prototype.hasOwnProperty.call(INDICATOR_OUTPUTS, operand.indicator)
+            ? INDICATOR_OUTPUTS[operand.indicator] : undefined;
+          if (!outputs) {
+            add(path + "/" + side + "/indicator", "Unknown indicator; select a supported indicator");
+          } else if (!outputs.includes(operand.output)) {
+            add(path + "/" + side + "/output", "Unsupported output for selected indicator");
+          }
           const period = operand.parameters.period;
           if (period !== undefined && (typeof period !== "number" || !Number.isInteger(period) || period < 1 || period > 10000)) {
             add(path + "/" + side + "/parameters/period", "Period must be 1–10,000");
