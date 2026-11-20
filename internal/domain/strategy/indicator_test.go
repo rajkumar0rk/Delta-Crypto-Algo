@@ -7,9 +7,9 @@ import (
 
 func TestValidateIndicator(t *testing.T) {
 	for _, tc := range []struct {
-		name string
+		name      string
 		indicator Indicator
-		valid bool
+		valid     bool
 	}{
 		{"EMA", Indicator{"ema", "value", map[string]int{"period": 20}}, true},
 		{"VWAP", Indicator{"vwap", "value", map[string]int{"period": 0}}, true},
