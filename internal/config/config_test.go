@@ -34,3 +34,45 @@ func TestDemoLoopbackAllowed(t *testing.T) {
 		t.Fatalf("cfg=%+v err=%v", cfg, err)
 	}
 }
+
+func TestRejectMalformedListenerPorts(t *testing.T) {
+	t.Setenv("DELTA_MODE", "paper")
+	for _, addr := range []string{
+		"127.0.0.1:",
+		"127.0.0.1:abc",
+		"127.0.0.1:-1",
+		"127.0.0.1:+80",
+		"127.0.0.1:65536",
+		"127.0.0.1:99999",
+		"127.0.0.1:80x",
+		"127.0.0.1:1.5",
+		"127.0.0.1:00000",
+		"localhost:http",
+		"[::1]:65536",
+	} {
+		t.Run(addr, func(t *testing.T) {
+			t.Setenv("DELTA_LISTEN_ADDR", addr)
+			if cfg, err := FromEnv(); err == nil {
+				t.Fatalf("invalid listener %q accepted: %+v", addr, cfg)
+			}
+		})
+	}
+}
+
+func TestValidLoopbackListenerPortBoundaries(t *testing.T) {
+	t.Setenv("DELTA_MODE", "demo")
+	for _, addr := range []string{
+		"127.0.0.1:1",
+		"127.0.0.1:65535",
+		"localhost:443",
+		"[::1]:8080",
+	} {
+		t.Run(addr, func(t *testing.T) {
+			t.Setenv("DELTA_LISTEN_ADDR", addr)
+			cfg, err := FromEnv()
+			if err != nil || cfg.ListenAddr != addr || cfg.Mode != ModeDemo {
+				t.Fatalf("cfg=%+v err=%v", cfg, err)
+			}
+		})
+	}
+}
