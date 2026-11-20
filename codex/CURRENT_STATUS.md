@@ -62,3 +62,9 @@
 - Public catalog now measures the entire HTTP response body before JSON decoding and rejects bodies exceeding 4 MiB, including valid JSON followed by excess whitespace. Incomplete fetches return no partial products.
 - Added regression fixture for valid JSON plus excessive whitespace. CI must verify Go formatting, tests/race/vet/build and UI/schema before merge; no local test execution claimed.
 - M2 still needs authoritative venue field mapping, margin/fee/capability verification, atomic refresh/freshness and UI integration. No private API, credentials, live orders or deployment.
+
+## M1 Go dependency integrity gate — 2026-11-20 (pending PR CI)
+- Integration baseline inspected: `develop` at `60fb41ed034ad86fe401623472d3d81b67d116bf`; no M1/M2 PRs #25–#38 merged at this check. The top-of-file integration SHA is historical and must not be mistaken for current HEAD.
+- Feature branch `feature/m1-verify-go-module-integrity` adds `go mod verify` and `go mod tidy -diff` to the Go CI job, with `GOTOOLCHAIN=local` for this integrity step. It detects module-cache integrity errors and uncommitted dependency graph changes. It does NOT pin the toolchain, lock npm dependencies, scan vulnerabilities or prove production safety.
+- CI outcome and PR review are NOT yet verified in this branch handoff. Do not merge before exact-head checks and independent review.
+- M1 remains open: PR #35–#38 review/integration, deterministic UI lockfile/install, owner-controlled branch protections, security and real browser/a11y acceptance. M2 remains blocked on authoritative catalog mapping/capability fixtures and review of #29/#30. M5 feature expansion stays paused.
