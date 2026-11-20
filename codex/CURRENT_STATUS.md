@@ -62,3 +62,8 @@
 - Public catalog now measures the entire HTTP response body before JSON decoding and rejects bodies exceeding 4 MiB, including valid JSON followed by excess whitespace. Incomplete fetches return no partial products.
 - Added regression fixture for valid JSON plus excessive whitespace. CI must verify Go formatting, tests/race/vet/build and UI/schema before merge; no local test execution claimed.
 - M2 still needs authoritative venue field mapping, margin/fee/capability verification, atomic refresh/freshness and UI integration. No private API, credentials, live orders or deployment.
+
+## M1 Go CI toolchain alignment (2026-11-20; review pending)
+- Branch `feature/m1-align-go-ci-toolchain` from `develop` HEAD `60fb41ed034ad86fe401623472d3d81b67d116bf` changes GitHub Actions `setup-go` to read the Go version from `go.mod` instead of hardcoding Go 1.27 while the module declares Go 1.23. This prevents drift between the declared minimum module toolchain and CI's selected version; it does **not** pin an exact patch release or replace multi-version compatibility testing.
+- Required acceptance: Go formatting/vet/race/build and UI/schema checks pass on the **exact PR head**, plus review. No claim of CI success until the workflow completes. The existing M1 PRs #35/#36 remain open and independent; no merge to `develop` until gates are met.
+- M1 still lacks deterministic UI lockfile/`npm ci`, branch protection/review rules, browser accessibility/visual tests, security checks and full exit-criteria evidence. M2 product mapping remains pending. No exchange credentials, orders, live enablement, VPS deployment or `main` changes.
