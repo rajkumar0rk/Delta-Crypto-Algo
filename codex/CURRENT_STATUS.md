@@ -62,3 +62,8 @@
 - Public catalog now measures the entire HTTP response body before JSON decoding and rejects bodies exceeding 4 MiB, including valid JSON followed by excess whitespace. Incomplete fetches return no partial products.
 - Added regression fixture for valid JSON plus excessive whitespace. CI must verify Go formatting, tests/race/vet/build and UI/schema before merge; no local test execution claimed.
 - M2 still needs authoritative venue field mapping, margin/fee/capability verification, atomic refresh/freshness and UI integration. No private API, credentials, live orders or deployment.
+
+## M5 editor navigation-loss guard (2026-11-20; PR pending)
+- Feature branch `feature/m5-guard-editor-navigation` from `develop` `60fb41ed034ad86fe401623472d3d81b67d116bf` adds parent-aware sidebar navigation confirmation and a `beforeunload` warning while the offline Configure Strategy editor is open. Same-page navigation is allowed without a warning.
+- This is a conservative warning for any open editor, not a precise dirty-field detector. The user can still choose to discard changes. Draft persistence, crash recovery, router/deep-link guards, automated browser interaction tests and a11y verification are NOT implemented.
+- GitHub CI for the exact PR head must pass before integration; no local test run claimed. No live trading or credentials.
