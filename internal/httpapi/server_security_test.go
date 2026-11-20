@@ -11,7 +11,7 @@ import (
 func TestAPIResponseSecurityHeaders(t *testing.T) {
 	for _, tc := range []struct {
 		name, method, path string
-		wantStatus int
+		wantStatus         int
 	}{
 		{"liveness", http.MethodGet, "/health/live", http.StatusOK},
 		{"unready", http.MethodGet, "/health/ready", http.StatusServiceUnavailable},
