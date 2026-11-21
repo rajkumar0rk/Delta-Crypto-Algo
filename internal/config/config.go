@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -44,8 +45,9 @@ func FromEnv() (Config, error) {
 	if host != "127.0.0.1" && host != "::1" && host != "localhost" {
 		return Config{}, errors.New("foundation API must bind to loopback")
 	}
-	if port == "0" {
-		return Config{}, errors.New("port 0 is disallowed")
+	portNumber, err := strconv.Atoi(port)
+	if err != nil || portNumber < 1 || portNumber > 65535 {
+		return Config{}, errors.New("foundation API port must be an integer between 1 and 65535")
 	}
 	return Config{Mode: mode, ListenAddr: addr}, nil
 }
