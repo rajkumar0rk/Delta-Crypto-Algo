@@ -62,3 +62,10 @@
 - Public catalog now measures the entire HTTP response body before JSON decoding and rejects bodies exceeding 4 MiB, including valid JSON followed by excess whitespace. Incomplete fetches return no partial products.
 - Added regression fixture for valid JSON plus excessive whitespace. CI must verify Go formatting, tests/race/vet/build and UI/schema before merge; no local test execution claimed.
 - M2 still needs authoritative venue field mapping, margin/fee/capability verification, atomic refresh/freshness and UI integration. No private API, credentials, live orders or deployment.
+
+## 2026-11-21 — consolidated M1 acceptance batch (PR #46, not merged)
+- Integration baseline: develop at 60fb41ed034ad86fe401623472d3d81b67d116bf. PR: https://github.com/rajkumar0rk/Delta-Crypto-Algo/pull/46
+- Combined overlapping M1 proposals #35–#42/#45 into one feature branch: strict canonical loopback TCP port parsing, deny-trading-route regression tests, server-generated request IDs, CSP/CORP API headers, Go module integrity/tidy checks, Go toolchain from go.mod, no persisted checkout credentials, pinned UI dependency guard, committed npm lockfile and npm ci.
+- At handoff exact-head CI results were not yet returned by GitHub; local tests could not run in this environment because the GitHub host was not reachable for cloning. Do not merge without Go formatting/vet/race/build and UI schema/build success plus independent review.
+- M1 remains OPEN: independent review and branch governance, actual browser responsive/keyboard/a11y visual acceptance, further security verification and clean CI evidence. Branch protection endpoint returned 403 (integration permission); no rulesets were returned. Owner must configure/enforce governance outside this connector.
+- No real orders, credentials, live enablement, production deploy or main branch change. M2 remains next after M1 acceptance.
