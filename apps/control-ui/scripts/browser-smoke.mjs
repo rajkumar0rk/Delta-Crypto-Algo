@@ -167,6 +167,7 @@ try {
   await cdp("Input.dispatchKeyEvent", {
     type: "keyUp", key: "Enter", code: "Enter", windowsVirtualKeyCode: 13
   });
+  console.log("Keyboard activation state:", await evaluate('JSON.stringify({focused:document.activeElement?.outerHTML?.slice(0,180), expanded:document.querySelector(".hamburger")?.getAttribute("aria-expanded"), display:getComputedStyle(document.querySelector(".hamburger")).display, width:innerWidth})'));
   await until('document.querySelector(".hamburger")?.getAttribute("aria-expanded")', "true", "mobile navigation open");
   await until('document.activeElement?.getAttribute("aria-label")', "Close menu", "menu focus placement");
   await cdp("Input.dispatchKeyEvent", {
