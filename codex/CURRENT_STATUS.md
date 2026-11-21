@@ -1,4 +1,18 @@
-# Project status — verified integration
+# Project status — M1 consolidated, acceptance pending
+
+**2026-11-21 (IST) verified handoff:** `develop` remains `60fb41ed034ad86fe401623472d3d81b67d116bf`; this document on feature branch is not yet integrated. `main` has not been touched.
+
+## M1 integrated work proposed for develop
+- Consolidated foundation PR **#46**: https://github.com/rajkumar0rk/Delta-Crypto-Algo/pull/46 (the **sole** M1 integration candidate; PRs #35–#42 and #45 overlap/superseded).
+- Verified green full CI for code head `39c028d80249c71b52c25a6279ffe029becaca67`: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44904413027 — Go module verify/tidy, formatting, vet, race tests, build; UI exact-version guard, lockfile npm ci, high-severity production dependency audit, JSON schema/TS build, Chrome viewport checks and screenshot artifact.
+- Browser smoke successfully checked 360, 768, 1280, 1920 widths: safety messaging, skip link, visible button labels, no document horizontal overflow; also Strategies navigation and Configure Strategy CTA. The screenshots were downloaded and manually inspected for obvious alignment/clipping. This is **not** full screen-reader, 200% zoom or keyboard-only acceptance.
+- Backend remains loopback-only, paper/demo-only, readiness 503, no trading routes or exchange credentials. API adds strict browser headers and random request IDs; no live trading enablement.
+- M1 acceptance ledger: [docs/M1_ACCEPTANCE.md](../docs/M1_ACCEPTANCE.md).
+- **Not complete:** PR #46 still needs an independent human security/code review and the owner to configure/verify `develop` branch-protection/rulesets with required reviews and checks. Github API read of protection returned HTTP 403; no proof it is configured. Final CI for this documentation-only status update must also pass before merge.
+- M2 next after M1 acceptance: reconcile #29/#30 and verify authoritative Delta India crypto/futures/options/RWA catalog mapping, margin/fees/expiry/capabilities; M5 remains deferred.
+- Do not push/merge main, deploy VPS, add production keys, or send any real orders.
+
+## Historical handoff (2026-11-19)
 
 **Date:** 2026-11-19 (IST), M2 catalog domain merge. This file is a handoff snapshot; always check GitHub `develop`, new PRs and Actions before acting.
 
