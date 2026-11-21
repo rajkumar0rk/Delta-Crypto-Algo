@@ -82,3 +82,10 @@
 - PR #47 previous head 8c898425 passed GitHub Actions run https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44925376511; this new change requires its own final-head CI and independent review before merge.
 
 - 2026-11-22 follow-up: Added regression tests for product order invariance, audit defensive-copy isolation, ID reassignment as a contract change, invalid baseline metadata, and unknown future status. Commit `d2b8df4ec1933f6aa5d96e1df639c02195ff06fd`. Previous exact-head PR #47 CI run 44930900442 passed before this new test commit; latest-head CI remains unverified until GitHub Actions completes. Do not merge ahead of M1 acceptance.
+
+
+## M2 audit comparator consolidation (2026-11-22; verification pending)
+- Existing PR #47 now shares one `sameContractSpec` invariant between Diff and ClassifyChanges, eliminating duplicated lists of exchange contract fields that could drift when metadata evolves.
+- Added table-driven contract-field classification tests for futures (symbol, underlying, kind/expiry, tick, lot, multiplier, quote/settlement currency) and options (strike/expiry), plus a status-only control.
+- Prior PR #47 head `11f4162221342d6fed0f879a93615fce09e64604` passed GitHub Actions run https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44936189043. That success **does not cover** these new commits; exact final-head CI must be verified before any merge.
+- M1 PR #46 still requires independent review, owner branch-protection evidence and manual screen-reader/zoom acceptance. M2 PR #47 remains unmerged until M1 acceptance. No live credentials, order routing, main or deployment changes.
