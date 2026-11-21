@@ -18,11 +18,19 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
-          go-version: '1.27'
+          persist-credentials: false
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version-file: go.mod
           cache: false
+      - name: Verify Go module integrity and tidy state
+        env:
+          GOTOOLCHAIN: local
+        run: |
+          go mod verify
+          go mod tidy -diff
       - name: Formatting
         run: |
           gofmt -l cmd internal | tee /tmp/unformatted-go
@@ -41,13 +49,30 @@ jobs:
       run:
         working-directory: apps/control-ui
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: '22'
-      - name: Install UI dependencies (M1; lockfile planned for M2)
-        run: npm install --no-audit --no-fund
+      - name: Reject floating UI dependency versions
+        run: node scripts/check-dependency-pins.mjs
+      - name: Install UI dependencies from lockfile
+        run: npm ci --no-audit --no-fund
+      - name: Audit runtime UI dependencies for high severity advisories
+        run: npm audit --omit=dev --audit-level=high
       - name: Validate strategy JSON Schema and examples
         run: npm run validate:schema
       - name: Type-check and build
         run: npm run build
+      - name: Browser viewport and keyboard-readiness smoke
+        run: |
+          npm run preview -- --port 4173 --strictPort > /tmp/delta-ui-preview.log 2>&1 &
+          node scripts/browser-smoke.mjs
+      - name: Upload UI viewport screenshots
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: m1-ui-viewport-screenshots
+          path: apps/control-ui/browser-screenshots/*.png
+          if-no-files-found: warn
