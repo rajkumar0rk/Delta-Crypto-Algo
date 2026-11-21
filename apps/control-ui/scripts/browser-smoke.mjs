@@ -111,6 +111,16 @@ try {
   }
 } finally {
   ws?.close();
-  browser.kill("SIGTERM");
-  rmSync(work, { recursive: true, force: true });
+  if (browser.exitCode === null) {
+    const stopped = new Promise((resolve) => browser.once("exit", resolve));
+    browser.kill("SIGTERM");
+    await Promise.race([stopped, sleep(3000)]);
+  }
+  // Chrome may still flush cache after exit. Do not fail valid UI checks for
+  // a temporary-profile cleanup race on an ephemeral CI runner.
+  try {
+    rmSync(work, { recursive: true, force: true, maxRetries: 10, retryDelay: 150 });
+  } catch (error) {
+    console.warn("Temporary browser profile cleanup deferred:", error.message);
+  }
 }
