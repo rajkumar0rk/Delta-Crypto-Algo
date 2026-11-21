@@ -79,9 +79,15 @@ func copyProduct(p Product) *Product {
 // sameProduct compares exchange metadata semantically. time.Time's location
 // and monotonic internals are not contract changes when instants are equal.
 func sameProduct(a, b Product) bool {
-	return a.ID == b.ID && a.Symbol == b.Symbol &&
+	return a.ID == b.ID && sameContractSpec(a, b) && a.Status == b.Status
+}
+
+// sameContractSpec is shared by diffing and classification to prevent drift
+// when venue contract metadata evolves. Status is deliberately excluded.
+func sameContractSpec(a, b Product) bool {
+	return a.Symbol == b.Symbol &&
 		a.Underlying == b.Underlying && a.Kind == b.Kind &&
-		a.Status == b.Status && sameDecimal(a.TickSize, b.TickSize) &&
+		sameDecimal(a.TickSize, b.TickSize) &&
 		sameDecimal(a.LotSize, b.LotSize) && sameDecimal(a.ContractMultiplier, b.ContractMultiplier) &&
 		a.QuoteCurrency == b.QuoteCurrency &&
 		a.SettlementCurrency == b.SettlementCurrency &&
