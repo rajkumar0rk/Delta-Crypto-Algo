@@ -83,7 +83,6 @@ func TestClassifyExactDecimalScaleEquivalenceAndRealChange(t *testing.T) {
 	}
 }
 
-
 // Every field used by the shared contract comparison must cause both a Diff
 // event and a ContractChanged classification. Status-only changes must not.
 func TestContractFieldClassificationParity(t *testing.T) {
@@ -150,6 +149,46 @@ func TestOptionContractFieldClassificationParity(t *testing.T) {
 			changes, err := ClassifyChanges(before, after)
 			if err != nil || len(changes) != 1 || changes[0].Kind != ContractChanged {
 				t.Fatalf("option contract %s: changes=%+v err=%v", tc.name, changes, err)
+			}
+		})
+	}
+}
+
+
+// A metadata-only state transition must remain explicit even when the
+// previous status is already non-active. These cases must never authorize
+// trading; the catalog audit only reports observed state changes.
+func TestClassifyStatusTransitionMatrix(t *testing.T) {
+	tests := []struct {
+		name string
+		before Status
+		after Status
+		want TransitionKind
+	}{
+		{"active to inactive", Active, Inactive, ProductDisabled},
+		{"active to expired", Active, Expired, ProductDisabled},
+		{"active to delisted", Active, Delisted, ProductDisabled},
+		{"active to unknown", Active, Unknown, ProductDisabled},
+		{"inactive to active", Inactive, Active, ProductEnabled},
+		{"expired to active", Expired, Active, ProductEnabled},
+		{"delisted to active", Delisted, Active, ProductEnabled},
+		{"unknown to active", Unknown, Active, ProductEnabled},
+		{"inactive to delisted", Inactive, Delisted, ProductUpdated},
+		{"unknown to expired", Unknown, Expired, ProductUpdated},
+	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			before := fixture()
+			after := fixture()
+			before.Products[0].Status = tc.before
+			after.Products[0].Status = tc.after
+			after.AsOf = before.AsOf.Add(time.Second)
+			changes, err := ClassifyChanges(before, after)
+			if err != nil || len(changes) != 1 {
+				t.Fatalf("expected one transition: changes=%+v err=%v", changes, err)
+			}
+			if changes[0].Kind != tc.want {
+				t.Fatalf("status %s -> %s: got %s want %s", tc.before, tc.after, changes[0].Kind, tc.want)
 			}
 		})
 	}
