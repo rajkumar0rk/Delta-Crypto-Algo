@@ -62,7 +62,8 @@ export default function App() {
   const mobileNavRef = useRef<HTMLElement>(null);
   useEffect(() => {
     if (!menuOpen) return;
-    closeMenuButtonRef.current?.focus();
+    // Let the native Enter key-up complete before moving focus into the drawer.
+    const focusFrame = window.requestAnimationFrame(() => closeMenuButtonRef.current?.focus());
     function handleNavigationKeys(event: KeyboardEvent) {
       if (event.key === "Escape") {
         event.preventDefault();
@@ -83,7 +84,10 @@ export default function App() {
       }
     }
     document.addEventListener("keydown", handleNavigationKeys);
-    return () => document.removeEventListener("keydown", handleNavigationKeys);
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      document.removeEventListener("keydown", handleNavigationKeys);
+    };
   }, [menuOpen]);
   function closeMenu() {
     setMenuOpen(false);
