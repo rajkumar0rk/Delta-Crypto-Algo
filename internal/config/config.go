@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -44,8 +45,12 @@ func FromEnv() (Config, error) {
 	if host != "127.0.0.1" && host != "::1" && host != "localhost" {
 		return Config{}, errors.New("foundation API must bind to loopback")
 	}
-	if port == "0" {
-		return Config{}, errors.New("port 0 is disallowed")
+	// A syntactically valid host:port is not necessarily a usable TCP port.
+	// Reject service names, signed values, leading zeroes and out-of-range ports
+	// before any listener is created.
+	n, parseErr := strconv.Atoi(port)
+	if parseErr != nil || n < 1 || n > 65535 || strconv.Itoa(n) != port {
+		return Config{}, errors.New("foundation API requires a canonical TCP port in 1..65535")
 	}
 	return Config{Mode: mode, ListenAddr: addr}, nil
 }
