@@ -93,3 +93,33 @@ func TestDiffRejectsIncompleteBeforeSnapshot(t *testing.T) {
 		t.Fatalf("incomplete prior snapshot must be rejected: changes=%+v err=%v", changes, err)
 	}
 }
+
+// Formatting differences must not generate spurious exchange contract events.
+func TestDiffExactDecimalScaleEquivalence(t *testing.T) {
+	before := fixture()
+	after := fixture()
+	after.AsOf = after.AsOf.Add(time.Minute)
+	for i := range after.Products {
+		after.Products[i].TickSize += "0"
+		after.Products[i].LotSize += "0"
+		after.Products[i].ContractMultiplier += "0"
+		if after.Products[i].Strike != "" {
+			after.Products[i].Strike += "0"
+		}
+	}
+	changes, err := Diff(before, after)
+	if err != nil || len(changes) != 0 {
+		t.Fatalf("equivalent decimal metadata must not create changes: %+v err=%v", changes, err)
+	}
+}
+
+func TestDiffActualDecimalContractChange(t *testing.T) {
+	before := fixture()
+	after := fixture()
+	after.AsOf = after.AsOf.Add(time.Minute)
+	after.Products[0].LotSize = "999999999999999999999999999999.0000000000001"
+	changes, err := Diff(before, after)
+	if err != nil || len(changes) != 1 || changes[0].ID != before.Products[0].ID {
+		t.Fatalf("exact high-precision change must be detected: %+v err=%v", changes, err)
+	}
+}
