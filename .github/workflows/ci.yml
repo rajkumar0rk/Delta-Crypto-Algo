@@ -19,10 +19,18 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-go@v5
         with:
-          go-version: '1.27'
+          go-version-file: go.mod
           cache: false
+      - name: Verify Go module integrity and tidy state
+        env:
+          GOTOOLCHAIN: local
+        run: |
+          go mod verify
+          go mod tidy -diff
       - name: Formatting
         run: |
           gofmt -l cmd internal | tee /tmp/unformatted-go
@@ -42,11 +50,15 @@ jobs:
         working-directory: apps/control-ui
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Install UI dependencies (M1; lockfile planned for M2)
-        run: npm install --no-audit --no-fund
+      - name: Reject floating UI dependency versions
+        run: node scripts/check-dependency-pins.mjs
+      - name: Install UI dependencies from committed lockfile
+        run: npm ci --no-audit --no-fund
       - name: Validate strategy JSON Schema and examples
         run: npm run validate:schema
       - name: Type-check and build

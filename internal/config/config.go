@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -38,14 +39,19 @@ func FromEnv() (Config, error) {
 		addr = "127.0.0.1:8080"
 	}
 	host, port, err := net.SplitHostPort(addr)
-	if err != nil || port == "" {
+	if err != nil || !validTCPPort(port) {
 		return Config{}, fmt.Errorf("invalid DELTA_LISTEN_ADDR %q (expected host:port)", addr)
 	}
 	if host != "127.0.0.1" && host != "::1" && host != "localhost" {
 		return Config{}, errors.New("foundation API must bind to loopback")
 	}
-	if port == "0" {
-		return Config{}, errors.New("port 0 is disallowed")
-	}
-	return Config{Mode: mode, ListenAddr: addr}, nil
+		return Config{Mode: mode, ListenAddr: addr}, nil
+}
+
+// validTCPPort accepts only canonical ASCII decimal TCP port numbers.
+func validTCPPort(port string) bool {
+	if port == "" { return false }
+	for _, c := range port { if c < '0' || c > '9' { return false } }
+	n, err := strconv.Atoi(port)
+	return err == nil && n >= 1 && n <= 65535 && strconv.Itoa(n) == port
 }
