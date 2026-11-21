@@ -173,6 +173,7 @@ try {
   });
   console.log("Keyboard activation state:", await evaluate('JSON.stringify({focused:document.activeElement?.outerHTML?.slice(0,180), expanded:document.querySelector(".hamburger")?.getAttribute("aria-expanded"), display:getComputedStyle(document.querySelector(".hamburger")).display, width:innerWidth})'));
   await until('document.querySelector(".hamburger")?.getAttribute("aria-expanded")', "true", "mobile navigation open");
+  console.log("Focus placement state:", await evaluate('JSON.stringify({focused: document.activeElement?.outerHTML?.slice(0,180), close: document.querySelector(".close-nav")?.outerHTML?.slice(0,180), navVisible: getComputedStyle(document.querySelector(".sidebar")).visibility})'));
   await until('document.activeElement?.getAttribute("aria-label")', "Close menu", "menu focus placement");
   await cdp("Input.dispatchKeyEvent", {
     type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9, modifiers: 8
