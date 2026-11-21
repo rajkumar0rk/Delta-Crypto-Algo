@@ -83,7 +83,7 @@ func TestClassifyExactDecimalScaleEquivalenceAndRealChange(t *testing.T) {
 	}
 }
 
- 
+
 // Every field used by the shared contract comparison must cause both a Diff
 // event and a ContractChanged classification. Status-only changes must not.
 func TestContractFieldClassificationParity(t *testing.T) {
