@@ -57,9 +57,22 @@ jobs:
           node-version: '22'
       - name: Reject floating UI dependency versions
         run: node scripts/check-dependency-pins.mjs
-      - name: Install UI dependencies from committed lockfile
+      - name: Install UI dependencies from lockfile
         run: npm ci --no-audit --no-fund
+      - name: Audit runtime UI dependencies for high severity advisories
+        run: npm audit --omit=dev --audit-level=high
       - name: Validate strategy JSON Schema and examples
         run: npm run validate:schema
       - name: Type-check and build
         run: npm run build
+      - name: Browser viewport and keyboard-readiness smoke
+        run: |
+          npm run preview -- --port 4173 --strictPort > /tmp/delta-ui-preview.log 2>&1 &
+          node scripts/browser-smoke.mjs
+      - name: Upload UI viewport screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: m1-ui-viewport-screenshots
+          path: apps/control-ui/browser-screenshots/*.png
+          if-no-files-found: warn
