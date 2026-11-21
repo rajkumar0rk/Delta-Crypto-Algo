@@ -1,5 +1,13 @@
 # Project status — M1 consolidated, acceptance pending
 
+## 2026-11-21 — M1 author-side review and expanded accessibility verification
+
+- PR #46 latest audited code SHA `6747cd825a1645f13beaa0ef7d499fa9546df081` passed both CI jobs: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44905852868. Checks: Go format, module integrity, vet, race suite and build; UI pinned dependencies, npm ci, audit, schema, typecheck, browser viewport and keyboard tests.
+- Browser tests now check 320px narrow reflow as a **zoom-equivalent approximation** (not a direct manual 200% browser zoom test), 360/768/1280/1920 widths, reduced-motion preference, accessibility-tree button names, skip-link keyboard focus, mobile drawer Enter open / Shift+Tab containment / Escape close / focus restoration. Six screenshots collected. This **does not constitute manual screen-reader acceptance**.
+- Author-side code review found and fixed a broken literal README newline, hidden mobile navigation remaining focusable, missing mobile drawer keyboard/focus affordances, and absent hardening headers on an unlikely RNG-error response path. This **is not an independent human approval**.
+- Branch governance: repository rulesets GET returned `[]`; classic protection GET returned HTTP 403 to this GitHub integration, so `develop` protection cannot be confirmed or configured in this connection.
+- No independent PR reviewer is assigned or has approved. Therefore M1 **remains open**, PR #46 unmerged, `develop` unchanged; require independent reviewer, repository owner protection setup, and manual screen-reader/zoom acceptance. Do not bypass these gates or touch `main`/live.
+
 **2026-11-21 (IST) verified handoff:** `develop` remains `60fb41ed034ad86fe401623472d3d81b67d116bf`; this document on feature branch is not yet integrated. `main` has not been touched.
 
 ## M1 integrated work proposed for develop
