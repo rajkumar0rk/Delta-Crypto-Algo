@@ -154,7 +154,6 @@ func TestOptionContractFieldClassificationParity(t *testing.T) {
 	}
 }
 
-
 // A metadata-only state transition must remain explicit even when the
 // previous status is already non-active. These cases must never authorize
 // trading; the catalog audit only reports observed state changes.
