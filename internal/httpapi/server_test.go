@@ -1,8 +1,8 @@
 package httpapi
 
 import (
-	"net/http"
 	"encoding/hex"
+	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
