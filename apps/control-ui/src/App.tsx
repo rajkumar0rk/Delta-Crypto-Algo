@@ -62,8 +62,9 @@ export default function App() {
   const mobileNavRef = useRef<HTMLElement>(null);
   useEffect(() => {
     if (!menuOpen) return;
-    // Let the native Enter key-up complete before moving focus into the drawer.
-    const focusFrame = window.requestAnimationFrame(() => closeMenuButtonRef.current?.focus());
+    // Focus after the mobile drawer becomes visible and its slide transition ends.
+    // Moving focus while the element is still translated off-screen is unreliable.
+    const focusHandle = window.setTimeout(() => closeMenuButtonRef.current?.focus(), 220);
     function handleNavigationKeys(event: KeyboardEvent) {
       if (event.key === "Escape") {
         event.preventDefault();
@@ -85,7 +86,7 @@ export default function App() {
     }
     document.addEventListener("keydown", handleNavigationKeys);
     return () => {
-      window.cancelAnimationFrame(focusFrame);
+      window.clearTimeout(focusHandle);
       document.removeEventListener("keydown", handleNavigationKeys);
     };
   }, [menuOpen]);
