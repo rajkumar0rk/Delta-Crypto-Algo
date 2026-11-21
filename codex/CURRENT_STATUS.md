@@ -74,3 +74,9 @@
 - CI run https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44914021531 failed Go formatting (transitions.go); UI job passed. Follow-up commits corrected constant alignment.
 - Snapshot comparison now treats identical expiry instants in different time zones as unchanged, avoiding false-positive contract-change audits caused by Go time.Time internals. Added regression cases for timezone-equivalent expiries and incomplete baseline rejection.
 - **Pending:** verify Go formatting, race/tests/vet/build and UI/schema checks on the latest PR head. No claim of successful final-head CI. M1 PR #46 still awaits independent review, owner branch protection and manual accessibility sign-off; do not merge M2 ahead of M1 acceptance.
+
+
+## M2 exact-decimal transition comparison (2026-11-21, PR #47 — pending CI)
+- Snapshot Diff and ClassifyChanges now compare validated tick size, lot size, multiplier and optional option strike using exact rational numeric equivalence, preventing false contract-change events when the exchange only changes decimal formatting (e.g. 0.10 vs 0.100).
+- Added regression tests for decimal scale equivalence, classification precedence, and high-precision genuine contract changes. No floating point conversion or order authorization.
+- PR #47 previous head 8c898425 passed GitHub Actions run https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44925376511; this new change requires its own final-head CI and independent review before merge.
