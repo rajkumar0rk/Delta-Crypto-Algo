@@ -62,3 +62,23 @@ func TestClassifyChangesListingsRemovalsAndExpiry(t *testing.T) {
 		t.Fatal("non-monotonic snapshots accepted")
 	}
 }
+
+func TestClassifyExactDecimalScaleEquivalenceAndRealChange(t *testing.T) {
+	before := fixture()
+	after := fixture()
+	after.AsOf = after.AsOf.Add(time.Minute)
+	after.Products[0].TickSize += "0"
+	after.Products[0].LotSize += "0"
+	if after.Products[1].Strike != "" {
+		after.Products[1].Strike += "0"
+	}
+	changes, err := ClassifyChanges(before, after)
+	if err != nil || len(changes) != 0 {
+		t.Fatalf("scale-only change should not classify: %+v err=%v", changes, err)
+	}
+	after.Products[0].Status = Delisted
+	changes, err = ClassifyChanges(before, after)
+	if err != nil || len(changes) != 1 || changes[0].Kind != ProductDisabled {
+		t.Fatalf("status change with decimal formatting must classify as disabled: %+v err=%v", changes, err)
+	}
+}
