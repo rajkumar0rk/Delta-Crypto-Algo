@@ -45,11 +45,11 @@ func classify(c Change) TransitionKind {
 	}
 	a, b := c.Before, c.After
 	if a.Symbol != b.Symbol || a.Underlying != b.Underlying ||
-		a.Kind != b.Kind || a.TickSize != b.TickSize ||
-		a.LotSize != b.LotSize || a.ContractMultiplier != b.ContractMultiplier ||
+		a.Kind != b.Kind || !sameDecimal(a.TickSize, b.TickSize) ||
+		!sameDecimal(a.LotSize, b.LotSize) || !sameDecimal(a.ContractMultiplier, b.ContractMultiplier) ||
 		a.QuoteCurrency != b.QuoteCurrency ||
 		a.SettlementCurrency != b.SettlementCurrency ||
-		a.Strike != b.Strike || !sameExpiry(a.Expiry, b.Expiry) {
+		!sameOptionalDecimal(a.Strike, b.Strike) || !sameExpiry(a.Expiry, b.Expiry) {
 		return ContractChanged
 	}
 	if a.Status == Active && b.Status != Active {
