@@ -62,3 +62,10 @@
 - Public catalog now measures the entire HTTP response body before JSON decoding and rejects bodies exceeding 4 MiB, including valid JSON followed by excess whitespace. Incomplete fetches return no partial products.
 - Added regression fixture for valid JSON plus excessive whitespace. CI must verify Go formatting, tests/race/vet/build and UI/schema before merge; no local test execution claimed.
 - M2 still needs authoritative venue field mapping, margin/fee/capability verification, atomic refresh/freshness and UI integration. No private API, credentials, live orders or deployment.
+
+
+## M2 catalog transition audit work (2026-11-21, PR #47 — pending integration)
+- PR #47: https://github.com/rajkumar0rk/Delta-Crypto-Algo/pull/47 extends the validated, complete, strictly time-monotonic snapshot diff with deterministic ID ordering and before/after defensive copies.
+- Follow-up adds explicit metadata-only transition classifications: listing, removal, disablement, enablement and contract-spec changes; structural changes take precedence over status transitions. Regression tests cover stable ordering, failure cases, copy isolation, contract tick/expiry changes and reactivation.
+- **Not accepted/merged:** check final-head Go formatting/race/vet/build and UI/schema CI, obtain required review and preserve M1 dependency gate. M1 PR #46 still requires independent approval, branch-protection verification and manual accessibility acceptance.
+- Delta India authoritative field mapping, account-specific eligibility, margin/fee/expiry capability evidence and read-only ingestion are still outstanding. No production authorization or trading functionality is implied.
