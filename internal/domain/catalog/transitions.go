@@ -44,12 +44,7 @@ func classify(c Change) TransitionKind {
 		return ProductRemoved
 	}
 	a, b := c.Before, c.After
-	if a.Symbol != b.Symbol || a.Underlying != b.Underlying ||
-		a.Kind != b.Kind || !sameDecimal(a.TickSize, b.TickSize) ||
-		!sameDecimal(a.LotSize, b.LotSize) || !sameDecimal(a.ContractMultiplier, b.ContractMultiplier) ||
-		a.QuoteCurrency != b.QuoteCurrency ||
-		a.SettlementCurrency != b.SettlementCurrency ||
-		!sameOptionalDecimal(a.Strike, b.Strike) || !sameExpiry(a.Expiry, b.Expiry) {
+	if !sameContractSpec(*a, *b) {
 		return ContractChanged
 	}
 	if a.Status == Active && b.Status != Active {
