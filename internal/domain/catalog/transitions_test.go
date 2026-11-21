@@ -159,10 +159,10 @@ func TestOptionContractFieldClassificationParity(t *testing.T) {
 // trading; the catalog audit only reports observed state changes.
 func TestClassifyStatusTransitionMatrix(t *testing.T) {
 	tests := []struct {
-		name string
+		name   string
 		before Status
-		after Status
-		want TransitionKind
+		after  Status
+		want   TransitionKind
 	}{
 		{"active to inactive", Active, Inactive, ProductDisabled},
 		{"active to expired", Active, Expired, ProductDisabled},
