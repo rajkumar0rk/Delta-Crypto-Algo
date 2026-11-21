@@ -1,5 +1,12 @@
 # Project status — verified integration
 
+## M1 startup listener validation — PR #43 (2026-11-21)
+- Branch `feature/m1-validate-listener-port-range` from `develop` HEAD `60fb41ed034ad86fe401623472d3d81b67d116bf`; draft PR: https://github.com/rajkumar0rk/Delta-Crypto-Algo/pull/43
+- Fix: fail configuration validation for nonnumeric, zero, negative, overflowing and >65535 listener ports instead of allowing startup to fail later at bind; tests cover boundaries and reject cases.
+- **CI pending on latest head**; do not claim M1 acceptance or merge without exact-head CI and independent review. No production, live, credentials or `main` changes.
+- Other M1 blockers remain: registry-resolved UI lockfile + `npm ci`, branch protection, independent reviews, browser accessibility/responsive testing and security acceptance.
+
+
 **Date:** 2026-11-19 (IST), M2 catalog domain merge. This file is a handoff snapshot; always check GitHub `develop`, new PRs and Actions before acting.
 
 ## Verified repository state
