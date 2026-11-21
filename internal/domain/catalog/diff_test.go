@@ -2,6 +2,7 @@ package catalog
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 )
@@ -100,11 +101,11 @@ func TestDiffExactDecimalScaleEquivalence(t *testing.T) {
 	after := fixture()
 	after.AsOf = after.AsOf.Add(time.Minute)
 	for i := range after.Products {
-		after.Products[i].TickSize += "0"
-		after.Products[i].LotSize += "0"
-		after.Products[i].ContractMultiplier += "0"
+		after.Products[i].TickSize = decimalWithExtraScale(after.Products[i].TickSize)
+		after.Products[i].LotSize = decimalWithExtraScale(after.Products[i].LotSize)
+		after.Products[i].ContractMultiplier = decimalWithExtraScale(after.Products[i].ContractMultiplier)
 		if after.Products[i].Strike != "" {
-			after.Products[i].Strike += "0"
+			after.Products[i].Strike = decimalWithExtraScale(after.Products[i].Strike)
 		}
 	}
 	changes, err := Diff(before, after)
@@ -122,4 +123,11 @@ func TestDiffActualDecimalContractChange(t *testing.T) {
 	if err != nil || len(changes) != 1 || changes[0].ID != before.Products[0].ID {
 		t.Fatalf("exact high-precision change must be detected: %+v err=%v", changes, err)
 	}
+}
+
+func decimalWithExtraScale(v string) string {
+	if !strings.Contains(v, ".") {
+		return v + ".0"
+	}
+	return v + "0"
 }
