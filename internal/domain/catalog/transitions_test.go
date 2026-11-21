@@ -67,10 +67,10 @@ func TestClassifyExactDecimalScaleEquivalenceAndRealChange(t *testing.T) {
 	before := fixture()
 	after := fixture()
 	after.AsOf = after.AsOf.Add(time.Minute)
-	after.Products[0].TickSize += "0"
-	after.Products[0].LotSize += "0"
+	after.Products[0].TickSize = decimalWithExtraScale(after.Products[0].TickSize)
+	after.Products[0].LotSize = decimalWithExtraScale(after.Products[0].LotSize)
 	if after.Products[1].Strike != "" {
-		after.Products[1].Strike += "0"
+		after.Products[1].Strike = decimalWithExtraScale(after.Products[1].Strike)
 	}
 	changes, err := ClassifyChanges(before, after)
 	if err != nil || len(changes) != 0 {
