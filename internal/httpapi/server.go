@@ -24,15 +24,15 @@ func NewHandler() http.Handler {
 		w.Header().Set("Cache-Control", "no-store")
 		w.Header().Set("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'")
 		w.Header().Set("Cross-Origin-Resource-Policy", "same-origin")
+		w.Header().Set("X-Content-Type-Options", "nosniff")
+		w.Header().Set("X-Frame-Options", "DENY")
+		w.Header().Set("Referrer-Policy", "no-referrer")
 		var requestID [16]byte
 		if _, err := rand.Read(requestID[:]); err != nil {
 			http.Error(w, "request unavailable", http.StatusServiceUnavailable)
 			return
 		}
 		w.Header().Set("X-Request-ID", hex.EncodeToString(requestID[:]))
-		w.Header().Set("X-Content-Type-Options", "nosniff")
-		w.Header().Set("X-Frame-Options", "DENY")
-		w.Header().Set("Referrer-Policy", "no-referrer")
 		mux.ServeHTTP(w, r)
 	})
 }
