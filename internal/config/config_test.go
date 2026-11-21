@@ -40,13 +40,17 @@ func TestCanonicalPortBounds(t *testing.T) {
 	for _, port := range []string{"", "0", "00", "080", "00080", "-1", "+80", "65536", "99999", "http", "1.5"} {
 		t.Run("reject_"+port, func(t *testing.T) {
 			t.Setenv("DELTA_LISTEN_ADDR", "127.0.0.1:"+port)
-			if _, err := FromEnv(); err == nil { t.Fatalf("invalid port %q accepted", port) }
+			if _, err := FromEnv(); err == nil {
+				t.Fatalf("invalid port %q accepted", port)
+			}
 		})
 	}
 	for _, port := range []string{"1", "80", "65535"} {
 		t.Run("accept_"+port, func(t *testing.T) {
 			t.Setenv("DELTA_LISTEN_ADDR", "127.0.0.1:"+port)
-			if _, err := FromEnv(); err != nil { t.Fatalf("valid port %q rejected: %v", port, err) }
+			if _, err := FromEnv(); err != nil {
+				t.Fatalf("valid port %q rejected: %v", port, err)
+			}
 		})
 	}
 }
