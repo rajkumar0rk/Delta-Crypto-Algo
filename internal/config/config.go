@@ -45,7 +45,7 @@ func FromEnv() (Config, error) {
 	if host != "127.0.0.1" && host != "::1" && host != "localhost" {
 		return Config{}, errors.New("foundation API must bind to loopback")
 	}
-		return Config{Mode: mode, ListenAddr: addr}, nil
+	return Config{Mode: mode, ListenAddr: addr}, nil
 }
 
 // validTCPPort accepts only canonical ASCII decimal TCP port numbers.
