@@ -19,7 +19,7 @@ M1 is an inert control-plane foundation, not an order engine, catalog, persisted
 
 ## Security and scope
 
-Live trading, public bind, real orders and credentials remain disallowed. CI uses read-only permissions and nonpersistent checkout credentials. GitHub Actions references are tag-pinned, not immutable SHA pinned: this remains supply-chain review work. A Chrome screenshot smoke test is not equivalent to independent visual inspection, screen-reader evaluation or complete keyboard testing.
+Live trading, public bind, real orders and credentials remain disallowed. CI uses read-only permissions and nonpersistent checkout credentials. GitHub Actions references are pinned to immutable commits verified against upstream v4/v5 GitHub tag refs on 2026-11-21. Review updates to these immutable pins as dependencies change. A Chrome screenshot smoke test is not equivalent to independent visual inspection, screen-reader evaluation or complete keyboard testing.
 
 ## Repository owner action
 
