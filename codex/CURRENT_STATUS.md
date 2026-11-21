@@ -1,5 +1,12 @@
 # Project status — verified integration
 
+## 2026-11-21 — M1 deterministic npm installation (PR #42; unmerged)
+- Verified `develop` HEAD `60fb41ed034ad86fe401623472d3d81b67d116bf`; no new code integrated. Existing M1 PRs remain open and review-gated.
+- Generated a genuine registry-resolved npm v3 lockfile using the existing GitHub Actions Node 22 runner, extracted and validated 127 package records and their public npm registry resolution, and committed `apps/control-ui/package-lock.json` in PR #42.
+- Replaced CI `npm install` with `npm ci --no-audit --no-fund`; removed temporary lockfile output from workflow. **Exact-head CI verification pending; not integrated.**
+- M1 still requires independent review, branch governance, integrated tests, browser accessibility/responsive checks and security acceptance. #43 was closed as duplicate of stronger #35; no live actions authorized.
+
+
 **Date:** 2026-11-19 (IST), M2 catalog domain merge. This file is a handoff snapshot; always check GitHub `develop`, new PRs and Actions before acting.
 
 ## Verified repository state
