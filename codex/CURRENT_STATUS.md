@@ -89,3 +89,8 @@
 - Added table-driven contract-field classification tests for futures (symbol, underlying, kind/expiry, tick, lot, multiplier, quote/settlement currency) and options (strike/expiry), plus a status-only control.
 - Prior PR #47 head `11f4162221342d6fed0f879a93615fce09e64604` passed GitHub Actions run https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44936189043. That success **does not cover** these new commits; exact final-head CI must be verified before any merge.
 - M1 PR #46 still requires independent review, owner branch-protection evidence and manual screen-reader/zoom acceptance. M2 PR #47 remains unmerged until M1 acceptance. No live credentials, order routing, main or deployment changes.
+
+## M2 catalog audit status-transition regression (2026-11-22)
+- PR #47: https://github.com/rajkumar0rk/Delta-Crypto-Algo/pull/47. Previous head `da9bd652` failed Go formatting in https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44941145868 (UI passed). The new change normalizes a test-file blank line and adds table-driven coverage for ten status transitions (including unknown, expired and delisted). Commit `ff3f804476c17b6c92140d264ee0639f20286c98`; final-head CI is **pending verification**, not claimed green.
+- `develop` remains unchanged. PR #46 independent approval, branch governance and manual accessibility acceptance remain prerequisites for M1 acceptance; do not merge M2 before M1. Existing M2 PR #29 atomic store and #30 strict decimals are unmerged and must be reconciled without duplicating work.
+- No live credentials, orders, deployment or `main` changes.
