@@ -118,6 +118,74 @@ try {
       console.log("PASS strategy workspace navigation");
     }
   }
+
+  // A 320 CSS-pixel viewport approximates 200% zoom in a 640px-wide
+  // physical viewport. This is a reflow check, not a screen-reader audit.
+  await cdp("Emulation.setDeviceMetricsOverride", {
+    width: 320, height: 900, deviceScaleFactor: 1, mobile: true
+  });
+  await cdp("Emulation.setEmulatedMedia", {
+    features: [{ name: "prefers-reduced-motion", value: "reduce" }]
+  });
+  await cdp("Page.navigate", { url: site });
+  await until('document.querySelector("main h1")?.textContent', "Trading overview", "narrow reflow");
+  assert.equal(
+    await evaluate('document.documentElement.scrollWidth > document.documentElement.clientWidth + 2'),
+    false, "Horizontal overflow in 320 CSS-pixel narrow-reflow mode"
+  );
+  assert.equal(await evaluate('matchMedia("(prefers-reduced-motion: reduce)").matches'), true);
+  const narrowShot = await cdp("Page.captureScreenshot", { format: "png" });
+  writeFileSync(join(screenshots, "overview-320-reflow.png"), Buffer.from(narrowShot.data, "base64"));
+  console.log("PASS 320px narrow-reflow and reduced-motion preferences");
+
+  // Validate the actual accessibility tree names, not merely visible text.
+  await cdp("Accessibility.enable");
+  const ax = await cdp("Accessibility.getFullAXTree");
+  const unnamed = ax.nodes.filter(node =>
+    node.role?.value === "button" && !node.ignored && !node.name?.value?.trim()
+  );
+  assert.equal(unnamed.length, 0, "Unnamed accessible buttons: " + unnamed.map(n => n.nodeId).join(", "));
+  console.log("PASS accessible button names");
+
+  // Exercise native keyboard events at a mobile viewport.
+  await cdp("Emulation.setDeviceMetricsOverride", {
+    width: 360, height: 900, deviceScaleFactor: 1, mobile: true
+  });
+  await cdp("Page.navigate", { url: site });
+  await until('document.querySelector("main h1")?.textContent', "Trading overview", "mobile keyboard");
+  await cdp("Input.dispatchKeyEvent", {
+    type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9
+  });
+  await cdp("Input.dispatchKeyEvent", {
+    type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9
+  });
+  await until('document.activeElement?.classList.contains("skip-link")', true, "keyboard skip link");
+  await evaluate('document.querySelector(".hamburger")?.focus()');
+  await cdp("Input.dispatchKeyEvent", {
+    type: "keyDown", key: "Enter", code: "Enter", windowsVirtualKeyCode: 13
+  });
+  await cdp("Input.dispatchKeyEvent", {
+    type: "keyUp", key: "Enter", code: "Enter", windowsVirtualKeyCode: 13
+  });
+  await until('document.querySelector(".hamburger")?.getAttribute("aria-expanded")', "true", "mobile navigation open");
+  await until('document.activeElement?.getAttribute("aria-label")', "Close menu", "menu focus placement");
+  await cdp("Input.dispatchKeyEvent", {
+    type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9, modifiers: 8
+  });
+  await cdp("Input.dispatchKeyEvent", {
+    type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9, modifiers: 8
+  });
+  await until('document.activeElement?.textContent.trim()', "Settings", "menu keyboard focus containment");
+  await cdp("Input.dispatchKeyEvent", {
+    type: "keyDown", key: "Escape", code: "Escape", windowsVirtualKeyCode: 27
+  });
+  await cdp("Input.dispatchKeyEvent", {
+    type: "keyUp", key: "Escape", code: "Escape", windowsVirtualKeyCode: 27
+  });
+  await until('document.querySelector(".hamburger")?.getAttribute("aria-expanded")', "false", "Escape closes navigation");
+  await until('document.activeElement?.getAttribute("aria-label")', "Open navigation", "Escape focus restoration");
+  console.log("PASS keyboard skip link, mobile menu Enter/Shift+Tab/Escape and focus restoration");
+
 } finally {
   ws?.close();
   if (browser.exitCode === null) {
