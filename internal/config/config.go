@@ -50,8 +50,14 @@ func FromEnv() (Config, error) {
 
 // validTCPPort accepts only canonical ASCII decimal TCP port numbers.
 func validTCPPort(port string) bool {
-	if port == "" { return false }
-	for _, c := range port { if c < '0' || c > '9' { return false } }
+	if port == "" {
+		return false
+	}
+	for _, c := range port {
+		if c < '0' || c > '9' {
+			return false
+		}
+	}
 	n, err := strconv.Atoi(port)
 	return err == nil && n >= 1 && n <= 65535 && strconv.Itoa(n) == port
 }
