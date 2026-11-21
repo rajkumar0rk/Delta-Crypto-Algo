@@ -3,6 +3,7 @@ package catalog
 import (
 	"errors"
 	"fmt"
+	"math/big"
 	"sort"
 )
 
@@ -80,9 +81,30 @@ func copyProduct(p Product) *Product {
 func sameProduct(a, b Product) bool {
 	return a.ID == b.ID && a.Symbol == b.Symbol &&
 		a.Underlying == b.Underlying && a.Kind == b.Kind &&
-		a.Status == b.Status && a.TickSize == b.TickSize &&
-		a.LotSize == b.LotSize && a.ContractMultiplier == b.ContractMultiplier &&
+		a.Status == b.Status && sameDecimal(a.TickSize, b.TickSize) &&
+		sameDecimal(a.LotSize, b.LotSize) && sameDecimal(a.ContractMultiplier, b.ContractMultiplier) &&
 		a.QuoteCurrency == b.QuoteCurrency &&
 		a.SettlementCurrency == b.SettlementCurrency &&
-		a.Strike == b.Strike && sameExpiry(a.Expiry, b.Expiry)
+		sameOptionalDecimal(a.Strike, b.Strike) && sameExpiry(a.Expiry, b.Expiry)
+}
+
+// sameDecimal compares validated exact decimal strings by numerical value,
+// not display scale (e.g. 0.10 and 0.100 are the same contract tick).
+func sameDecimal(a, b string) bool {
+	if a == b {
+		return true
+	}
+	x, ok := new(big.Rat).SetString(a)
+	if !ok {
+		return false
+	}
+	y, ok := new(big.Rat).SetString(b)
+	return ok && x.Cmp(y) == 0
+}
+
+func sameOptionalDecimal(a, b string) bool {
+	if a == "" || b == "" {
+		return a == b
+	}
+	return sameDecimal(a, b)
 }
