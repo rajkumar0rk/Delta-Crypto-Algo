@@ -69,3 +69,27 @@ func TestDiffRejectsInvalidOrNonMonotonicSnapshots(t *testing.T) {
 		t.Fatalf("unchanged products: %+v, %v", changes, err)
 	}
 }
+
+func TestDiffIgnoresEquivalentExpiryInstantAcrossTimezones(t *testing.T) {
+	before := fixture()
+	after := fixture()
+	after.AsOf = after.AsOf.Add(time.Minute)
+	original := before.Products[1].Expiry
+	otherZone := original.In(time.FixedZone("IST", 5*60*60+30*60))
+	after.Products[1].Expiry = &otherZone
+	changes, err := Diff(before, after)
+	if err != nil || len(changes) != 0 {
+		t.Fatalf("same expiry instant must not produce contract transition: changes=%+v err=%v", changes, err)
+	}
+}
+
+func TestDiffRejectsIncompleteBeforeSnapshot(t *testing.T) {
+	before := fixture()
+	before.Complete = false
+	after := fixture()
+	after.AsOf = after.AsOf.Add(time.Minute)
+	changes, err := Diff(before, after)
+	if err == nil || changes != nil {
+		t.Fatalf("incomplete prior snapshot must be rejected: changes=%+v err=%v", changes, err)
+	}
+}
