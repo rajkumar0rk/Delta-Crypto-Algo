@@ -3,7 +3,7 @@
 ## 2026-11-21 — M1 deterministic npm installation (PR #42; unmerged)
 - Verified `develop` HEAD `60fb41ed034ad86fe401623472d3d81b67d116bf`; no new code integrated. Existing M1 PRs remain open and review-gated.
 - Generated a genuine registry-resolved npm v3 lockfile using the existing GitHub Actions Node 22 runner, extracted and validated 127 package records and their public npm registry resolution, and committed `apps/control-ui/package-lock.json` in PR #42.
-- Replaced CI `npm install` with `npm ci --no-audit --no-fund`; removed temporary lockfile output from workflow. **Exact-head CI verification pending; not integrated.**
+- Replaced CI `npm install` with `npm ci --no-audit --no-fund`; removed temporary lockfile output from workflow. On PR #42 commit `93eef0393f0a61d2651ec71e4522877564edbda6`, GitHub Actions run https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44870213827 **PASSED** (Go format/vet/race/build; UI direct-pin check, clean `npm ci`, schema validation, typecheck/build). This documentation update requires new exact-head CI verification; **PR is not integrated**.
 - M1 still requires independent review, branch governance, integrated tests, browser accessibility/responsive checks and security acceptance. #43 was closed as duplicate of stronger #35; no live actions authorized.
 
 
