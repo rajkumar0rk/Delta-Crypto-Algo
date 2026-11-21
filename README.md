@@ -27,7 +27,7 @@ A dynamic exchange product catalog will cover **every instrument Delta Exchange 
 go test -race ./...
 go vet ./...
 go run ./cmd/control-api
-# ./apps/control-ui: npm install && npm run build && npm run dev
+# ./apps/control-ui: npm ci && npm run build && npm run dev
 ```
 
 Read [architecture](docs/ARCHITECTURE.md), [milestones](docs/MILESTONES.md), [security](docs/SECURITY.md), [UX standards](docs/UI_UX.md), [performance](docs/PERFORMANCE.md), and [Delta contracts](docs/DELTA_API.md).
