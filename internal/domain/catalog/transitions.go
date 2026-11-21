@@ -7,12 +7,12 @@ import "time"
 type TransitionKind string
 
 const (
-	ProductListed	TransitionKind = "listed"
-	ProductRemoved	TransitionKind = "removed"
-	ProductDisabled	TransitionKind = "disabled"
-	ProductEnabled	TransitionKind = "enabled"
-	ContractChanged	TransitionKind = "contract_changed"
-	ProductUpdated	TransitionKind = "updated"
+	ProductListed   TransitionKind = "listed"
+	ProductRemoved  TransitionKind = "removed"
+	ProductDisabled TransitionKind = "disabled"
+	ProductEnabled  TransitionKind = "enabled"
+	ContractChanged TransitionKind = "contract_changed"
+	ProductUpdated  TransitionKind = "updated"
 )
 
 // ClassifiedChange keeps the complete before/after evidence, not just a label.
