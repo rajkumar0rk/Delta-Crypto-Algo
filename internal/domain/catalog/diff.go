@@ -3,7 +3,6 @@ package catalog
 import (
 	"errors"
 	"fmt"
-	"reflect"
 	"sort"
 )
 
@@ -53,7 +52,7 @@ func Diff(before, after Snapshot) ([]Change, error) {
 	for _, id := range ids {
 		prev, had := old[id]
 		next, has := current[id]
-		if had && has && reflect.DeepEqual(prev, next) {
+		if had && has && sameProduct(prev, next) {
 			continue
 		}
 		change := Change{ID: id}
@@ -74,4 +73,16 @@ func copyProduct(p Product) *Product {
 		p.Expiry = &expiry
 	}
 	return &p
+}
+
+// sameProduct compares exchange metadata semantically. time.Time's location
+// and monotonic internals are not contract changes when instants are equal.
+func sameProduct(a, b Product) bool {
+	return a.ID == b.ID && a.Symbol == b.Symbol &&
+		a.Underlying == b.Underlying && a.Kind == b.Kind &&
+		a.Status == b.Status && a.TickSize == b.TickSize &&
+		a.LotSize == b.LotSize && a.ContractMultiplier == b.ContractMultiplier &&
+		a.QuoteCurrency == b.QuoteCurrency &&
+		a.SettlementCurrency == b.SettlementCurrency &&
+		a.Strike == b.Strike && sameExpiry(a.Expiry, b.Expiry)
 }
