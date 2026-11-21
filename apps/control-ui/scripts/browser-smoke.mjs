@@ -162,10 +162,14 @@ try {
   await until('document.activeElement?.classList.contains("skip-link")', true, "keyboard skip link");
   await evaluate('document.querySelector(".hamburger")?.focus()');
   await cdp("Input.dispatchKeyEvent", {
-    type: "keyDown", key: "Enter", code: "Enter", windowsVirtualKeyCode: 13
+    type: "rawKeyDown", key: "Enter", code: "Enter", windowsVirtualKeyCode: 13, nativeVirtualKeyCode: 13
   });
   await cdp("Input.dispatchKeyEvent", {
-    type: "keyUp", key: "Enter", code: "Enter", windowsVirtualKeyCode: 13
+    type: "char", key: "Enter", code: "Enter", text: "\r", unmodifiedText: "\r",
+    windowsVirtualKeyCode: 13, nativeVirtualKeyCode: 13
+  });
+  await cdp("Input.dispatchKeyEvent", {
+    type: "keyUp", key: "Enter", code: "Enter", windowsVirtualKeyCode: 13, nativeVirtualKeyCode: 13
   });
   console.log("Keyboard activation state:", await evaluate('JSON.stringify({focused:document.activeElement?.outerHTML?.slice(0,180), expanded:document.querySelector(".hamburger")?.getAttribute("aria-expanded"), display:getComputedStyle(document.querySelector(".hamburger")).display, width:innerWidth})'));
   await until('document.querySelector(".hamburger")?.getAttribute("aria-expanded")', "true", "mobile navigation open");
