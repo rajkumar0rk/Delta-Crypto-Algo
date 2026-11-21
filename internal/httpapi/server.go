@@ -1,9 +1,9 @@
 package httpapi
 
 import (
-	"encoding/json"
 	"crypto/rand"
 	"encoding/hex"
+	"encoding/json"
 	"net/http"
 )
 
