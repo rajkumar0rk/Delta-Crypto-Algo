@@ -2,7 +2,7 @@
 // Intended for CI on Node 22 with preinstalled Google Chrome/Chromium.
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -14,24 +14,33 @@ mkdirSync(screenshots, { recursive: true });
 const browser = spawn(chrome, [
   "--headless=new", "--no-sandbox", "--disable-dev-shm-usage",
   "--disable-gpu", "--no-first-run", "--remote-allow-origins=*",
-  "--remote-debugging-port=9223", "--user-data-dir=" + work, "about:blank"
-], { stdio: "ignore" });
+  "--remote-debugging-port=0", "--user-data-dir=" + work, "about:blank"
+], { stdio: ["ignore", "ignore", "pipe"] });
+let chromeDiagnostics = "";
+browser.stderr?.on("data", (data) => {
+  chromeDiagnostics = (chromeDiagnostics + data.toString()).slice(-4000);
+});
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 let ws;
 try {
   let target;
-  for (let i = 0; i < 60; i++) {
-    if (browser.exitCode !== null) throw new Error("Chrome exited during startup");
+  for (let i = 0; i < 120; i++) {
+    if (browser.exitCode !== null) throw new Error("Chrome exited during startup: " + chromeDiagnostics);
     try {
-      const response = await fetch("http://127.0.0.1:9223/json");
+      const portText = readFileSync(join(work, "DevToolsActivePort"), "utf8").split("\n")[0];
+      const port = Number(portText);
+      if (!Number.isInteger(port) || port < 1) throw new Error("No debugger port yet");
+      const response = await fetch("http://127.0.0.1:" + port + "/json", {
+        signal: AbortSignal.timeout(1500)
+      });
       const pages = await response.json();
       target = pages.find((page) => page.type === "page");
       if (target?.webSocketDebuggerUrl) break;
     } catch { /* Chrome is still starting */ }
     await sleep(200);
   }
-  assert.ok(target?.webSocketDebuggerUrl, "Chrome debugging target unavailable");
+  assert.ok(target?.webSocketDebuggerUrl, "Chrome debugging target unavailable: " + chromeDiagnostics);
   ws = new WebSocket(target.webSocketDebuggerUrl);
   await new Promise((resolve, reject) => {
     ws.addEventListener("open", resolve, { once: true });
