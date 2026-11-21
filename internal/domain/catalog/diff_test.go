@@ -131,3 +131,54 @@ func decimalWithExtraScale(v string) string {
 	}
 	return v + "0"
 }
+
+func TestDiffOrderIndependentAndNoAliasing(t *testing.T) {
+	before := fixture()
+	after := fixture()
+	after.AsOf = after.AsOf.Add(time.Second)
+	after.Products[0], after.Products[1] = after.Products[1], after.Products[0]
+	changes, err := Diff(before, after)
+	if err != nil || len(changes) != 0 {
+		t.Fatalf("reordered catalog must be equivalent: changes=%+v err=%v", changes, err)
+	}
+	after.Products[0].Status = Inactive
+	changes, err = Diff(before, after)
+	if err != nil || len(changes) != 1 {
+		t.Fatalf("expected one status change: changes=%+v err=%v", changes, err)
+	}
+	changes[0].Before.Status = Unknown
+	changes[0].After.Status = Unknown
+	if before.Products[1].Status != Active || after.Products[0].Status != Inactive {
+		t.Fatal("audit changes mutated source snapshots")
+	}
+}
+
+func TestDiffDetectsProductIDReassignment(t *testing.T) {
+	before := fixture()
+	after := fixture()
+	after.AsOf = after.AsOf.Add(time.Second)
+	after.Products[0].Symbol = "REASSIGNED-PERP"
+	after.Products[0].Underlying = "REASSIGNED"
+	changes, err := ClassifyChanges(before, after)
+	if err != nil || len(changes) != 1 || changes[0].Kind != ContractChanged {
+		t.Fatalf("product ID reuse must be reported as contract change: changes=%+v err=%v", changes, err)
+	}
+	if changes[0].Before.Symbol == changes[0].After.Symbol {
+		t.Fatal("lost old contract identity")
+	}
+}
+
+func TestDiffRejectsInvalidBaselineAndFutureSnapshot(t *testing.T) {
+	before := fixture()
+	after := fixture()
+	after.AsOf = after.AsOf.Add(time.Second)
+	before.Products[0].TickSize = "invalid"
+	if changes, err := Diff(before, after); err == nil || changes != nil {
+		t.Fatalf("invalid baseline accepted: changes=%+v err=%v", changes, err)
+	}
+	before = fixture()
+	after.Products[0].Status = Status("unexpected")
+	if changes, err := Diff(before, after); err == nil || changes != nil {
+		t.Fatalf("unknown future status accepted: changes=%+v err=%v", changes, err)
+	}
+}
