@@ -6,13 +6,13 @@ M1 is an inert control-plane foundation, not an order engine, catalog, persisted
 
 | Gate | Required evidence | Current state |
 |---|---|---|
-| Startup | Reject live mode, non-loopback binding and noncanonical/out-of-range TCP ports | Proposed branch; test in combined CI |
-| HTTP boundary | Liveness 200, readiness 503, trade_enabled explicitly false, representative trading routes return 404 | Proposed branch; test in combined CI |
-| API isolation | Browser security policy, no open CORS, server-generated unpredictable request IDs | Proposed branch; test in combined CI |
-| Go quality | Module verify/tidy, format, vet, race suite, build | Pending combined CI |
-| UI reproducibility | Exact direct dependencies, lockfile, npm ci, type-check, schema examples | Pending combined CI |
-| Runtime dependency audit | npm audit high severity for production dependencies | Pending combined CI |
-| Browser | Chrome screenshots at 360,768,1280,1920; horizontal overflow, labels, skip link, disabled live banner, navigation smoke | Pending combined CI and visual review |
+| Startup | Reject live mode, non-loopback binding and noncanonical/out-of-range TCP ports | Passed combined CI run 44904889053 |
+| HTTP boundary | Liveness 200, readiness 503, trade_enabled explicitly false, representative trading routes return 404 | Passed combined CI run 44904889053 |
+| API isolation | Browser security policy, no open CORS, server-generated unpredictable request IDs | Passed combined CI run 44904889053 |
+| Go quality | Module verify/tidy, format, vet, race suite, build | Passed combined CI run 44904889053 |
+| UI reproducibility | Exact direct dependencies, lockfile, npm ci, type-check, schema examples | Passed combined CI run 44904889053 |
+| Runtime dependency audit | npm audit high severity for production dependencies | Passed combined CI run 44904889053 |
+| Browser | Chrome screenshots at 360,768,1280,1920; horizontal overflow, labels, skip link, disabled live banner, navigation smoke | Browser CI passed 44904889053; screenshots visually inspected; full accessibility review pending |
 | Independent review | Approved by a person other than the author; no high/critical concerns | Not verified |
 | Branch governance | Protect develop; required checks, independent review, no force push/delete or bypass | Owner-only setting, not verified (GitHub 403) |
 | M1 handoff | Final SHA, CI run, review, acceptance evidence, merge SHA in CURRENT_STATUS | Pending |
@@ -25,4 +25,4 @@ Live trading, public bind, real orders and credentials remain disallowed. CI use
 
 In Settings > Rules > Rulesets or Branch protection, target develop and require one independent approving review plus the Go/UI checks; reject forced pushes/deletions and unauthorized bypass. Confirm those settings using owner access; the agent connection returns HTTP 403 for branch protection reads.
 
-Do not call M1 complete or move the dependency gate to M2 until combined CI, independent review and governance are verified.
+Combined code/CI checks passed; do not call M1 complete or move the dependency gate to M2 until independent review and develop governance are verified.
