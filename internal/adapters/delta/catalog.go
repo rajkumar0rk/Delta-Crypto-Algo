@@ -109,6 +109,10 @@ func (c PublicCatalog) Fetch(ctx context.Context) (RawSnapshot, error) {
 		if readErr != nil || closeErr != nil || len(body) > maxPageBytes {
 			return empty, fmt.Errorf("%w: oversized or unreadable page: %v %v", ErrCatalogIncomplete, readErr, closeErr)
 		}
+		// Reject ambiguous nested product and pagination fields before mapping.
+		if err := rejectAmbiguousJSON(body); err != nil {
+			return empty, fmt.Errorf("%w: ambiguous JSON: %v", ErrCatalogIncomplete, err)
+		}
 		var data pageResponse
 		decoder := json.NewDecoder(bytes.NewReader(body))
 		err = decoder.Decode(&data)
