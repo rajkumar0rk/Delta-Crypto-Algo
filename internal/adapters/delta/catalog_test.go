@@ -217,3 +217,30 @@ func TestPublicCatalogRejectsAmbiguousRepresentationHeaders(t *testing.T) {
 		})
 	}
 }
+
+func TestPublicCatalogRejectsSecondPageRepresentationWithoutPartialPublication(t *testing.T) {
+	requests := 0
+	srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requests++
+		if requests == 1 {
+			w.Header().Set("Content-Type", "application/json")
+			fmt.Fprint(w, `{"success":true,"result":[{"id":1}],"meta":{"after":"next"}}`)
+			return
+		}
+		if r.URL.Query().Get("after") != "next" {
+			t.Errorf("unexpected second-page cursor: %s", r.URL)
+		}
+		w.Header().Set("Content-Type", "text/html")
+		fmt.Fprint(w, `{"success":true,"result":[{"id":2}],"meta":{"after":null}}`)
+	}))
+	defer srv.Close()
+	client := srv.Client()
+	client.Timeout = time.Second
+	got, err := (PublicCatalog{BaseURL: srv.URL, Client: client}).Fetch(context.Background())
+	if !errors.Is(err, ErrCatalogIncomplete) || len(got.Products) != 0 || got.Pages != 0 || !got.AsOf.IsZero() {
+		t.Fatalf("second-page representation must discard complete snapshot: %+v, %v", got, err)
+	}
+	if requests != 2 {
+		t.Fatalf("expected two pages, got %d", requests)
+	}
+}
