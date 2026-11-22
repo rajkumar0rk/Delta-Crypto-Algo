@@ -17,10 +17,10 @@ func TestPublicCatalogRejectsUnsafeCursorsBeforeNextRequest(t *testing.T) {
 	cases := []struct {
 		name, cursor string
 	}{
-		{"newline", `"next\\npage"`},
-		{"carriage return", `"next\\rpage"`},
-		{"tab", `"next\\tpage"`},
-		{"nul", `"next\\u0000page"`},
+		{"newline", `"next\npage"`},
+		{"carriage return", `"next\rpage"`},
+		{"tab", `"next\tpage"`},
+		{"nul", `"next\u0000page"`},
 		{"whitespace only", `"   "`},
 		{"oversized", `"` + strings.Repeat("a", 257) + `"`},
 	}
