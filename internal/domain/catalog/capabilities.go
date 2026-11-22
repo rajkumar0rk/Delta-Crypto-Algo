@@ -13,24 +13,24 @@ var ErrCapabilityUnverified = errors.New("venue product capability unverified")
 // Absence is deliberately different from a zero fee or zero margin requirement.
 // No account permission, risk approval, or trading authorization is implied.
 type Capability struct {
-	ProductID int64
-	VerifiedAt time.Time
-	Source string
-	AllowMarket bool
-	AllowLimit bool
-	AllowPostOnly bool
-	AllowReduceOnly bool
-	MakerFeeRate string
-	TakerFeeRate string
-	InitialMarginRate string
+	ProductID             int64
+	VerifiedAt            time.Time
+	Source                string
+	AllowMarket           bool
+	AllowLimit            bool
+	AllowPostOnly         bool
+	AllowReduceOnly       bool
+	MakerFeeRate          string
+	TakerFeeRate          string
+	InitialMarginRate     string
 	MaintenanceMarginRate string
 }
 
 // CapabilitySet is intentionally keyed by numeric venue product ID rather than
 // underlying symbol. Different expiries and option strikes have distinct rules.
 type CapabilitySet struct {
-	AsOf time.Time
-	Source string
+	AsOf     time.Time
+	Source   string
 	Products map[int64]Capability
 }
 
@@ -56,7 +56,7 @@ func (s CapabilitySet) VerifiedFor(p Product, now time.Time, maxAge time.Duratio
 	}
 	// These are ratios, not prices or percentages. They must be explicit exact
 	// decimals; no defaults are inferred from product kind or underlying.
-	for _, f := range []struct{name, value string}{
+	for _, f := range []struct{ name, value string }{
 		{"maker fee", c.MakerFeeRate},
 		{"taker fee", c.TakerFeeRate},
 		{"initial margin", c.InitialMarginRate},
@@ -105,14 +105,18 @@ func nonnegativeRatio(v string) bool {
 
 func allZeros(v string) bool {
 	for i := range v {
-		if v[i] != '0' { return false }
+		if v[i] != '0' {
+			return false
+		}
 	}
 	return true
 }
 
 func allDecimalDigits(v string) bool {
 	for i := range v {
-		if v[i] < '0' || v[i] > '9' { return false }
+		if v[i] < '0' || v[i] > '9' {
+			return false
+		}
 	}
 	return true
 }
