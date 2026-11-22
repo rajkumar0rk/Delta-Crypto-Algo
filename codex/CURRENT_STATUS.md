@@ -74,3 +74,8 @@
 - PR #51 first exact-head run https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45027754004 failed Go formatting; UI passed, Go vet/race/build were skipped.
 - Commit `55fd5a5d7100e1f7a7a6f2872f51f38545b82a45` aligns the new HTTP representation test table with gofmt. Recheck CI on the latest documentation commit; do not claim success or merge until exact-head checks pass.
 - M1 PR #46 remains open without independent approval; branch governance and manual accessibility acceptance remain unverified. M2 is preparation only, not accepted or live-enabled.
+
+## M2 HTTP representation PR #51 CI regression (2026-11-22)
+- Exact head `a8010d716aef70aa18084bd99f772de060b36533` failed Go race tests because the existing successful `TestPublicCatalogPagination` TLS fixture omitted `Content-Type`, now required by the new fail-closed HTTP representation validation. Go formatting/vet and UI passed; compilation skipped: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45032828992
+- Follow-up commit `8ee8b53d9ad2f3b66e3d7e716539b305898a8239` sets `Content-Type: application/json` on that successful fixture. CI on the new exact head is not yet verified. This changes test setup, not production response acceptance.
+- M1 #46 independent review, governance and manual accessibility acceptance remain blockers; M2 cannot integrate ahead of M1. No credentials, orders, deployment or main changes.
