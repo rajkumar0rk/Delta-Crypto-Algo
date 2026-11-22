@@ -18,6 +18,11 @@ func TestRejectAmbiguousJSON(t *testing.T) {
 		bad  bool
 	}{
 		{"valid nested", `{"success":true,"result":[{"id":1,"meta":{"strike":"0.01"}}],"meta":{"after":null}}`, false},
+		{"case-ambiguous success", `{"Success":false,"success":true,"result":[{"id":1}],"meta":{"after":null}}`, true},
+		{"escaped-equivalent key", `{"id":1,"\u0069d":2}`, true},
+		{"case-ambiguous nested", `{"meta":{"After":1,"after":2}}`, true},
+		{"invalid UTF-8", string([]byte{'{','"',0xff,'"',':','1','}'}), true},
+		{"object key limit", `{"x":1,` + func() string { var keys []string; for i := 0; i < 256; i++ { keys = append(keys, fmt.Sprintf("%q:1", fmt.Sprintf("k%d", i))) }; return strings.Join(keys, ",") }() + `}`, true},
 		{"duplicate success", `{"success":false,"success":true,"result":[{"id":1}],"meta":{"after":null}}`, true},
 		{"duplicate cursor", `{"success":true,"result":[{"id":1}],"meta":{"after":"next","after":null}}`, true},
 		{"duplicate product ID", `{"success":true,"result":[{"id":1,"id":2}],"meta":{"after":null}}`, true},
