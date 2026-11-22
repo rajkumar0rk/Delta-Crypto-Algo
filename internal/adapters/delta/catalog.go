@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"mime"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -107,16 +108,9 @@ func (c PublicCatalog) Fetch(ctx context.Context) (RawSnapshot, error) {
 		// compressed or non-JSON body that could be interpreted inconsistently.
 		// Missing Content-Type is tolerated for legacy venue responses, but a
 		// declared type must be JSON. The byte cap still applies in every case.
-		if encoding := strings.TrimSpace(resp.Header.Get("Content-Encoding")); encoding != "" && !strings.EqualFold(encoding, "identity") {
+		if err := validateCatalogRepresentation(resp.Header); err != nil {
 			resp.Body.Close()
-			return empty, fmt.Errorf("%w: unsupported content encoding", ErrCatalogIncomplete)
-		}
-		if declared := resp.Header.Get("Content-Type"); declared != "" {
-			mediaType := strings.ToLower(strings.TrimSpace(strings.SplitN(declared, ";", 2)[0]))
-			if mediaType != "application/json" {
-				resp.Body.Close()
-				return empty, fmt.Errorf("%w: unexpected content type", ErrCatalogIncomplete)
-			}
+			return empty, fmt.Errorf("%w: %v", ErrCatalogIncomplete, err)
 		}
 		// Enforce the byte limit independently of JSON parsing. A valid JSON
 		// document followed by excess whitespace must not bypass the cap.
@@ -176,4 +170,36 @@ func (c PublicCatalog) Fetch(ctx context.Context) (RawSnapshot, error) {
 		cursor = next
 	}
 	return empty, fmt.Errorf("%w: pagination page limit reached", ErrCatalogIncomplete)
+}
+
+
+// validateCatalogRepresentation rejects ambiguous or incompatible response headers.
+// Missing Content-Type is tolerated until authoritative venue fixtures are verified.
+func validateCatalogRepresentation(headers http.Header) error {
+	if values := headers.Values("Content-Encoding"); len(values) > 1 {
+		return errors.New("ambiguous content encoding")
+	} else if len(values) == 1 {
+		encoding := strings.TrimSpace(values[0])
+		if encoding != "" && !strings.EqualFold(encoding, "identity") {
+			return errors.New("unsupported content encoding")
+		}
+	}
+	if values := headers.Values("Content-Type"); len(values) > 1 {
+		return errors.New("ambiguous content type")
+	} else if len(values) == 1 {
+		declared := strings.TrimSpace(values[0])
+		if declared == "" {
+			return errors.New("empty declared content type")
+		}
+		mediaType, params, err := mime.ParseMediaType(declared)
+		if err != nil || !strings.EqualFold(mediaType, "application/json") {
+			return errors.New("unexpected content type")
+		}
+		for key, value := range params {
+			if key != "charset" || !strings.EqualFold(value, "utf-8") {
+				return errors.New("unsupported JSON media parameter")
+			}
+		}
+	}
+	return nil
 }
