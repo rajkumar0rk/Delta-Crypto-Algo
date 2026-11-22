@@ -16,6 +16,7 @@ func TestPublicCatalogPagination(t *testing.T) {
 	requests := 0
 	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		requests++
+		w.Header().Set("Content-Type", "application/json")
 		if r.Method != http.MethodGet || r.URL.Path != "/v2/products" || r.Header.Get("Accept") != "application/json" {
 			t.Errorf("unexpected request %s %s", r.Method, r.URL)
 		}
