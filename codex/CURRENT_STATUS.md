@@ -62,3 +62,14 @@
 - Public catalog now measures the entire HTTP response body before JSON decoding and rejects bodies exceeding 4 MiB, including valid JSON followed by excess whitespace. Incomplete fetches return no partial products.
 - Added regression fixture for valid JSON plus excessive whitespace. CI must verify Go formatting, tests/race/vet/build and UI/schema before merge; no local test execution claimed.
 - M2 still needs authoritative venue field mapping, margin/fee/capability verification, atomic refresh/freshness and UI integration. No private API, credentials, live orders or deployment.
+
+## 2026-11-22 M2 capability evidence preparation (unmerged)
+- Branch `feature/m2-verified-product-capabilities` from develop `60fb41ed034ad86fe401623472d3d81b67d116bf` adds product-ID keyed, time/provenance-bound capability evidence validation, exact decimal fee/margin ratios, fail-closed order-type preconditions, negative-case tests, and `docs/M2_CAPABILITY_CONTRACT.md`.
+- These are development-only primitives, NOT authoritative Delta India capability mapping, verified fee/margin schedules, account eligibility, risk approval, or live execution. The tests and exact-head CI must be checked before merge.
+- M1 #46 remains open pending independent review, governance and manual accessibility acceptance; do not integrate M2 ahead of M1 gates. M2 PRs #29/#30/#47/#48 remain independent and require reconciliation.
+
+## 2026-11-22 M2 capability PR #49 CI correction
+- Original exact-head run on `80a4e774` failed Go formatting; UI passed: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44998560356
+- Formatted `internal/domain/catalog/capabilities.go` and `capabilities_test.go` on the existing feature branch (commits `f66219a` and `14406e1`), preserving fail-closed behavior and deterministic fixtures.
+- New exact-head run for `14406e1`: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45003489799 — queued at observation, NOT a passing claim. Do not merge until green, independent review, and M1 acceptance gates.
+- `develop` remains `60fb41ed`; M1 #46 remains unreviewed and branch protection is not enabled. Verified Delta India fixtures, account-specific fees/margin, refresh and UI integration remain M2 blockers.
