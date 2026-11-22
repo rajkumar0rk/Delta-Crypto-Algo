@@ -68,3 +68,9 @@
 - Read-only public product fetch now requests identity encoding and rejects declared non-JSON media types or non-identity content encodings. Added TLS-backed negative/positive representation tests. A missing Content-Type remains tolerated for compatibility, and this is **not** authoritative Delta India fixture validation.
 - Independent review and exact-head CI are required; M1 PR #46 governance, review, manual accessibility and acceptance gates remain unresolved. No merge until M1 acceptance.
 - M2 PRs #29/#30/#47/#48/#49/#50 need reconciliation. Product mapping, fee/margin capability evidence, atomic refresh and UI integration remain incomplete. No live credentials, orders, production deployment or `main` changes.
+
+
+## M2 HTTP representation CI correction (2026-11-22)
+- PR #51 first exact-head run https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45027754004 failed Go formatting; UI passed, Go vet/race/build were skipped.
+- Commit `55fd5a5d7100e1f7a7a6f2872f51f38545b82a45` aligns the new HTTP representation test table with gofmt. Recheck CI on the latest documentation commit; do not claim success or merge until exact-head checks pass.
+- M1 PR #46 remains open without independent approval; branch governance and manual accessibility acceptance remain unverified. M2 is preparation only, not accepted or live-enabled.
