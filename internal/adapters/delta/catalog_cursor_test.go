@@ -87,3 +87,28 @@ func TestPublicCatalogCanceledContextNeverPublishes(t *testing.T) {
 		t.Fatalf("canceled context must not fetch or publish: %+v, err=%v, requests=%d", got, err, requests)
 	}
 }
+
+
+func TestPublicCatalogMissingCursorFailsClosed(t *testing.T) {
+	cases := []struct {
+		name, response string
+	}{
+		{"missing meta", `{"success":true,"result":[{"id":1}]}`},
+		{"missing after", `{"success":true,"result":[{"id":1}],"meta":{}}`},
+		{"null meta", `{"success":true,"result":[{"id":1}],"meta":null}`},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				fmt.Fprint(w, tc.response)
+			}))
+			defer srv.Close()
+			client := srv.Client()
+			client.Timeout = time.Second
+			got, err := (PublicCatalog{BaseURL: srv.URL, Client: client}).Fetch(context.Background())
+			if !errors.Is(err, ErrCatalogIncomplete) || got.Pages != 0 || len(got.Products) != 0 {
+				t.Fatalf("missing completion marker must fail closed: %+v, %v", got, err)
+			}
+		})
+	}
+}
