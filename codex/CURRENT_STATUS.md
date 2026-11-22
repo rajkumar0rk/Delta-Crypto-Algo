@@ -84,3 +84,8 @@
 - Added strict declared media-type parsing, UTF-8 charset-only policy, duplicate Content-Type/Content-Encoding rejection, and TLS-backed failure fixtures for conflicting/malformed headers. Latest code head before this status commit: `eefc7f10fcb2ad6b773375107d4739b10a3d8f24`.
 - Previous exact-head PR #51 CI at `2ffebb83dc5a13083b77b87737b98ff7a429e934` passed: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45039143937. This is **not** evidence for the new changes. New exact-head CI remains to be verified; no local Go test execution claimed.
 - M1 #46 independent approval, branch governance and manual screen-reader acceptance remain outstanding. M2 changes must not merge before those gates and their own review/CI. No live trading, credentials, deployment or `main` modifications.
+
+## M2 PR #51 exact-head regression follow-up (2026-11-22)
+- CI run https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45044382029 failed Go formatting at prior head `e99eb365006ee01c8ef4a9e23504418eba5d89f4`; UI passed, Go vet/race/build skipped.
+- Normalized extra blank lines in `catalog.go` and `catalog_test.go` and added TLS-backed second-page invalid-representation regression: an otherwise valid first page must be discarded atomically, including pages/timestamp, if terminal page headers are invalid. Latest implementation commit `94cf669ae9481a68811b772bb25d04bc4c55f73d`.
+- Exact-head CI for this batch is **not yet verified**. No local Go tests claimed. M1 #46 independent review, branch protection/governance and manual accessibility acceptance remain blockers; no M2 merge, real credentials, orders, VPS deployment or `main` changes.
