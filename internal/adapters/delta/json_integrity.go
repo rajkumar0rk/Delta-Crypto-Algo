@@ -45,6 +45,9 @@ func inspectJSONValue(dec *json.Decoder, depth int) error {
 		seen := make(map[string]struct{})
 		seenFolded := make([]string, 0)
 		for dec.More() {
+			if len(seen) >= 256 {
+				return errors.New("JSON object exceeds key limit")
+			}
 			keyToken, err := dec.Token()
 			if err != nil {
 				return err
