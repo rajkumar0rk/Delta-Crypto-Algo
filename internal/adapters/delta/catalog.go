@@ -141,7 +141,8 @@ func (c PublicCatalog) Fetch(ctx context.Context) (RawSnapshot, error) {
 		// snapshot is complete. A null cursor is the terminal marker.
 		if len(data.Meta.After) == 0 {
 			return empty, fmt.Errorf("%w: missing pagination cursor", ErrCatalogIncomplete)
-		}\n		raw := strings.TrimSpace(string(data.Meta.After))
+		}
+		raw := strings.TrimSpace(string(data.Meta.After))
 		if raw == "" || raw == "null" {
 			return out, nil
 		}
