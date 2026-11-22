@@ -172,7 +172,6 @@ func (c PublicCatalog) Fetch(ctx context.Context) (RawSnapshot, error) {
 	return empty, fmt.Errorf("%w: pagination page limit reached", ErrCatalogIncomplete)
 }
 
-
 // validateCatalogRepresentation rejects ambiguous or incompatible response headers.
 // Missing Content-Type is tolerated until authoritative venue fixtures are verified.
 func validateCatalogRepresentation(headers http.Header) error {
