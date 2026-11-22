@@ -181,3 +181,40 @@ func TestPublicCatalogAcceptsDeclaredJSONMediaType(t *testing.T) {
 		t.Fatalf("valid JSON response rejected: %+v, %v", got, err)
 	}
 }
+
+
+func TestPublicCatalogRejectsAmbiguousRepresentationHeaders(t *testing.T) {
+	cases := []struct {
+		name string
+		contentTypes []string
+		encodings []string
+	}{
+		{name: "duplicate content type", contentTypes: []string{"application/json", "text/html"}},
+		{name: "duplicate content encoding", contentTypes: []string{"application/json"}, encodings: []string{"identity", "gzip"}},
+		{name: "comma joined content type", contentTypes: []string{"application/json, text/html"}},
+		{name: "non utf8 charset", contentTypes: []string{"application/json; charset=iso-8859-1"}},
+		{name: "invalid media parameter", contentTypes: []string{"application/json; charset="}},
+		{name: "unknown media parameter", contentTypes: []string{"application/json; version=1"}},
+		{name: "empty declared content type", contentTypes: []string{""}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				for _, value := range tc.contentTypes {
+					w.Header().Add("Content-Type", value)
+				}
+				for _, value := range tc.encodings {
+					w.Header().Add("Content-Encoding", value)
+				}
+				fmt.Fprint(w, `{"success":true,"result":[{"id":1}],"meta":{"after":null}}`)
+			}))
+			defer srv.Close()
+			client := srv.Client()
+			client.Timeout = time.Second
+			got, err := (PublicCatalog{BaseURL: srv.URL, Client: client}).Fetch(context.Background())
+			if !errors.Is(err, ErrCatalogIncomplete) || len(got.Products) != 0 {
+				t.Fatalf("ambiguous representation accepted: %+v %v", got, err)
+			}
+		})
+	}
+}
