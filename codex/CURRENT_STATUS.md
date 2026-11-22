@@ -68,3 +68,7 @@
 - Reject whitespace-only, control-character and invalid-UTF-8 pagination cursors before a subsequent GET; discard partial snapshots on failure.
 - Add deterministic TLS fixture regression tests for unsafe cursors, second-page HTTP 502/429 and pre-canceled context.
 - This is **not** authoritative Delta India mapping, margin/fee capability validation, refresh scheduling or UI integration. M1 PR #46 remains unaccepted; no M2 merge before M1.
+
+## M2 cursor CI correction (2026-11-22; awaiting exact-head rerun)
+- PR #48 initial CI https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44980917364: Go race tests FAILED; UI CI passed. Unsafe-cursor test fixtures accidentally encoded literal backslash sequences instead of JSON control-character escapes.
+- Corrected fixture escaping in `internal/adapters/delta/catalog_cursor_test.go` at commit `9ea0f61ba25917e371b42f4eeed33bcb14e271b4`; recheck exact-head CI before considering merge. No M1 approval, no M2 merge or trading enablement.
