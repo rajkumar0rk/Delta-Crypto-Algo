@@ -131,3 +131,52 @@ func TestPublicCatalogRejectsRedirectsWithoutFollowing(t *testing.T) {
 		t.Fatal("caller HTTP client mutated")
 	}
 }
+
+func TestPublicCatalogRejectsUnexpectedHTTPRepresentation(t *testing.T) {
+	cases := []struct {
+		name string
+		contentType string
+		encoding string
+	}{
+		{name: "html content type", contentType: "text/html"},
+		{name: "json suffix is not JSON", contentType: "application/problem+json"},
+		{name: "gzip encoding", contentType: "application/json", encoding: "gzip"},
+		{name: "br encoding", contentType: "application/json", encoding: "br"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Header.Get("Accept-Encoding") != "identity" {
+					t.Errorf("unexpected encoding negotiation: %q", r.Header.Get("Accept-Encoding"))
+				}
+				w.Header().Set("Content-Type", tc.contentType)
+				if tc.encoding != "" {
+					w.Header().Set("Content-Encoding", tc.encoding)
+				}
+				fmt.Fprint(w, `{"success":true,"result":[{"id":1}],"meta":{"after":null}}`)
+			}))
+			defer srv.Close()
+			client := srv.Client()
+			client.Timeout = time.Second
+			got, err := (PublicCatalog{BaseURL: srv.URL, Client: client}).Fetch(context.Background())
+			if !errors.Is(err, ErrCatalogIncomplete) || len(got.Products) != 0 {
+				t.Fatalf("must reject representation without publishing products: %+v, %v", got, err)
+			}
+		})
+	}
+}
+
+func TestPublicCatalogAcceptsDeclaredJSONMediaType(t *testing.T) {
+	srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.Header().Set("Content-Encoding", "identity")
+		fmt.Fprint(w, `{"success":true,"result":[{"id":1}],"meta":{"after":null}}`)
+	}))
+	defer srv.Close()
+	client := srv.Client()
+	client.Timeout = time.Second
+	got, err := (PublicCatalog{BaseURL: srv.URL, Client: client}).Fetch(context.Background())
+	if err != nil || len(got.Products) != 1 {
+		t.Fatalf("valid JSON response rejected: %+v, %v", got, err)
+	}
+}
