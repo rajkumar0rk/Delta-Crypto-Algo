@@ -14,6 +14,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
+	"unicode/utf8"
 )
 
 const (
@@ -150,7 +152,7 @@ func (c PublicCatalog) Fetch(ctx context.Context) (RawSnapshot, error) {
 				return empty, fmt.Errorf("%w: invalid numeric cursor", ErrCatalogIncomplete)
 			}
 		}
-		if next == "" || len(next) > 256 {
+		if next == "" || strings.TrimSpace(next) == "" || len(next) > 256 || !utf8.ValidString(next) || strings.IndexFunc(next, unicode.IsControl) >= 0 {
 			return empty, fmt.Errorf("%w: empty or oversized cursor", ErrCatalogIncomplete)
 		}
 		if _, exists := seen[next]; exists {
