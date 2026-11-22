@@ -88,7 +88,6 @@ func TestPublicCatalogCanceledContextNeverPublishes(t *testing.T) {
 	}
 }
 
-
 func TestPublicCatalogMissingCursorFailsClosed(t *testing.T) {
 	cases := []struct {
 		name, response string
