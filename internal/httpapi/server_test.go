@@ -103,12 +103,12 @@ func TestSecurityHeadersOnEveryResponse(t *testing.T) {
 				t.Fatalf("status %d, want %d", rec.Code, tc.want)
 			}
 			for name, want := range map[string]string{
-				"Cache-Control": "no-store",
-				"Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+				"Cache-Control":                "no-store",
+				"Content-Security-Policy":      "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
 				"Cross-Origin-Resource-Policy": "same-origin",
-				"X-Content-Type-Options": "nosniff",
-				"X-Frame-Options": "DENY",
-				"Referrer-Policy": "no-referrer",
+				"X-Content-Type-Options":       "nosniff",
+				"X-Frame-Options":              "DENY",
+				"Referrer-Policy":              "no-referrer",
 			} {
 				if got := rec.Header().Get(name); got != want {
 					t.Errorf("%s = %q, want %q", name, got, want)
