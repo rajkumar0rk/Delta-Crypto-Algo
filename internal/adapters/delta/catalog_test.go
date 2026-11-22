@@ -132,7 +132,6 @@ func TestPublicCatalogRejectsRedirectsWithoutFollowing(t *testing.T) {
 	}
 }
 
-
 func TestPublicCatalogSnapshotTimestampAfterFinalPage(t *testing.T) {
 	started := make(chan struct{})
 	release := make(chan struct{})
@@ -146,7 +145,7 @@ func TestPublicCatalogSnapshotTimestampAfterFinalPage(t *testing.T) {
 	httpClient.Timeout = 5 * time.Second
 	type outcome struct {
 		snapshot RawSnapshot
-		err		error
+		err      error
 	}
 	done := make(chan outcome, 1)
 	go func() {
