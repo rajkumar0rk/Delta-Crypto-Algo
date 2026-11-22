@@ -185,9 +185,9 @@ func TestPublicCatalogAcceptsDeclaredJSONMediaType(t *testing.T) {
 
 func TestPublicCatalogRejectsAmbiguousRepresentationHeaders(t *testing.T) {
 	cases := []struct {
-		name string
+		name         string
 		contentTypes []string
-		encodings []string
+		encodings    []string
 	}{
 		{name: "duplicate content type", contentTypes: []string{"application/json", "text/html"}},
 		{name: "duplicate content encoding", contentTypes: []string{"application/json"}, encodings: []string{"identity", "gzip"}},
