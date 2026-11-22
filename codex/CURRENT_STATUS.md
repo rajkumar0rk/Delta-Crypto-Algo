@@ -62,3 +62,9 @@
 - Public catalog now measures the entire HTTP response body before JSON decoding and rejects bodies exceeding 4 MiB, including valid JSON followed by excess whitespace. Incomplete fetches return no partial products.
 - Added regression fixture for valid JSON plus excessive whitespace. CI must verify Go formatting, tests/race/vet/build and UI/schema before merge; no local test execution claimed.
 - M2 still needs authoritative venue field mapping, margin/fee/capability verification, atomic refresh/freshness and UI integration. No private API, credentials, live orders or deployment.
+
+## M2 HTTP response representation hardening (2026-11-22; review pending)
+- Feature branch `feature/m2-catalog-http-envelope-guards` starts at `develop` commit `60fb41ed034ad86fe401623472d3d81b67d116bf`.
+- Read-only public product fetch now requests identity encoding and rejects declared non-JSON media types or non-identity content encodings. Added TLS-backed negative/positive representation tests. A missing Content-Type remains tolerated for compatibility, and this is **not** authoritative Delta India fixture validation.
+- Independent review and exact-head CI are required; M1 PR #46 governance, review, manual accessibility and acceptance gates remain unresolved. No merge until M1 acceptance.
+- M2 PRs #29/#30/#47/#48/#49/#50 need reconciliation. Product mapping, fee/margin capability evidence, atomic refresh and UI integration remain incomplete. No live credentials, orders, production deployment or `main` changes.
