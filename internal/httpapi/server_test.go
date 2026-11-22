@@ -80,3 +80,46 @@ func TestRequestIDOnDeniedRoutes(t *testing.T) {
 		}
 	}
 }
+
+func TestSecurityHeadersOnEveryResponse(t *testing.T) {
+	handler := NewHandler()
+	for _, tc := range []struct {
+		method string
+		path   string
+		want   int
+	}{
+		{http.MethodGet, "/health/live", http.StatusOK},
+		{http.MethodGet, "/health/ready", http.StatusServiceUnavailable},
+		{http.MethodPost, "/health/live", http.StatusMethodNotAllowed},
+		{http.MethodPost, "/orders", http.StatusNotFound},
+		{http.MethodOptions, "/api/v1/orders", http.StatusNotFound},
+	} {
+		t.Run(tc.method+"_"+tc.path, func(t *testing.T) {
+			rec := httptest.NewRecorder()
+			req := httptest.NewRequest(tc.method, tc.path, nil)
+			req.Header.Set("Origin", "https://untrusted.example")
+			handler.ServeHTTP(rec, req)
+			if rec.Code != tc.want {
+				t.Fatalf("status %d, want %d", rec.Code, tc.want)
+			}
+			for name, want := range map[string]string{
+				"Cache-Control": "no-store",
+				"Content-Security-Policy": "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'",
+				"Cross-Origin-Resource-Policy": "same-origin",
+				"X-Content-Type-Options": "nosniff",
+				"X-Frame-Options": "DENY",
+				"Referrer-Policy": "no-referrer",
+			} {
+				if got := rec.Header().Get(name); got != want {
+					t.Errorf("%s = %q, want %q", name, got, want)
+				}
+			}
+			if got := rec.Header().Get("Access-Control-Allow-Origin"); got != "" {
+				t.Errorf("unexpected CORS grant %q", got)
+			}
+			if len(rec.Header().Get("X-Request-ID")) != 32 {
+				t.Error("missing generated request ID")
+			}
+		})
+	}
+}
