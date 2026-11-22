@@ -98,3 +98,8 @@
 - Implementation commits `bdd9d584dc77cc486aa1631cfb9de480394b9db9`, `5c3547dbf9013fef3eaae6c63fe84e3029a61c4f`, acceptance docs `420d8853281758cab04c847384b49156cf017964`.
 - GitHub Actions lookup returned **no runs** for documentation head at inspection time; no local Go tests were executed. Do not treat previous green runs as validation of these changes.
 - M1 remains blocked by independent review, owner-only `develop` governance, manual screen-reader and 200% zoom acceptance. No merge, `main` changes, credentials, live orders or deployment.
+
+## 2026-11-23 — M1 HTTP response security regression (PR #46; not merged)
+- Added deterministic table-driven tests on the M1 consolidation branch covering CSP, CORP, nosniff, frame denial, referrer policy, cache disabling, generated request IDs, and no CORS grant across liveness, unready, denied-method, missing-order and preflight paths. Commit `6bb80c4d72344afcc1b6ef74c5d474da62966607`.
+- Prior PR head `c8a6ab4ed221ffb128285a908c74ab44fc885b4d` has successful Actions run https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45067324239. New test commit had no workflow run returned at inspection; do not call it validated or merge until exact-head CI passes.
+- M1 acceptance still requires independent review, owner-verified develop branch governance, and manual screen-reader/200% zoom acceptance. No live access, orders, deployment, or main changes.
