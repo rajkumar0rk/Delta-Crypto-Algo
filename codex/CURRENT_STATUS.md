@@ -72,3 +72,8 @@
 ## M2 cursor CI correction (2026-11-22; awaiting exact-head rerun)
 - PR #48 initial CI https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44980917364: Go race tests FAILED; UI CI passed. Unsafe-cursor test fixtures accidentally encoded literal backslash sequences instead of JSON control-character escapes.
 - Corrected fixture escaping in `internal/adapters/delta/catalog_cursor_test.go` at commit `9ea0f61ba25917e371b42f4eeed33bcb14e271b4`; recheck exact-head CI before considering merge. No M1 approval, no M2 merge or trading enablement.
+
+## M2 explicit terminal cursor gate (2026-11-22)
+- PR #48 head added strict rejection of a missing `meta.after` field (including absent/null `meta`), with TLS fixture regressions. An explicit JSON `null` remains the only accepted terminal marker; the existing nonterminal cursor handling remains bounded. This prevents truncated catalog envelopes from being mistaken for complete snapshots.
+- **Compatibility gate:** confirm the real Delta India API guarantees `meta.after` for all successful pages before treating this as authoritative; no production fixture has been verified. Latest exact-head CI must be inspected after commit; no green claim for this addition yet.
+- M1 independent review, owner-controlled develop protection and manual screen-reader/200% zoom acceptance remain blocked; do not merge M2 ahead of M1. No credentials, orders, live mode or main changes.
