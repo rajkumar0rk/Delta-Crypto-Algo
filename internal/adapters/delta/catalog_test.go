@@ -182,7 +182,6 @@ func TestPublicCatalogAcceptsDeclaredJSONMediaType(t *testing.T) {
 	}
 }
 
-
 func TestPublicCatalogRejectsAmbiguousRepresentationHeaders(t *testing.T) {
 	cases := []struct {
 		name         string
