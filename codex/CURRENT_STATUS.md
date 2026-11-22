@@ -62,3 +62,9 @@
 - Public catalog now measures the entire HTTP response body before JSON decoding and rejects bodies exceeding 4 MiB, including valid JSON followed by excess whitespace. Incomplete fetches return no partial products.
 - Added regression fixture for valid JSON plus excessive whitespace. CI must verify Go formatting, tests/race/vet/build and UI/schema before merge; no local test execution claimed.
 - M2 still needs authoritative venue field mapping, margin/fee/capability verification, atomic refresh/freshness and UI integration. No private API, credentials, live orders or deployment.
+
+## M2 cursor/pagination failure-injection batch (2026-11-22; CI pending)
+- Branch `feature/m2-catalog-cursor-safety-batch` from `develop` `60fb41ed034ad86fe401623472d3d81b67d116bf`.
+- Reject whitespace-only, control-character and invalid-UTF-8 pagination cursors before a subsequent GET; discard partial snapshots on failure.
+- Add deterministic TLS fixture regression tests for unsafe cursors, second-page HTTP 502/429 and pre-canceled context.
+- This is **not** authoritative Delta India mapping, margin/fee capability validation, refresh scheduling or UI integration. M1 PR #46 remains unaccepted; no M2 merge before M1.
