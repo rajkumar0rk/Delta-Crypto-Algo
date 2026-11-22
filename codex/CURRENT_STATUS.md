@@ -79,3 +79,8 @@
 - Exact head `a8010d716aef70aa18084bd99f772de060b36533` failed Go race tests because the existing successful `TestPublicCatalogPagination` TLS fixture omitted `Content-Type`, now required by the new fail-closed HTTP representation validation. Go formatting/vet and UI passed; compilation skipped: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45032828992
 - Follow-up commit `8ee8b53d9ad2f3b66e3d7e716539b305898a8239` sets `Content-Type: application/json` on that successful fixture. CI on the new exact head is not yet verified. This changes test setup, not production response acceptance.
 - M1 #46 independent review, governance and manual accessibility acceptance remain blockers; M2 cannot integrate ahead of M1. No credentials, orders, deployment or main changes.
+
+## M2 PR #51 representation ambiguity regression batch (2026-11-22)
+- Added strict declared media-type parsing, UTF-8 charset-only policy, duplicate Content-Type/Content-Encoding rejection, and TLS-backed failure fixtures for conflicting/malformed headers. Latest code head before this status commit: `eefc7f10fcb2ad6b773375107d4739b10a3d8f24`.
+- Previous exact-head PR #51 CI at `2ffebb83dc5a13083b77b87737b98ff7a429e934` passed: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45039143937. This is **not** evidence for the new changes. New exact-head CI remains to be verified; no local Go test execution claimed.
+- M1 #46 independent approval, branch governance and manual screen-reader acceptance remain outstanding. M2 changes must not merge before those gates and their own review/CI. No live trading, credentials, deployment or `main` modifications.
