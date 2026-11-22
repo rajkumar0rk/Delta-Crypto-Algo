@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 	"time"
 )
@@ -21,12 +22,9 @@ func TestPublicCatalogRejectsUnsafeCursorsBeforeNextRequest(t *testing.T) {
 		{"tab", `"next\\tpage"`},
 		{"nul", `"next\\u0000page"`},
 		{"whitespace only", `"   "`},
-		{"oversized", `"` + string(make([]byte, 0)) + `"`},
+		{"oversized", `"` + strings.Repeat("a", 257) + `"`},
 	}
 	for _, tc := range cases {
-		if tc.name == "oversized" {
-			tc.cursor = `"` + stringOf('a', 257) + `"`
-		}
 		t.Run(tc.name, func(t *testing.T) {
 			requests := 0
 			srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -45,14 +43,6 @@ func TestPublicCatalogRejectsUnsafeCursorsBeforeNextRequest(t *testing.T) {
 			}
 		})
 	}
-}
-
-func stringOf(b byte, n int) string {
-	buf := make([]byte, n)
-	for i := range buf {
-		buf[i] = b
-	}
-	return string(buf)
 }
 
 func TestPublicCatalogSecondPageFailureDiscardsFirstPage(t *testing.T) {
