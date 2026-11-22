@@ -62,3 +62,40 @@
 - Public catalog now measures the entire HTTP response body before JSON decoding and rejects bodies exceeding 4 MiB, including valid JSON followed by excess whitespace. Incomplete fetches return no partial products.
 - Added regression fixture for valid JSON plus excessive whitespace. CI must verify Go formatting, tests/race/vet/build and UI/schema before merge; no local test execution claimed.
 - M2 still needs authoritative venue field mapping, margin/fee/capability verification, atomic refresh/freshness and UI integration. No private API, credentials, live orders or deployment.
+
+
+## M2 catalog transition audit work (2026-11-21, PR #47 — pending integration)
+- PR #47: https://github.com/rajkumar0rk/Delta-Crypto-Algo/pull/47 extends the validated, complete, strictly time-monotonic snapshot diff with deterministic ID ordering and before/after defensive copies.
+- Follow-up adds explicit metadata-only transition classifications: listing, removal, disablement, enablement and contract-spec changes; structural changes take precedence over status transitions. Regression tests cover stable ordering, failure cases, copy isolation, contract tick/expiry changes and reactivation.
+- **Not accepted/merged:** check final-head Go formatting/race/vet/build and UI/schema CI, obtain required review and preserve M1 dependency gate. M1 PR #46 still requires independent approval, branch-protection verification and manual accessibility acceptance.
+- Delta India authoritative field mapping, account-specific eligibility, margin/fee/expiry capability evidence and read-only ingestion are still outstanding. No production authorization or trading functionality is implied.
+
+## M2 audit CI repair and semantic equality (2026-11-21, PR #47)
+- CI run https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44914021531 failed Go formatting (transitions.go); UI job passed. Follow-up commits corrected constant alignment.
+- Snapshot comparison now treats identical expiry instants in different time zones as unchanged, avoiding false-positive contract-change audits caused by Go time.Time internals. Added regression cases for timezone-equivalent expiries and incomplete baseline rejection.
+- **Pending:** verify Go formatting, race/tests/vet/build and UI/schema checks on the latest PR head. No claim of successful final-head CI. M1 PR #46 still awaits independent review, owner branch protection and manual accessibility sign-off; do not merge M2 ahead of M1 acceptance.
+
+
+## M2 exact-decimal transition comparison (2026-11-21, PR #47 — pending CI)
+- Snapshot Diff and ClassifyChanges now compare validated tick size, lot size, multiplier and optional option strike using exact rational numeric equivalence, preventing false contract-change events when the exchange only changes decimal formatting (e.g. 0.10 vs 0.100).
+- Added regression tests for decimal scale equivalence, classification precedence, and high-precision genuine contract changes. No floating point conversion or order authorization.
+- PR #47 previous head 8c898425 passed GitHub Actions run https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44925376511; this new change requires its own final-head CI and independent review before merge.
+
+- 2026-11-22 follow-up: Added regression tests for product order invariance, audit defensive-copy isolation, ID reassignment as a contract change, invalid baseline metadata, and unknown future status. Commit `d2b8df4ec1933f6aa5d96e1df639c02195ff06fd`. Previous exact-head PR #47 CI run 44930900442 passed before this new test commit; latest-head CI remains unverified until GitHub Actions completes. Do not merge ahead of M1 acceptance.
+
+
+## M2 audit comparator consolidation (2026-11-22; verification pending)
+- Existing PR #47 now shares one `sameContractSpec` invariant between Diff and ClassifyChanges, eliminating duplicated lists of exchange contract fields that could drift when metadata evolves.
+- Added table-driven contract-field classification tests for futures (symbol, underlying, kind/expiry, tick, lot, multiplier, quote/settlement currency) and options (strike/expiry), plus a status-only control.
+- Prior PR #47 head `11f4162221342d6fed0f879a93615fce09e64604` passed GitHub Actions run https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44936189043. That success **does not cover** these new commits; exact final-head CI must be verified before any merge.
+- M1 PR #46 still requires independent review, owner branch-protection evidence and manual screen-reader/zoom acceptance. M2 PR #47 remains unmerged until M1 acceptance. No live credentials, order routing, main or deployment changes.
+
+## M2 catalog audit status-transition regression (2026-11-22)
+- PR #47: https://github.com/rajkumar0rk/Delta-Crypto-Algo/pull/47. Previous head `da9bd652` failed Go formatting in https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44941145868 (UI passed). The new change normalizes a test-file blank line and adds table-driven coverage for ten status transitions (including unknown, expired and delisted). Commit `ff3f804476c17b6c92140d264ee0639f20286c98`; final-head CI is **pending verification**, not claimed green.
+- `develop` remains unchanged. PR #46 independent approval, branch governance and manual accessibility acceptance remain prerequisites for M1 acceptance; do not merge M2 before M1. Existing M2 PR #29 atomic store and #30 strict decimals are unmerged and must be reconciled without duplicating work.
+- No live credentials, orders, deployment or `main` changes.
+
+## M2 audit precision regression batch (2026-11-22; CI pending)
+- PR #47: https://github.com/rajkumar0rk/Delta-Crypto-Algo/pull/47, code commit `3071d8e7a9420b0bb18d006388e7eeb54e25bcfd` adds three deterministic regression tests for nested expiry audit evidence isolation, timezone-equivalent vs nanosecond expiry changes, and exact high-precision multiplier changes taking precedence over status changes.
+- These tests are metadata-only; no venue contract mapping, margin/fee verification, order authorization or live connectivity. No local test result is claimed. The new exact-head GitHub Actions run was not yet visible when checked; inspect final-head Go/UI checks before any merge.
+- M1 PR #46 remains unaccepted without independent review, verified develop branch protection and manual accessibility signoff. Do not merge M2 before M1 acceptance.
