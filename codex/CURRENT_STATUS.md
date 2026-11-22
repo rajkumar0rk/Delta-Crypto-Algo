@@ -62,3 +62,30 @@
 - Public catalog now measures the entire HTTP response body before JSON decoding and rejects bodies exceeding 4 MiB, including valid JSON followed by excess whitespace. Incomplete fetches return no partial products.
 - Added regression fixture for valid JSON plus excessive whitespace. CI must verify Go formatting, tests/race/vet/build and UI/schema before merge; no local test execution claimed.
 - M2 still needs authoritative venue field mapping, margin/fee/capability verification, atomic refresh/freshness and UI integration. No private API, credentials, live orders or deployment.
+
+## M2 HTTP response representation hardening (2026-11-22; review pending)
+- Feature branch `feature/m2-catalog-http-envelope-guards` starts at `develop` commit `60fb41ed034ad86fe401623472d3d81b67d116bf`.
+- Read-only public product fetch now requests identity encoding and rejects declared non-JSON media types or non-identity content encodings. Added TLS-backed negative/positive representation tests. A missing Content-Type remains tolerated for compatibility, and this is **not** authoritative Delta India fixture validation.
+- Independent review and exact-head CI are required; M1 PR #46 governance, review, manual accessibility and acceptance gates remain unresolved. No merge until M1 acceptance.
+- M2 PRs #29/#30/#47/#48/#49/#50 need reconciliation. Product mapping, fee/margin capability evidence, atomic refresh and UI integration remain incomplete. No live credentials, orders, production deployment or `main` changes.
+
+
+## M2 HTTP representation CI correction (2026-11-22)
+- PR #51 first exact-head run https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45027754004 failed Go formatting; UI passed, Go vet/race/build were skipped.
+- Commit `55fd5a5d7100e1f7a7a6f2872f51f38545b82a45` aligns the new HTTP representation test table with gofmt. Recheck CI on the latest documentation commit; do not claim success or merge until exact-head checks pass.
+- M1 PR #46 remains open without independent approval; branch governance and manual accessibility acceptance remain unverified. M2 is preparation only, not accepted or live-enabled.
+
+## M2 HTTP representation PR #51 CI regression (2026-11-22)
+- Exact head `a8010d716aef70aa18084bd99f772de060b36533` failed Go race tests because the existing successful `TestPublicCatalogPagination` TLS fixture omitted `Content-Type`, now required by the new fail-closed HTTP representation validation. Go formatting/vet and UI passed; compilation skipped: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45032828992
+- Follow-up commit `8ee8b53d9ad2f3b66e3d7e716539b305898a8239` sets `Content-Type: application/json` on that successful fixture. CI on the new exact head is not yet verified. This changes test setup, not production response acceptance.
+- M1 #46 independent review, governance and manual accessibility acceptance remain blockers; M2 cannot integrate ahead of M1. No credentials, orders, deployment or main changes.
+
+## M2 PR #51 representation ambiguity regression batch (2026-11-22)
+- Added strict declared media-type parsing, UTF-8 charset-only policy, duplicate Content-Type/Content-Encoding rejection, and TLS-backed failure fixtures for conflicting/malformed headers. Latest code head before this status commit: `eefc7f10fcb2ad6b773375107d4739b10a3d8f24`.
+- Previous exact-head PR #51 CI at `2ffebb83dc5a13083b77b87737b98ff7a429e934` passed: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45039143937. This is **not** evidence for the new changes. New exact-head CI remains to be verified; no local Go test execution claimed.
+- M1 #46 independent approval, branch governance and manual screen-reader acceptance remain outstanding. M2 changes must not merge before those gates and their own review/CI. No live trading, credentials, deployment or `main` modifications.
+
+## M2 PR #51 exact-head regression follow-up (2026-11-22)
+- CI run https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45044382029 failed Go formatting at prior head `e99eb365006ee01c8ef4a9e23504418eba5d89f4`; UI passed, Go vet/race/build skipped.
+- Normalized extra blank lines in `catalog.go` and `catalog_test.go` and added TLS-backed second-page invalid-representation regression: an otherwise valid first page must be discarded atomically, including pages/timestamp, if terminal page headers are invalid. Latest implementation commit `94cf669ae9481a68811b772bb25d04bc4c55f73d`.
+- Exact-head CI for this batch is **not yet verified**. No local Go tests claimed. M1 #46 independent review, branch protection/governance and manual accessibility acceptance remain blockers; no M2 merge, real credentials, orders, VPS deployment or `main` changes.
