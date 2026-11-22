@@ -62,3 +62,9 @@
 - Public catalog now measures the entire HTTP response body before JSON decoding and rejects bodies exceeding 4 MiB, including valid JSON followed by excess whitespace. Incomplete fetches return no partial products.
 - Added regression fixture for valid JSON plus excessive whitespace. CI must verify Go formatting, tests/race/vet/build and UI/schema before merge; no local test execution claimed.
 - M2 still needs authoritative venue field mapping, margin/fee/capability verification, atomic refresh/freshness and UI integration. No private API, credentials, live orders or deployment.
+
+## M1 CI toolchain alignment (2026-11-22; pending verification)
+- PR #52 targets `develop` from HEAD `60fb41ed034ad86fe401623472d3d81b67d116bf`: https://github.com/rajkumar0rk/Delta-Crypto-Algo/pull/52
+- CI `actions/setup-go` now derives its version from `go.mod` (currently 1.23) rather than an unrelated hardcoded 1.27. This is a reproducibility correction, **not** a full toolchain or dependency pinning audit.
+- Exact-head CI and independent review must pass before integration. M1 remains blocked on independent review of PR #46, branch governance and manual screen-reader acceptance; M2 work remains unmerged pending M1 acceptance.
+- No live credentials, orders, production deployment or `main` changes.
