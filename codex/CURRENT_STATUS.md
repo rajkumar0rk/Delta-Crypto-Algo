@@ -92,3 +92,9 @@
 - At handoff exact-head CI results were not yet returned by GitHub; local tests could not run in this environment because the GitHub host was not reachable for cloning. Do not merge without Go formatting/vet/race/build and UI schema/build success plus independent review.
 - M1 remains OPEN: independent review and branch governance, actual browser responsive/keyboard/a11y visual acceptance, further security verification and clean CI evidence. Branch protection endpoint returned 403 (integration permission); no rulesets were returned. Owner must configure/enforce governance outside this connector.
 - No real orders, credentials, live enablement, production deploy or main branch change. M2 remains next after M1 acceptance.
+
+## 2026-11-23 — M1 numeric loopback hardening (PR #46, pending exact-head CI)
+- Foundation listener now accepts only literal `127.0.0.1` or `::1`, rejecting `localhost`/case aliases because resolver/hosts mappings are not guaranteed loopback. Demo IPv6 acceptance and alias rejection covered in deterministic configuration tests.
+- Implementation commits `bdd9d584dc77cc486aa1631cfb9de480394b9db9`, `5c3547dbf9013fef3eaae6c63fe84e3029a61c4f`, acceptance docs `420d8853281758cab04c847384b49156cf017964`.
+- GitHub Actions lookup returned **no runs** for documentation head at inspection time; no local Go tests were executed. Do not treat previous green runs as validation of these changes.
+- M1 remains blocked by independent review, owner-only `develop` governance, manual screen-reader and 200% zoom acceptance. No merge, `main` changes, credentials, live orders or deployment.
