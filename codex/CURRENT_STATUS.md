@@ -103,3 +103,8 @@
 - Added deterministic table-driven tests on the M1 consolidation branch covering CSP, CORP, nosniff, frame denial, referrer policy, cache disabling, generated request IDs, and no CORS grant across liveness, unready, denied-method, missing-order and preflight paths. Commit `6bb80c4d72344afcc1b6ef74c5d474da62966607`.
 - Prior PR head `c8a6ab4ed221ffb128285a908c74ab44fc885b4d` has successful Actions run https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45067324239. New test commit had no workflow run returned at inspection; do not call it validated or merge until exact-head CI passes.
 - M1 acceptance still requires independent review, owner-verified develop branch governance, and manual screen-reader/200% zoom acceptance. No live access, orders, deployment, or main changes.
+
+## M1 CI formatting repair (2026-11-23)
+- PR #46 exact prior head `39b26cd6d248ba54d491216f3df1ef9cd5bfbd54` failed Go formatting (only `internal/httpapi/server_test.go`); UI succeeded: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45072767981
+- Commit `3c7f6c1b35d3f3389c1c0f60c04f8e8f3ceed864` aligns the security-header test table with gofmt. **Fresh exact-head CI remains required**; the failed run does not validate Go tests/race/vet/build.
+- M1 remains unaccepted until independent review, owner-confirmed `develop` governance and manual screen-reader/200% zoom acceptance. Do not merge or begin M2 integration on green CI alone.
