@@ -134,9 +134,9 @@ func TestPublicCatalogRejectsRedirectsWithoutFollowing(t *testing.T) {
 
 func TestPublicCatalogRejectsUnexpectedHTTPRepresentation(t *testing.T) {
 	cases := []struct {
-		name string
+		name        string
 		contentType string
-		encoding string
+		encoding    string
 	}{
 		{name: "html content type", contentType: "text/html"},
 		{name: "json suffix is not JSON", contentType: "application/problem+json"},
