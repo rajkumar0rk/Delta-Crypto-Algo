@@ -62,3 +62,30 @@
 - Public catalog now measures the entire HTTP response body before JSON decoding and rejects bodies exceeding 4 MiB, including valid JSON followed by excess whitespace. Incomplete fetches return no partial products.
 - Added regression fixture for valid JSON plus excessive whitespace. CI must verify Go formatting, tests/race/vet/build and UI/schema before merge; no local test execution claimed.
 - M2 still needs authoritative venue field mapping, margin/fee/capability verification, atomic refresh/freshness and UI integration. No private API, credentials, live orders or deployment.
+
+## M2 cursor/pagination failure-injection batch (2026-11-22; CI pending)
+- Branch `feature/m2-catalog-cursor-safety-batch` from `develop` `60fb41ed034ad86fe401623472d3d81b67d116bf`.
+- Reject whitespace-only, control-character and invalid-UTF-8 pagination cursors before a subsequent GET; discard partial snapshots on failure.
+- Add deterministic TLS fixture regression tests for unsafe cursors, second-page HTTP 502/429 and pre-canceled context.
+- This is **not** authoritative Delta India mapping, margin/fee capability validation, refresh scheduling or UI integration. M1 PR #46 remains unaccepted; no M2 merge before M1.
+
+## M2 cursor CI correction (2026-11-22; awaiting exact-head rerun)
+- PR #48 initial CI https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44980917364: Go race tests FAILED; UI CI passed. Unsafe-cursor test fixtures accidentally encoded literal backslash sequences instead of JSON control-character escapes.
+- Corrected fixture escaping in `internal/adapters/delta/catalog_cursor_test.go` at commit `9ea0f61ba25917e371b42f4eeed33bcb14e271b4`; recheck exact-head CI before considering merge. No M1 approval, no M2 merge or trading enablement.
+
+## M2 explicit terminal cursor gate (2026-11-22)
+- PR #48 head added strict rejection of a missing `meta.after` field (including absent/null `meta`), with TLS fixture regressions. An explicit JSON `null` remains the only accepted terminal marker; the existing nonterminal cursor handling remains bounded. This prevents truncated catalog envelopes from being mistaken for complete snapshots.
+- **Compatibility gate:** confirm the real Delta India API guarantees `meta.after` for all successful pages before treating this as authoritative; no production fixture has been verified. Latest exact-head CI must be inspected after commit; no green claim for this addition yet.
+- M1 independent review, owner-controlled develop protection and manual screen-reader/200% zoom acceptance remain blocked; do not merge M2 ahead of M1. No credentials, orders, live mode or main changes.
+
+## M2 catalog fetch completion semantics (2026-11-22, PR #48)
+- Catalog snapshot observation timestamp now records successful terminal-page completion, not initial request dispatch. This prevents a slow multi-page fetch from advertising a pre-completion observation time.
+- Context cancellation at the terminal page fails closed and discards all accumulated products.
+- TLS-backed regression tests cover blocked final-page timing and cancellation during terminal response.
+- PR #48 remains unmerged pending exact-head Go/race/vet/build + UI/schema CI and independent review; M1 acceptance still blocks M2 integration.
+- Authoritative Delta India pagination/contract fixtures and product mapping remain unverified; no credentials, live trading, production deployment or `main` changes.
+
+## M2 PR #48 exact-head formatting correction (2026-11-22)
+- Previous head `847511c9f29fb8ad1c775d3a19c6dd9689da72ea` failed Go formatting (vet/race/build skipped); UI passed: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45008287347
+- Corrected extra blank line and nested test struct alignment in `internal/adapters/delta/catalog_test.go` at commit `8d04ada4236a1a0d3d5041c8e1ca93ece8017d14`. Exact-head CI must complete before any passing claim; no merge before M1 acceptance and independent review.
+- Product contract fixtures, actual Delta India terminal pagination semantics, fee/margin eligibility and catalog refresh/UI wiring remain unverified. No live trading, credentials, deployment or main changes.

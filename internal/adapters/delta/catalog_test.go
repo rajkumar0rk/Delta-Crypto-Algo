@@ -131,3 +131,48 @@ func TestPublicCatalogRejectsRedirectsWithoutFollowing(t *testing.T) {
 		t.Fatal("caller HTTP client mutated")
 	}
 }
+
+func TestPublicCatalogSnapshotTimestampAfterFinalPage(t *testing.T) {
+	started := make(chan struct{})
+	release := make(chan struct{})
+	srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		close(started)
+		<-release
+		fmt.Fprint(w, `{"success":true,"result":[{"id":1}],"meta":{"after":null}}`)
+	}))
+	defer srv.Close()
+	httpClient := srv.Client()
+	httpClient.Timeout = 5 * time.Second
+	type outcome struct {
+		snapshot RawSnapshot
+		err      error
+	}
+	done := make(chan outcome, 1)
+	go func() {
+		snapshot, err := (PublicCatalog{BaseURL: srv.URL, Client: httpClient}).Fetch(context.Background())
+		done <- outcome{snapshot, err}
+	}()
+	<-started
+	completedAfter := time.Now().UTC()
+	close(release)
+	got := <-done
+	if got.err != nil || len(got.snapshot.Products) != 1 || got.snapshot.AsOf.Before(completedAfter) {
+		t.Fatalf("snapshot timestamp predates completed fetch: %+v %v", got.snapshot, got.err)
+	}
+}
+
+func TestPublicCatalogCanceledAtFinalPageFailsClosed(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		cancel()
+		fmt.Fprint(w, `{"success":true,"result":[{"id":1}],"meta":{"after":null}}`)
+	}))
+	defer srv.Close()
+	httpClient := srv.Client()
+	httpClient.Timeout = time.Second
+	got, err := (PublicCatalog{BaseURL: srv.URL, Client: httpClient}).Fetch(ctx)
+	if !errors.Is(err, ErrCatalogIncomplete) || len(got.Products) != 0 || got.Pages != 0 {
+		t.Fatalf("canceled fetch must discard snapshot: %+v %v", got, err)
+	}
+}
