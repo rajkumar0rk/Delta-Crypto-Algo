@@ -62,3 +62,8 @@
 - Public catalog now measures the entire HTTP response body before JSON decoding and rejects bodies exceeding 4 MiB, including valid JSON followed by excess whitespace. Incomplete fetches return no partial products.
 - Added regression fixture for valid JSON plus excessive whitespace. CI must verify Go formatting, tests/race/vet/build and UI/schema before merge; no local test execution claimed.
 - M2 still needs authoritative venue field mapping, margin/fee/capability verification, atomic refresh/freshness and UI integration. No private API, credentials, live orders or deployment.
+
+## 2026-11-22 M2 capability evidence preparation (unmerged)
+- Branch `feature/m2-verified-product-capabilities` from develop `60fb41ed034ad86fe401623472d3d81b67d116bf` adds product-ID keyed, time/provenance-bound capability evidence validation, exact decimal fee/margin ratios, fail-closed order-type preconditions, negative-case tests, and `docs/M2_CAPABILITY_CONTRACT.md`.
+- These are development-only primitives, NOT authoritative Delta India capability mapping, verified fee/margin schedules, account eligibility, risk approval, or live execution. The tests and exact-head CI must be checked before merge.
+- M1 #46 remains open pending independent review, governance and manual accessibility acceptance; do not integrate M2 ahead of M1 gates. M2 PRs #29/#30/#47/#48 remain independent and require reconciliation.
