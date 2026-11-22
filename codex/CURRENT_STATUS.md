@@ -77,3 +77,10 @@
 - PR #48 head added strict rejection of a missing `meta.after` field (including absent/null `meta`), with TLS fixture regressions. An explicit JSON `null` remains the only accepted terminal marker; the existing nonterminal cursor handling remains bounded. This prevents truncated catalog envelopes from being mistaken for complete snapshots.
 - **Compatibility gate:** confirm the real Delta India API guarantees `meta.after` for all successful pages before treating this as authoritative; no production fixture has been verified. Latest exact-head CI must be inspected after commit; no green claim for this addition yet.
 - M1 independent review, owner-controlled develop protection and manual screen-reader/200% zoom acceptance remain blocked; do not merge M2 ahead of M1. No credentials, orders, live mode or main changes.
+
+## M2 catalog fetch completion semantics (2026-11-22, PR #48)
+- Catalog snapshot observation timestamp now records successful terminal-page completion, not initial request dispatch. This prevents a slow multi-page fetch from advertising a pre-completion observation time.
+- Context cancellation at the terminal page fails closed and discards all accumulated products.
+- TLS-backed regression tests cover blocked final-page timing and cancellation during terminal response.
+- PR #48 remains unmerged pending exact-head Go/race/vet/build + UI/schema CI and independent review; M1 acceptance still blocks M2 integration.
+- Authoritative Delta India pagination/contract fixtures and product mapping remain unverified; no credentials, live trading, production deployment or `main` changes.
