@@ -91,6 +91,9 @@ func nonnegativeRatio(v string) bool {
 		return false
 	}
 	// Ratios are bounded to [0,1] without lossy float conversion.
+	if len(v) > 1 && v[0] == '0' && v[1] != '.' {
+		return false
+	}
 	if v[0] != '0' {
 		return v == "1" || (v[0] == '1' && dot && allZeros(v[2:]))
 	}
