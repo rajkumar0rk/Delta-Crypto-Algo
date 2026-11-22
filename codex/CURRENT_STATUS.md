@@ -68,3 +68,8 @@
 - Public read-only catalog transport rejects duplicate JSON object keys at all nested levels, excessive nesting (>64), and trailing documents before returning products. This prevents Go's last-value-wins decoder from silently accepting contradictory product IDs, contract fields, pagination cursors or success flags.
 - Added deterministic unit cases and TLS fail-closed regression tests. CI and independent review are mandatory; this change is NOT exchange contract verification or permission to trade.
 - M1 #46 still requires independent review, branch governance and manual accessibility acceptance. M2 authoritative mapping, venue fixtures, capability/margin/fee evidence, refresh orchestration and UI integration remain pending. No merge into `develop` until M1 gates are met.
+
+## M2 ambiguous JSON follow-up (2026-11-22)
+- PR #50 extends strict JSON inspection to reject invalid UTF-8, case-folded object-key collisions (including Go's case-insensitive struct field matching), and objects exceeding 256 keys. The bound limits per-object duplicate/case-fold comparison work.
+- Regression coverage includes escaped-equivalent keys, nested case collisions, invalid UTF-8, and excessive key counts. These are defensive restrictions, **not** verified Delta India response-contract guarantees; confirm real venue fixtures before enabling any catalog publication.
+- Exact-head CI for the latest branch changes must be checked; no passing claim is made before completion. PR remains unmerged while M1 #46 lacks independent review, branch governance and manual screen-reader acceptance. No credentials, orders, live mode, main or production changes.
