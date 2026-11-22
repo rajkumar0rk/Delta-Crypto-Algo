@@ -94,3 +94,8 @@
 - PR #47: https://github.com/rajkumar0rk/Delta-Crypto-Algo/pull/47. Previous head `da9bd652` failed Go formatting in https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44941145868 (UI passed). The new change normalizes a test-file blank line and adds table-driven coverage for ten status transitions (including unknown, expired and delisted). Commit `ff3f804476c17b6c92140d264ee0639f20286c98`; final-head CI is **pending verification**, not claimed green.
 - `develop` remains unchanged. PR #46 independent approval, branch governance and manual accessibility acceptance remain prerequisites for M1 acceptance; do not merge M2 before M1. Existing M2 PR #29 atomic store and #30 strict decimals are unmerged and must be reconciled without duplicating work.
 - No live credentials, orders, deployment or `main` changes.
+
+## M2 audit precision regression batch (2026-11-22; CI pending)
+- PR #47: https://github.com/rajkumar0rk/Delta-Crypto-Algo/pull/47, code commit `3071d8e7a9420b0bb18d006388e7eeb54e25bcfd` adds three deterministic regression tests for nested expiry audit evidence isolation, timezone-equivalent vs nanosecond expiry changes, and exact high-precision multiplier changes taking precedence over status changes.
+- These tests are metadata-only; no venue contract mapping, margin/fee verification, order authorization or live connectivity. No local test result is claimed. The new exact-head GitHub Actions run was not yet visible when checked; inspect final-head Go/UI checks before any merge.
+- M1 PR #46 remains unaccepted without independent review, verified develop branch protection and manual accessibility signoff. Do not merge M2 before M1 acceptance.
