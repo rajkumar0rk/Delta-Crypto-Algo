@@ -87,6 +87,7 @@ func (c PublicCatalog) Fetch(ctx context.Context) (RawSnapshot, error) {
 			return empty, fmt.Errorf("%w: request: %v", ErrCatalogIncomplete, err)
 		}
 		req.Header.Set("Accept", "application/json")
+		req.Header.Set("Accept-Encoding", "identity")
 		// Never follow redirects: a configurable HTTPS origin must not be able
 		// to redirect catalog reads to another host (or an untrusted path).
 		// Copy the client to preserve caller configuration without mutation.
@@ -101,6 +102,21 @@ func (c PublicCatalog) Fetch(ctx context.Context) (RawSnapshot, error) {
 		if resp.StatusCode != http.StatusOK {
 			resp.Body.Close()
 			return empty, fmt.Errorf("%w: HTTP %d", ErrCatalogIncomplete, resp.StatusCode)
+		}
+		// Do not trust content negotiation alone. A proxy must not supply a
+		// compressed or non-JSON body that could be interpreted inconsistently.
+		// Missing Content-Type is tolerated for legacy venue responses, but a
+		// declared type must be JSON. The byte cap still applies in every case.
+		if encoding := strings.TrimSpace(resp.Header.Get("Content-Encoding")); encoding != "" && !strings.EqualFold(encoding, "identity") {
+			resp.Body.Close()
+			return empty, fmt.Errorf("%w: unsupported content encoding", ErrCatalogIncomplete)
+		}
+		if declared := resp.Header.Get("Content-Type"); declared != "" {
+			mediaType := strings.ToLower(strings.TrimSpace(strings.SplitN(declared, ";", 2)[0]))
+			if mediaType != "application/json" {
+				resp.Body.Close()
+				return empty, fmt.Errorf("%w: unexpected content type", ErrCatalogIncomplete)
+			}
 		}
 		// Enforce the byte limit independently of JSON parsing. A valid JSON
 		// document followed by excess whitespace must not bypass the cap.
