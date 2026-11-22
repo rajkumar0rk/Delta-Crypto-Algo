@@ -42,8 +42,8 @@ func FromEnv() (Config, error) {
 	if err != nil || !validTCPPort(port) {
 		return Config{}, fmt.Errorf("invalid DELTA_LISTEN_ADDR %q (expected host:port)", addr)
 	}
-	if host != "127.0.0.1" && host != "::1" && host != "localhost" {
-		return Config{}, errors.New("foundation API must bind to loopback")
+	if host != "127.0.0.1" && host != "::1" {
+		return Config{}, errors.New("foundation API must bind to a numeric loopback address")
 	}
 	return Config{Mode: mode, ListenAddr: addr}, nil
 }
