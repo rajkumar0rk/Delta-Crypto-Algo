@@ -6,7 +6,7 @@ M1 is an inert control-plane foundation, not an order engine, catalog, persisted
 
 | Gate | Required evidence | Current state |
 |---|---|---|
-| Startup | Reject live mode, non-loopback binding and noncanonical/out-of-range TCP ports | Passed combined CI run 44905852868 |
+| Startup | Reject live mode, non-numeric-loopback binding (including DNS-based localhost aliases) and noncanonical/out-of-range TCP ports | Passed combined CI run 44905852868 |
 | HTTP boundary | Liveness 200, readiness 503, trade_enabled explicitly false, representative trading routes return 404 | Passed combined CI run 44905852868 |
 | API isolation | Browser security policy, no open CORS, server-generated unpredictable request IDs | Passed combined CI run 44905852868 |
 | Go quality | Module verify/tidy, format, vet, race suite, build | Passed combined CI run 44905852868 |
@@ -30,3 +30,7 @@ Author-side review found and fixed: literal README newline, off-screen mobile dr
 In Settings > Rules > Rulesets or Branch protection, target develop and require one independent approving review plus the Go/UI checks; reject forced pushes/deletions and unauthorized bypass. Confirm those settings using owner access; the agent connection returns HTTP 403 for branch protection reads.
 
 Combined code/CI checks passed; do not call M1 complete or move the dependency gate to M2 until independent review and develop governance are verified.
+
+## Loopback DNS ambiguity hardening (2026-11-23)
+
+M1 foundation startup must accept only numeric IPv4 `127.0.0.1` or IPv6 `::1` listeners. A hostname such as `localhost` depends on external resolver/hosts configuration and is rejected even if it usually resolves to loopback. Regression coverage includes IPv6 acceptance, DNS aliases and port bounds. This change requires fresh exact-head CI and independent review; it does not satisfy manual screen-reader or owner governance gates.
