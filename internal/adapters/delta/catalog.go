@@ -137,7 +137,11 @@ func (c PublicCatalog) Fetch(ctx context.Context) (RawSnapshot, error) {
 			out.Products = append(out.Products, append(json.RawMessage(nil), product...))
 		}
 		out.Pages++
-		raw := strings.TrimSpace(string(data.Meta.After))
+		// Absence of an explicit pagination cursor is not proof that the
+		// snapshot is complete. A null cursor is the terminal marker.
+		if len(data.Meta.After) == 0 {
+			return empty, fmt.Errorf("%w: missing pagination cursor", ErrCatalogIncomplete)
+		}\n		raw := strings.TrimSpace(string(data.Meta.After))
 		if raw == "" || raw == "null" {
 			return out, nil
 		}
