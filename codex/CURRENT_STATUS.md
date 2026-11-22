@@ -84,3 +84,8 @@
 - TLS-backed regression tests cover blocked final-page timing and cancellation during terminal response.
 - PR #48 remains unmerged pending exact-head Go/race/vet/build + UI/schema CI and independent review; M1 acceptance still blocks M2 integration.
 - Authoritative Delta India pagination/contract fixtures and product mapping remain unverified; no credentials, live trading, production deployment or `main` changes.
+
+## M2 PR #48 exact-head formatting correction (2026-11-22)
+- Previous head `847511c9f29fb8ad1c775d3a19c6dd9689da72ea` failed Go formatting (vet/race/build skipped); UI passed: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45008287347
+- Corrected extra blank line and nested test struct alignment in `internal/adapters/delta/catalog_test.go` at commit `8d04ada4236a1a0d3d5041c8e1ca93ece8017d14`. Exact-head CI must complete before any passing claim; no merge before M1 acceptance and independent review.
+- Product contract fixtures, actual Delta India terminal pagination semantics, fee/margin eligibility and catalog refresh/UI wiring remain unverified. No live trading, credentials, deployment or main changes.
