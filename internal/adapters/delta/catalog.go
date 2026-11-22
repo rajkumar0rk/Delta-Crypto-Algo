@@ -73,7 +73,7 @@ func (c PublicCatalog) Fetch(ctx context.Context) (RawSnapshot, error) {
 	if pageLimit < 1 || pageLimit > maxPages || productLimit < 1 || productLimit > maxProducts {
 		return empty, fmt.Errorf("%w: invalid bounded limits", ErrCatalogIncomplete)
 	}
-	out := RawSnapshot{AsOf: time.Now().UTC()}
+	out := RawSnapshot{}
 	seen := map[string]struct{}{}
 	cursor := ""
 	for page := 0; page < pageLimit; page++ {
@@ -144,6 +144,10 @@ func (c PublicCatalog) Fetch(ctx context.Context) (RawSnapshot, error) {
 		}
 		raw := strings.TrimSpace(string(data.Meta.After))
 		if raw == "" || raw == "null" {
+			if err := ctx.Err(); err != nil {
+				return empty, fmt.Errorf("%w: canceled: %v", ErrCatalogIncomplete, err)
+			}
+			out.AsOf = time.Now().UTC()
 			return out, nil
 		}
 		var next string
