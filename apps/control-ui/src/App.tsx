@@ -69,7 +69,8 @@ export default function App() {
       if (event.key === "Escape") {
         event.preventDefault();
         setMenuOpen(false);
-        menuButtonRef.current?.focus();
+        // Inert background is cleared by the React render before focus returns.
+        window.requestAnimationFrame(() => menuButtonRef.current?.focus());
       }
       if (event.key !== "Tab") return;
       const buttons = Array.from(mobileNavRef.current?.querySelectorAll<HTMLButtonElement>("button:not(:disabled)") ?? [])
@@ -110,7 +111,8 @@ export default function App() {
         // Moving from the desktop sidebar to the hidden mobile drawer must
         // not strand keyboard focus inside invisible navigation controls.
         setMenuOpen(false);
-        menuButtonRef.current?.focus();
+        // Inert background is cleared by the React render before focus returns.
+        window.requestAnimationFrame(() => menuButtonRef.current?.focus());
       }
     }
     desktop.addEventListener("change", handleBreakpointChange);
@@ -118,7 +120,8 @@ export default function App() {
   }, []);
   function closeMenu() {
     setMenuOpen(false);
-    menuButtonRef.current?.focus();
+    // Do not focus an element while its ancestor remains inert.
+    window.requestAnimationFrame(() => menuButtonRef.current?.focus());
   }
   useEffect(() => {
     document.title = `${page} · Delta Crypto Algo`;
