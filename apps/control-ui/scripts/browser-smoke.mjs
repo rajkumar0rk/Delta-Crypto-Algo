@@ -138,6 +138,30 @@ try {
   writeFileSync(join(screenshots, "overview-320-reflow.png"), Buffer.from(narrowShot.data, "base64"));
   console.log("PASS 320px narrow-reflow and reduced-motion preferences");
 
+  // CSS zoom is an automated 200% layout stress test, not a substitute for
+  // browser-native zoom and assistive-technology acceptance on real devices.
+  await cdp("Emulation.setDeviceMetricsOverride", {
+    width: 640, height: 900, deviceScaleFactor: 1, mobile: false
+  });
+  await cdp("Page.navigate", { url: site });
+  await until('document.querySelector("main h1")?.textContent', "Trading overview", "zoom stress");
+  const zoomState = await evaluate(String.raw`(() => {
+    document.documentElement.style.zoom = "2";
+    return {
+      zoom: parseFloat(getComputedStyle(document.documentElement).zoom),
+      overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 2,
+      safety: document.body.innerText.includes("Live trading is disabled."),
+      skipLink: !!document.querySelector('a.skip-link[href="#main"]')
+    };
+  })()`);
+  assert.ok(zoomState.zoom >= 2 && zoomState.safety && zoomState.skipLink,
+    "200% CSS zoom safety check failed: " + JSON.stringify(zoomState));
+  assert.equal(zoomState.overflow, false,
+    "Horizontal document overflow during 200% CSS zoom stress");
+  const zoomShot = await cdp("Page.captureScreenshot", { format: "png" });
+  writeFileSync(join(screenshots, "overview-css-zoom-200.png"), Buffer.from(zoomShot.data, "base64"));
+  console.log("PASS 200% CSS zoom layout stress (manual browser zoom still required)");
+
   // Validate the actual accessibility tree names, not merely visible text.
   await cdp("Accessibility.enable");
   const ax = await cdp("Accessibility.getFullAXTree");
@@ -182,6 +206,22 @@ try {
     type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9, modifiers: 8
   });
   await until('document.activeElement?.textContent.trim()', "Settings", "menu keyboard focus containment");
+  assert.equal(await evaluate('document.querySelector(".mobile-scrim")?.tabIndex'), -1,
+    "Backdrop must not be in the mobile keyboard tab order");
+  assert.equal(await evaluate('document.querySelector(".mobile-scrim")?.getAttribute("aria-hidden")'), "true",
+    "Backdrop must not compete with the drawer close button in the accessibility tree");
+
+  // Even if focus is moved outside by browser automation or an extension,
+  // the next Tab must return to the first control within the open drawer.
+  await evaluate('document.querySelector(".hamburger")?.focus()');
+  await cdp("Input.dispatchKeyEvent", {
+    type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9
+  });
+  await cdp("Input.dispatchKeyEvent", {
+    type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9
+  });
+  await until('document.activeElement?.getAttribute("aria-label")', "Close menu",
+    "focus trapped after external focus");
   await cdp("Input.dispatchKeyEvent", {
     type: "keyDown", key: "Escape", code: "Escape", windowsVirtualKeyCode: 27
   });
@@ -191,6 +231,20 @@ try {
   await until('document.querySelector(".hamburger")?.getAttribute("aria-expanded")', "false", "Escape closes navigation");
   await until('document.activeElement?.getAttribute("aria-label")', "Open navigation", "Escape focus restoration");
   console.log("PASS keyboard skip link, mobile menu Enter/Shift+Tab/Escape and focus restoration");
+
+  // Check the state transition in the opposite direction: an open drawer
+  // must close when a window resize moves to the desktop breakpoint.
+  await evaluate('document.querySelector(".hamburger")?.click()');
+  await until('document.querySelector(".hamburger")?.getAttribute("aria-expanded")', "true",
+    "drawer reopened before resize");
+  await cdp("Emulation.setDeviceMetricsOverride", {
+    width: 1280, height: 900, deviceScaleFactor: 1, mobile: false
+  });
+  await until('document.querySelector(".hamburger")?.getAttribute("aria-expanded")', "false",
+    "desktop breakpoint resets mobile drawer");
+  assert.equal(await evaluate('document.querySelector(".mobile-scrim") === null'), true,
+    "Mobile backdrop remained mounted after desktop resize");
+  console.log("PASS desktop breakpoint closes mobile drawer and removes backdrop");
 
 } finally {
   ws?.close();
