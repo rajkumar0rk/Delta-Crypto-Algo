@@ -101,10 +101,16 @@ export default function App() {
     // a stale mobile backdrop or drawer state over the desktop navigation.
     const desktop = window.matchMedia("(min-width: 981px)");
     function handleBreakpointChange() {
-      if (!desktop.matches) return;
-      setMenuOpen(false);
-      if (document.activeElement === closeMenuButtonRef.current) {
-        mobileNavRef.current?.querySelector<HTMLButtonElement>(".nav-link.selected")?.focus();
+      if (desktop.matches) {
+        setMenuOpen(false);
+        if (document.activeElement === closeMenuButtonRef.current) {
+          mobileNavRef.current?.querySelector<HTMLButtonElement>(".nav-link.selected")?.focus();
+        }
+      } else if (mobileNavRef.current?.contains(document.activeElement)) {
+        // Moving from the desktop sidebar to the hidden mobile drawer must
+        // not strand keyboard focus inside invisible navigation controls.
+        setMenuOpen(false);
+        menuButtonRef.current?.focus();
       }
     }
     desktop.addEventListener("change", handleBreakpointChange);
