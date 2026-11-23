@@ -108,3 +108,8 @@
 - PR #46 exact prior head `39b26cd6d248ba54d491216f3df1ef9cd5bfbd54` failed Go formatting (only `internal/httpapi/server_test.go`); UI succeeded: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45072767981
 - Commit `3c7f6c1b35d3f3389c1c0f60c04f8e8f3ceed864` aligns the security-header test table with gofmt. **Fresh exact-head CI remains required**; the failed run does not validate Go tests/race/vet/build.
 - M1 remains unaccepted until independent review, owner-confirmed `develop` governance and manual screen-reader/200% zoom acceptance. Do not merge or begin M2 integration on green CI alone.
+
+## M1 health contract regression batch (2026-11-23)
+- PR #46: added table-driven coverage for JSON health state/trade_enabled=false, liveness/readiness statuses, HEAD routing, unsafe method denials, unknown order paths, no-store and denied cross-origin responses.
+- Code head `5f454852446b081c3b3d20974696fa12412bf6b3` was pushed; no exact-head workflow returned immediately after push. Go tests were NOT run locally. This is pending CI and independent review, not accepted M1.
+- Owner-only branch protection verification and manual screen-reader/200%-zoom acceptance remain outstanding. No `develop`, `main`, credentials, orders or production changes.
