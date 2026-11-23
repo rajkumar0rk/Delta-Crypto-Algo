@@ -140,3 +140,8 @@
 - **Exact new-head CI not yet verified.** Prior green run #45092945033 validates an older head only and MUST NOT be used to merge this update. Local Go/UI test execution was not performed through the GitHub connector.
 - M1 remains blocked by independent qualified review, develop governance/protection verification, manual screen-reader/200% zoom acceptance and exact-head CI. Do not merge until gates are satisfied.
 - M2 PRs #29/#30/#47–#51 require consolidation after M1; authoritative Delta India contract/margin/fee/expiry fixtures remain missing. No live credentials, orders, production or main changes.
+
+## M1 exact-head CI diagnosis — 2026-11-23
+- PR #46 head `1e29961dc3eafcd7779499b33296074d0ba128be` failed Go formatting while UI passed: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45106026995. The Go job explicitly reported `internal/httpapi/server_security_test.go` from `gofmt -l`; no Go tests were reached.
+- Corrected the `Permissions-Policy` map literal's one-column alignment in commit `95762feb4550c50670ca81fef3eb830a3a463364`; this is a targeted formatting fix, not evidence of successful CI. The latest head must be rechecked after this status commit.
+- Independent review count remains zero; branch governance and native screen-reader/200%-zoom manual acceptance remain external gates. M1 not accepted and no merge authorized until all gates pass. M2 integration remains deferred.
