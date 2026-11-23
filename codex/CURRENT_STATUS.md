@@ -1,3 +1,8 @@
+## 2026-11-23 — M2 refresh rejection regression batch (unmerged)
+- Added `internal/domain/catalog/store_rejection_test.go` at commit `ea959bf913f70a612e29b00469e1b22b5049f635` on the existing consolidated M2 branch / PR #54. Nine table-driven malformed refresh scenarios assert that the previously published catalog remains intact, stays usable only while fresh, and becomes non-tradeable when stale.
+- Tests and exact-head CI for this commit are **not yet verified**; do not treat the new tests as passed or merge M2. No exchange-authoritative contract fixture, account-specific eligibility, fee/margin rates, or full M2 acceptance established.
+- M1 PR #46 is already merged into `develop`, but formal manual screen-reader/200% zoom and independent governance acceptance evidence remains missing. Earlier historical entries below describe previous states and must not be read as current.
+
 ## 2026-11-23 M1 merge and M2 consolidated preparation
 - **M1 PR #46 merged into `develop`** at `e3a24aca6b6b870bb0bcccf06ed7066786e5207a`: https://github.com/rajkumar0rk/Delta-Crypto-Algo/pull/46 . PR source head `7f2d86c` passed Go and UI CI https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45111951903 . Post-merge CI has not yet been verified in this status entry.
 - Maintainer expressly waived **independent review** and **server-side branch protection** for development integration on 2026-11-23. These controls are NOT configured/verified. Manual screen-reader and native browser 200% zoom acceptance remain **unverified**; M1 is integrated with partial acceptance.
