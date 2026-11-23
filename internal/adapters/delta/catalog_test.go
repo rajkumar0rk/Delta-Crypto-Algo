@@ -327,3 +327,31 @@ func TestPublicCatalogRejectsOpaqueHTTPSOriginBeforeNetwork(t *testing.T) {
 		t.Fatalf("invalid origin reached transport %d times", n)
 	}
 }
+// A missing or empty cursor cannot prove that every venue page was fetched.
+// Only an explicit JSON null terminates a complete catalog.
+func TestPublicCatalogRequiresExplicitTerminalCursor(t *testing.T) {
+	cases := []struct {
+		name string
+		meta string
+	}{
+		{name: "empty string", meta: `"after":""`},
+		{name: "whitespace string", meta: `"after":"   "`},
+		{name: "missing after", meta: `"other":null`},
+		{name: "empty metadata", meta: ""},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
+				fmt.Fprintf(w, `{"success":true,"result":[{"id":1}],"meta":{%s}}`, tc.meta)
+			}))
+			defer srv.Close()
+			client := srv.Client()
+			client.Timeout = time.Second
+			got, err := (PublicCatalog{BaseURL: srv.URL, Client: client}).Fetch(context.Background())
+			if !errors.Is(err, ErrCatalogIncomplete) || len(got.Products) != 0 || got.Pages != 0 || !got.AsOf.IsZero() {
+				t.Fatalf("unproven terminal cursor published data: %+v, %v", got, err)
+			}
+		})
+	}
+}
