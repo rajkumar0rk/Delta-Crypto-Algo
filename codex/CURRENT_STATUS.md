@@ -12,6 +12,14 @@
 
 # Project status — M1 consolidated, acceptance pending
 
+## 2026-11-24 — M2 catalog transport preflight hardening (draft PR #54)
+
+- On existing consolidation branch `feature/m2-catalog-domain-consolidated-20261123`, reject opaque HTTPS origins and reject already-canceled contexts before each pagination request. Added deterministic counting-transport regression tests proving no network I/O for canceled requests or malformed origins.
+- Code commit: https://github.com/rajkumar0rk/Delta-Crypto-Algo/commit/7cf6b93fdc1b2499bcb74e67cf4447276048acc2 ; tests commit: https://github.com/rajkumar0rk/Delta-Crypto-Algo/commit/54d187c2bf9bac4a71bba69b3d6aa2cb2d0a5f16 .
+- **CI for these new commits not yet verified at this handoff**; older green run #45216268002 covers an earlier head only. No local test execution claimed.
+- M1 code merged via #46 but formal independent review, protection and manual assistive-tech/zoom acceptance remain unverified. M2 still lacks authoritative venue contract/fee/margin/expiry mapping and eligibility proof. Do not merge #54 or enable trading on this evidence.
+
+
 ## 2026-11-23 — M1 accessibility, review governance and current CI
 
 - Existing PR #46: https://github.com/rajkumar0rk/Delta-Crypto-Algo/pull/46 targeting `develop`, not merged.
