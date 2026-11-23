@@ -159,7 +159,7 @@ func (c PublicCatalog) Fetch(ctx context.Context) (RawSnapshot, error) {
 			return empty, fmt.Errorf("%w: missing pagination cursor", ErrCatalogIncomplete)
 		}
 		raw := strings.TrimSpace(string(data.Meta.After))
-		if raw == "" || raw == "null" {
+		if raw == "null" {
 			if err := ctx.Err(); err != nil {
 				return empty, fmt.Errorf("%w: canceled: %v", ErrCatalogIncomplete, err)
 			}
