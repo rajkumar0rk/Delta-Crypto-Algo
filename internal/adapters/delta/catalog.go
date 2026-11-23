@@ -9,11 +9,14 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"mime"
 	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
 	"time"
+	"unicode"
+	"unicode/utf8"
 )
 
 const (
@@ -71,7 +74,7 @@ func (c PublicCatalog) Fetch(ctx context.Context) (RawSnapshot, error) {
 	if pageLimit < 1 || pageLimit > maxPages || productLimit < 1 || productLimit > maxProducts {
 		return empty, fmt.Errorf("%w: invalid bounded limits", ErrCatalogIncomplete)
 	}
-	out := RawSnapshot{AsOf: time.Now().UTC()}
+	out := RawSnapshot{}
 	seen := map[string]struct{}{}
 	cursor := ""
 	for page := 0; page < pageLimit; page++ {
@@ -87,6 +90,7 @@ func (c PublicCatalog) Fetch(ctx context.Context) (RawSnapshot, error) {
 			return empty, fmt.Errorf("%w: request: %v", ErrCatalogIncomplete, err)
 		}
 		req.Header.Set("Accept", "application/json")
+		req.Header.Set("Accept-Encoding", "identity")
 		// Never follow redirects: a configurable HTTPS origin must not be able
 		// to redirect catalog reads to another host (or an untrusted path).
 		// Copy the client to preserve caller configuration without mutation.
@@ -102,12 +106,21 @@ func (c PublicCatalog) Fetch(ctx context.Context) (RawSnapshot, error) {
 			resp.Body.Close()
 			return empty, fmt.Errorf("%w: HTTP %d", ErrCatalogIncomplete, resp.StatusCode)
 		}
+		// Reject non-JSON or encoded HTTP representations before reading.
+		if err := validateCatalogRepresentation(resp.Header); err != nil {
+			resp.Body.Close()
+			return empty, fmt.Errorf("%w: %v", ErrCatalogIncomplete, err)
+		}
 		// Enforce the byte limit independently of JSON parsing. A valid JSON
 		// document followed by excess whitespace must not bypass the cap.
 		body, readErr := io.ReadAll(io.LimitReader(resp.Body, maxPageBytes+1))
 		closeErr := resp.Body.Close()
 		if readErr != nil || closeErr != nil || len(body) > maxPageBytes {
 			return empty, fmt.Errorf("%w: oversized or unreadable page: %v %v", ErrCatalogIncomplete, readErr, closeErr)
+		}
+		// Reject ambiguous nested keys before typed mapping.
+		if err := rejectAmbiguousJSON(body); err != nil {
+			return empty, fmt.Errorf("%w: ambiguous JSON: %v", ErrCatalogIncomplete, err)
 		}
 		var data pageResponse
 		decoder := json.NewDecoder(bytes.NewReader(body))
@@ -135,8 +148,17 @@ func (c PublicCatalog) Fetch(ctx context.Context) (RawSnapshot, error) {
 			out.Products = append(out.Products, append(json.RawMessage(nil), product...))
 		}
 		out.Pages++
+		// Absence of an explicit pagination cursor is not proof that the
+		// snapshot is complete. A null cursor is the terminal marker.
+		if len(data.Meta.After) == 0 {
+			return empty, fmt.Errorf("%w: missing pagination cursor", ErrCatalogIncomplete)
+		}
 		raw := strings.TrimSpace(string(data.Meta.After))
 		if raw == "" || raw == "null" {
+			if err := ctx.Err(); err != nil {
+				return empty, fmt.Errorf("%w: canceled: %v", ErrCatalogIncomplete, err)
+			}
+			out.AsOf = time.Now().UTC()
 			return out, nil
 		}
 		var next string
@@ -150,7 +172,7 @@ func (c PublicCatalog) Fetch(ctx context.Context) (RawSnapshot, error) {
 				return empty, fmt.Errorf("%w: invalid numeric cursor", ErrCatalogIncomplete)
 			}
 		}
-		if next == "" || len(next) > 256 {
+		if next == "" || strings.TrimSpace(next) == "" || len(next) > 256 || !utf8.ValidString(next) || strings.IndexFunc(next, unicode.IsControl) >= 0 {
 			return empty, fmt.Errorf("%w: empty or oversized cursor", ErrCatalogIncomplete)
 		}
 		if _, exists := seen[next]; exists {
@@ -160,4 +182,35 @@ func (c PublicCatalog) Fetch(ctx context.Context) (RawSnapshot, error) {
 		cursor = next
 	}
 	return empty, fmt.Errorf("%w: pagination page limit reached", ErrCatalogIncomplete)
+}
+
+// validateCatalogRepresentation rejects ambiguous or incompatible response headers.
+// Missing Content-Type is tolerated until authoritative venue fixtures are verified.
+func validateCatalogRepresentation(headers http.Header) error {
+	if values := headers.Values("Content-Encoding"); len(values) > 1 {
+		return errors.New("ambiguous content encoding")
+	} else if len(values) == 1 {
+		encoding := strings.TrimSpace(values[0])
+		if encoding != "" && !strings.EqualFold(encoding, "identity") {
+			return errors.New("unsupported content encoding")
+		}
+	}
+	if values := headers.Values("Content-Type"); len(values) > 1 {
+		return errors.New("ambiguous content type")
+	} else if len(values) == 1 {
+		declared := strings.TrimSpace(values[0])
+		if declared == "" {
+			return errors.New("empty declared content type")
+		}
+		mediaType, params, err := mime.ParseMediaType(declared)
+		if err != nil || !strings.EqualFold(mediaType, "application/json") {
+			return errors.New("unexpected content type")
+		}
+		for key, value := range params {
+			if key != "charset" || !strings.EqualFold(value, "utf-8") {
+				return errors.New("unsupported JSON media parameter")
+			}
+		}
+	}
+	return nil
 }

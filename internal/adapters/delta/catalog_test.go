@@ -16,6 +16,7 @@ func TestPublicCatalogPagination(t *testing.T) {
 	requests := 0
 	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		requests++
+		w.Header().Set("Content-Type", "application/json")
 		if r.Method != http.MethodGet || r.URL.Path != "/v2/products" || r.Header.Get("Accept") != "application/json" {
 			t.Errorf("unexpected request %s %s", r.Method, r.URL)
 		}
@@ -129,5 +130,162 @@ func TestPublicCatalogRejectsRedirectsWithoutFollowing(t *testing.T) {
 	}
 	if client.CheckRedirect != nil {
 		t.Fatal("caller HTTP client mutated")
+	}
+}
+
+func TestPublicCatalogRejectsUnexpectedHTTPRepresentation(t *testing.T) {
+	cases := []struct {
+		name        string
+		contentType string
+		encoding    string
+	}{
+		{name: "html content type", contentType: "text/html"},
+		{name: "json suffix is not JSON", contentType: "application/problem+json"},
+		{name: "gzip encoding", contentType: "application/json", encoding: "gzip"},
+		{name: "br encoding", contentType: "application/json", encoding: "br"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.Header.Get("Accept-Encoding") != "identity" {
+					t.Errorf("unexpected encoding negotiation: %q", r.Header.Get("Accept-Encoding"))
+				}
+				w.Header().Set("Content-Type", tc.contentType)
+				if tc.encoding != "" {
+					w.Header().Set("Content-Encoding", tc.encoding)
+				}
+				fmt.Fprint(w, `{"success":true,"result":[{"id":1}],"meta":{"after":null}}`)
+			}))
+			defer srv.Close()
+			client := srv.Client()
+			client.Timeout = time.Second
+			got, err := (PublicCatalog{BaseURL: srv.URL, Client: client}).Fetch(context.Background())
+			if !errors.Is(err, ErrCatalogIncomplete) || len(got.Products) != 0 {
+				t.Fatalf("must reject representation without publishing products: %+v, %v", got, err)
+			}
+		})
+	}
+}
+
+func TestPublicCatalogAcceptsDeclaredJSONMediaType(t *testing.T) {
+	srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		w.Header().Set("Content-Encoding", "identity")
+		fmt.Fprint(w, `{"success":true,"result":[{"id":1}],"meta":{"after":null}}`)
+	}))
+	defer srv.Close()
+	client := srv.Client()
+	client.Timeout = time.Second
+	got, err := (PublicCatalog{BaseURL: srv.URL, Client: client}).Fetch(context.Background())
+	if err != nil || len(got.Products) != 1 {
+		t.Fatalf("valid JSON response rejected: %+v, %v", got, err)
+	}
+}
+
+func TestPublicCatalogRejectsAmbiguousRepresentationHeaders(t *testing.T) {
+	cases := []struct {
+		name         string
+		contentTypes []string
+		encodings    []string
+	}{
+		{name: "duplicate content type", contentTypes: []string{"application/json", "text/html"}},
+		{name: "duplicate content encoding", contentTypes: []string{"application/json"}, encodings: []string{"identity", "gzip"}},
+		{name: "comma joined content type", contentTypes: []string{"application/json, text/html"}},
+		{name: "non utf8 charset", contentTypes: []string{"application/json; charset=iso-8859-1"}},
+		{name: "invalid media parameter", contentTypes: []string{"application/json; charset="}},
+		{name: "unknown media parameter", contentTypes: []string{"application/json; version=1"}},
+		{name: "empty declared content type", contentTypes: []string{""}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				for _, value := range tc.contentTypes {
+					w.Header().Add("Content-Type", value)
+				}
+				for _, value := range tc.encodings {
+					w.Header().Add("Content-Encoding", value)
+				}
+				fmt.Fprint(w, `{"success":true,"result":[{"id":1}],"meta":{"after":null}}`)
+			}))
+			defer srv.Close()
+			client := srv.Client()
+			client.Timeout = time.Second
+			got, err := (PublicCatalog{BaseURL: srv.URL, Client: client}).Fetch(context.Background())
+			if !errors.Is(err, ErrCatalogIncomplete) || len(got.Products) != 0 {
+				t.Fatalf("ambiguous representation accepted: %+v %v", got, err)
+			}
+		})
+	}
+}
+
+func TestPublicCatalogRejectsSecondPageRepresentationWithoutPartialPublication(t *testing.T) {
+	requests := 0
+	srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		requests++
+		if requests == 1 {
+			w.Header().Set("Content-Type", "application/json")
+			fmt.Fprint(w, `{"success":true,"result":[{"id":1}],"meta":{"after":"next"}}`)
+			return
+		}
+		if r.URL.Query().Get("after") != "next" {
+			t.Errorf("unexpected second-page cursor: %s", r.URL)
+		}
+		w.Header().Set("Content-Type", "text/html")
+		fmt.Fprint(w, `{"success":true,"result":[{"id":2}],"meta":{"after":null}}`)
+	}))
+	defer srv.Close()
+	client := srv.Client()
+	client.Timeout = time.Second
+	got, err := (PublicCatalog{BaseURL: srv.URL, Client: client}).Fetch(context.Background())
+	if !errors.Is(err, ErrCatalogIncomplete) || len(got.Products) != 0 || got.Pages != 0 || !got.AsOf.IsZero() {
+		t.Fatalf("second-page representation must discard complete snapshot: %+v, %v", got, err)
+	}
+	if requests != 2 {
+		t.Fatalf("expected two pages, got %d", requests)
+	}
+}
+
+func TestPublicCatalogSnapshotTimestampAfterFinalPage(t *testing.T) {
+	started := make(chan struct{})
+	release := make(chan struct{})
+	srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		close(started)
+		<-release
+		fmt.Fprint(w, `{"success":true,"result":[{"id":1}],"meta":{"after":null}}`)
+	}))
+	defer srv.Close()
+	httpClient := srv.Client()
+	httpClient.Timeout = 5 * time.Second
+	type outcome struct {
+		snapshot RawSnapshot
+		err      error
+	}
+	done := make(chan outcome, 1)
+	go func() {
+		snapshot, err := (PublicCatalog{BaseURL: srv.URL, Client: httpClient}).Fetch(context.Background())
+		done <- outcome{snapshot, err}
+	}()
+	<-started
+	completedAfter := time.Now().UTC()
+	close(release)
+	got := <-done
+	if got.err != nil || len(got.snapshot.Products) != 1 || got.snapshot.AsOf.Before(completedAfter) {
+		t.Fatalf("snapshot timestamp predates completed fetch: %+v %v", got.snapshot, got.err)
+	}
+}
+
+func TestPublicCatalogCanceledAtFinalPageFailsClosed(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		cancel()
+		fmt.Fprint(w, `{"success":true,"result":[{"id":1}],"meta":{"after":null}}`)
+	}))
+	defer srv.Close()
+	httpClient := srv.Client()
+	httpClient.Timeout = time.Second
+	got, err := (PublicCatalog{BaseURL: srv.URL, Client: httpClient}).Fetch(ctx)
+	if !errors.Is(err, ErrCatalogIncomplete) || len(got.Products) != 0 || got.Pages != 0 {
+		t.Fatalf("canceled fetch must discard snapshot: %+v %v", got, err)
 	}
 }
