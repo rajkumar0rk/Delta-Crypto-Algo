@@ -34,3 +34,16 @@ Combined code/CI checks passed; do not call M1 complete or move the dependency g
 ## Loopback DNS ambiguity hardening (2026-11-23)
 
 M1 foundation startup must accept only numeric IPv4 `127.0.0.1` or IPv6 `::1` listeners. A hostname such as `localhost` depends on external resolver/hosts configuration and is rejected even if it usually resolves to loopback. Regression coverage includes IPv6 acceptance, DNS aliases and port bounds. This change requires fresh exact-head CI and independent review; it does not satisfy manual screen-reader or owner governance gates.
+
+## Autonomous solo-maintainer M1 UI review — 2026-11-23
+
+The user has **already delegated routine development decisions and eligible merges to `develop`**. Repeatedly asking the sole developer to personally approve each development milestone is not a requirement. This delegation does not supply an independent human code review or authorize bypassing a GitHub-enforced gate. Additional developers will later use the same feature-branch, PR, review, and CI workflow.
+
+PR #46 now includes responsive mobile navigation changes: prevent keyboard focus escaping the open drawer; mark the backdrop as outside the accessibility and sequential tab order; close stale mobile drawer state when switching to desktop; and restore focus to the visible menu trigger when switching from desktop to mobile. Automated Chrome coverage includes both breakpoint directions and forced external focus, plus the existing 320px narrow-reflow and reduced-motion check.
+
+CI investigation:
+- https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45091601256 — Go passed; UI browser smoke failed solely on a new **headless CSS zoom assertion**. Chrome reported computed zoom `1` despite the inline style reading `200%`. This was **not valid evidence of native browser zoom**.
+- The unreliable zoom assertion was removed; the deterministic 320 CSS-pixel reflow check remains, and **manual native browser zoom and screen-reader acceptance remain unverified**.
+- Updated code head `d7bab0505fa23a789d4972d2dc0eccc881a51063` requires fresh CI; no green result is claimed here.
+
+M1 remains pending independent code-review evidence, repository governance and manual assistive-technology acceptance. No live trading, production credentials, VPS deployment or `main` changes are authorized by this development delegation.
