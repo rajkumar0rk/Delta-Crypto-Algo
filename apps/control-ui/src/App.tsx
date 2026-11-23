@@ -131,9 +131,9 @@ export default function App() {
   }
   return (
     <div className="app">
-      <a className="skip-link" href="#main">Skip to main content</a>
+      <a className="skip-link" href="#main" inert={menuOpen}>Skip to main content</a>
       {menuOpen && <button aria-label="Close navigation" aria-hidden="true" tabIndex={-1} className="mobile-scrim" onClick={closeMenu} />}
-      <aside className={`sidebar ${menuOpen ? "sidebar-open" : ""}`} ref={mobileNavRef} id="primary-navigation" aria-label="Primary navigation">
+      <aside className={`sidebar ${menuOpen ? "sidebar-open" : ""}`} ref={mobileNavRef} id="primary-navigation" aria-label="Primary navigation" role={menuOpen ? "dialog" : undefined} aria-modal={menuOpen || undefined}>
         <div className="brand">
           <div className="brand-mark" aria-hidden="true">D</div>
           <div className="brand-word"><strong>delta<span>crypto</span></strong><small>ALGO PLATFORM</small></div>
@@ -163,7 +163,7 @@ export default function App() {
           <small>Foundation v0.1 · No accounts connected</small>
         </div>
       </aside>
-      <div className="workspace">
+      <div className="workspace" inert={menuOpen}>
         <header className="topbar">
           <div className="top-left">
             <button ref={menuButtonRef} className="hamburger" aria-controls="primary-navigation" aria-expanded={menuOpen} aria-label="Open navigation" onClick={() => setMenuOpen(true)}><Menu size={21} /></button>
