@@ -1,3 +1,9 @@
+## 2026-11-24 — M2 exact-head CI failure triage and formatting repair (draft PR #54)
+
+- Inspected exact-head GitHub Actions for prior commit `a29d53b78915f2529c95a987910d4cd8e7fc99b8`: [run #45240094938](https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45240094938) **failed** Go formatting (step 5); Go vet/race/build skipped. UI job succeeded. Previous green CI was for an older commit and does not validate this head.
+- Repaired Go formatting in `internal/domain/catalog/store_rejection_test.go` and `internal/adapters/delta/catalog_test.go` on the existing M2 consolidation branch. Final formatting-repair code commit: [ee816582](https://github.com/rajkumar0rk/Delta-Crypto-Algo/commit/ee816582d34509573168f65e2db091a32385ee11). No new functional capability or venue-authoritative fixture is claimed.
+- **Current head tests/CI unverified** at handoff; inspect the new workflow, fix remaining failures, then extend M2 contract mapping and fixture coverage. Do not merge PR #54 while M2 acceptance is incomplete. `develop` unchanged. M1 manual assistive-technology acceptance and governance evidence still unresolved. No live credentials, orders, production deployment or `main` changes.
+
 ## 2026-11-23 — M2 refresh rejection regression batch (unmerged)
 - Added `internal/domain/catalog/store_rejection_test.go` at commit `ea959bf913f70a612e29b00469e1b22b5049f635` on the existing consolidated M2 branch / PR #54. Nine table-driven malformed refresh scenarios assert that the previously published catalog remains intact, stays usable only while fresh, and becomes non-tradeable when stale.
 - Tests and exact-head CI for this commit are **not yet verified**; do not treat the new tests as passed or merge M2. No exchange-authoritative contract fixture, account-specific eligibility, fee/margin rates, or full M2 acceptance established.
