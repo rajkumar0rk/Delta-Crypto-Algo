@@ -179,6 +179,14 @@ try {
   await until('document.querySelector(".hamburger")?.getAttribute("aria-expanded")', "true", "mobile navigation open");
   console.log("Focus placement state:", await evaluate('JSON.stringify({focused: document.activeElement?.outerHTML?.slice(0,180), close: document.querySelector(".close-nav")?.outerHTML?.slice(0,180), navVisible: getComputedStyle(document.querySelector(".sidebar")).visibility})'));
   await until('document.activeElement?.getAttribute("aria-label")', "Close menu", "menu focus placement");
+  assert.equal(await evaluate('document.querySelector(".workspace")?.inert'), true,
+    "Main workspace must be inert while the navigation modal is active");
+  assert.equal(await evaluate('document.querySelector(".skip-link")?.inert'), true,
+    "Skip link must not bypass the active navigation modal");
+  assert.equal(await evaluate('document.querySelector(".sidebar")?.getAttribute("role")'), "dialog",
+    "Open mobile drawer needs dialog semantics");
+  assert.equal(await evaluate('document.querySelector(".sidebar")?.getAttribute("aria-modal")'), "true",
+    "Open mobile drawer needs a modal accessibility boundary");
   await cdp("Input.dispatchKeyEvent", {
     type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9, modifiers: 8
   });
@@ -210,7 +218,13 @@ try {
   });
   await until('document.querySelector(".hamburger")?.getAttribute("aria-expanded")', "false", "Escape closes navigation");
   await until('document.activeElement?.getAttribute("aria-label")', "Open navigation", "Escape focus restoration");
-  console.log("PASS keyboard skip link, mobile menu Enter/Shift+Tab/Escape and focus restoration");
+  assert.equal(await evaluate('document.querySelector(".workspace")?.inert'), false,
+    "Closing the navigation must restore the interactive workspace");
+  assert.equal(await evaluate('document.querySelector(".skip-link")?.inert'), false,
+    "Closing the navigation must restore the skip link");
+  assert.equal(await evaluate('document.querySelector(".sidebar")?.getAttribute("role")'), null,
+    "Closed/desktop sidebar must not remain a dialog");
+  console.log("PASS modal AX boundary, inert background, keyboard skip link, focus trap and Escape restoration");
 
   // Check the state transition in the opposite direction: an open drawer
   // must close when a window resize moves to the desktop breakpoint.
@@ -226,6 +240,8 @@ try {
     "desktop breakpoint resets mobile drawer");
   assert.equal(await evaluate('document.querySelector(".mobile-scrim") === null'), true,
     "Mobile backdrop remained mounted after desktop resize");
+  assert.equal(await evaluate('document.querySelector(".workspace")?.inert'), false,
+    "Desktop workspace must be interactive after breakpoint transition");
   await until('document.activeElement?.textContent.trim()', "Overview",
     "desktop sidebar navigation focus");
   await cdp("Emulation.setDeviceMetricsOverride", {
