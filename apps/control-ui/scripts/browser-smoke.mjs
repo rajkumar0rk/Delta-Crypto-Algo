@@ -237,6 +237,8 @@ try {
   await evaluate('document.querySelector(".hamburger")?.click()');
   await until('document.querySelector(".hamburger")?.getAttribute("aria-expanded")', "true",
     "drawer reopened before resize");
+  await until('document.activeElement?.getAttribute("aria-label")', "Close menu",
+    "drawer focus before desktop resize");
   await cdp("Emulation.setDeviceMetricsOverride", {
     width: 1280, height: 900, deviceScaleFactor: 1, mobile: false
   });
@@ -244,7 +246,14 @@ try {
     "desktop breakpoint resets mobile drawer");
   assert.equal(await evaluate('document.querySelector(".mobile-scrim") === null'), true,
     "Mobile backdrop remained mounted after desktop resize");
-  console.log("PASS desktop breakpoint closes mobile drawer and removes backdrop");
+  await until('document.activeElement?.textContent.trim()', "Overview",
+    "desktop sidebar navigation focus");
+  await cdp("Emulation.setDeviceMetricsOverride", {
+    width: 360, height: 900, deviceScaleFactor: 1, mobile: true
+  });
+  await until('document.activeElement?.getAttribute("aria-label")', "Open navigation",
+    "mobile breakpoint restores focus to menu trigger");
+  console.log("PASS bidirectional viewport transitions, drawer cleanup and focus recovery");
 
 } finally {
   ws?.close();
