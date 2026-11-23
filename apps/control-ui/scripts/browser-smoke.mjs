@@ -146,9 +146,12 @@ try {
   await cdp("Page.navigate", { url: site });
   await until('document.querySelector("main h1")?.textContent', "Trading overview", "zoom stress");
   const zoomState = await evaluate(String.raw`(() => {
-    document.documentElement.style.zoom = "2";
+    // Chrome does not apply root-element zoom consistently in headless mode;
+    // zoom the body and confirm the computed value instead.
+    document.body.style.zoom = "200%";
     return {
-      zoom: parseFloat(getComputedStyle(document.documentElement).zoom),
+      zoom: parseFloat(getComputedStyle(document.body).zoom),
+      inlineZoom: document.body.style.zoom,
       overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 2,
       safety: document.body.innerText.includes("Live trading is disabled."),
       skipLink: !!document.querySelector('a.skip-link[href="#main"]')
