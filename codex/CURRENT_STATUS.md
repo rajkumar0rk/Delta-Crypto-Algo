@@ -133,3 +133,10 @@
 - PR #46: added table-driven coverage for JSON health state/trade_enabled=false, liveness/readiness statuses, HEAD routing, unsafe method denials, unknown order paths, no-store and denied cross-origin responses.
 - Code head `5f454852446b081c3b3d20974696fa12412bf6b3` was pushed; no exact-head workflow returned immediately after push. Go tests were NOT run locally. This is pending CI and independent review, not accepted M1.
 - Owner-only branch protection verification and manual screen-reader/200%-zoom acceptance remain outstanding. No `develop`, `main`, credentials, orders or production changes.
+
+
+## M1 security regression batch — 2026-11-23
+- PR #46 remains the M1 integration candidate; new commits add a deny-by-default browser Permissions-Policy and Go regression tests for server-generated unique request IDs across successful/denied/unknown routes, client-supplied request ID spoofing, denied unsafe methods and absence of permissive CORS preflight headers.
+- **Exact new-head CI not yet verified.** Prior green run #45092945033 validates an older head only and MUST NOT be used to merge this update. Local Go/UI test execution was not performed through the GitHub connector.
+- M1 remains blocked by independent qualified review, develop governance/protection verification, manual screen-reader/200% zoom acceptance and exact-head CI. Do not merge until gates are satisfied.
+- M2 PRs #29/#30/#47–#51 require consolidation after M1; authoritative Delta India contract/margin/fee/expiry fixtures remain missing. No live credentials, orders, production or main changes.
