@@ -76,10 +76,16 @@ export default function App() {
         .filter(button => getComputedStyle(button).display !== "none");
       const first = buttons[0];
       const last = buttons[buttons.length - 1];
-      if (first && last && event.shiftKey && document.activeElement === first) {
+      if (!first || !last) return;
+      // A focusable element outside the drawer must never become a keyboard
+      // escape route while the mobile navigation is acting as an overlay.
+      if (!mobileNavRef.current?.contains(document.activeElement)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      } else if (event.shiftKey && document.activeElement === first) {
         event.preventDefault();
         last.focus();
-      } else if (first && last && !event.shiftKey && document.activeElement === last) {
+      } else if (!event.shiftKey && document.activeElement === last) {
         event.preventDefault();
         first.focus();
       }
@@ -90,6 +96,20 @@ export default function App() {
       document.removeEventListener("keydown", handleNavigationKeys);
     };
   }, [menuOpen]);
+  useEffect(() => {
+    // A viewport resize or zoom-induced breakpoint change must not leave
+    // a stale mobile backdrop or drawer state over the desktop navigation.
+    const desktop = window.matchMedia("(min-width: 981px)");
+    function handleBreakpointChange() {
+      if (!desktop.matches) return;
+      setMenuOpen(false);
+      if (document.activeElement === closeMenuButtonRef.current) {
+        mobileNavRef.current?.querySelector<HTMLButtonElement>(".nav-link.selected")?.focus();
+      }
+    }
+    desktop.addEventListener("change", handleBreakpointChange);
+    return () => desktop.removeEventListener("change", handleBreakpointChange);
+  }, []);
   function closeMenu() {
     setMenuOpen(false);
     menuButtonRef.current?.focus();
@@ -106,7 +126,7 @@ export default function App() {
   return (
     <div className="app">
       <a className="skip-link" href="#main">Skip to main content</a>
-      {menuOpen && <button aria-label="Close navigation" className="mobile-scrim" onClick={closeMenu} />}
+      {menuOpen && <button aria-label="Close navigation" aria-hidden="true" tabIndex={-1} className="mobile-scrim" onClick={closeMenu} />}
       <aside className={`sidebar ${menuOpen ? "sidebar-open" : ""}`} ref={mobileNavRef} id="primary-navigation" aria-label="Primary navigation">
         <div className="brand">
           <div className="brand-mark" aria-hidden="true">D</div>
