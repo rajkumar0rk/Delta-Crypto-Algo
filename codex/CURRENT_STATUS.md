@@ -1,3 +1,10 @@
+## 2026-11-24 — M2 explicit pagination terminal cursor hardening (PR #54)
+
+- Verified prior exact-head `9b71955f17b9e778274b05a112f241a517d2cf0d` passed GitHub Actions Go/UI at https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45260837908. This does **not** validate subsequent commits.
+- Fixed public catalog transport to reject an empty JSON-string pagination cursor rather than treating it as terminal. Only explicit JSON `null` proves completion; an empty string must fail closed without publishing partial records.
+- Added deterministic HTTPS fixture tests for empty, whitespace, absent and empty-metadata terminal markers. No live venue call or authoritative contract mapping claimed.
+- Implementation commits: `31af4c4bb0f6fb7c6b305ab5e8d279f5eadd82e4`, `9090dcb404908175ac3c080a3801da5da22590a0`. **Exact-new-head CI not yet verified** at this handoff; PR remains draft and unmerged. `develop` unchanged. M1 manual governance/accessibility and M2 venue product fee/margin/expiry/account eligibility remain blocked.
+
 ## 2026-11-24 — M2 exact-head CI failure triage and formatting repair (draft PR #54)
 
 - Inspected exact-head GitHub Actions for prior commit `a29d53b78915f2529c95a987910d4cd8e7fc99b8`: [run #45240094938](https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45240094938) **failed** Go formatting (step 5); Go vet/race/build skipped. UI job succeeded. Previous green CI was for an older commit and does not validate this head.
