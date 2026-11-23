@@ -1,5 +1,14 @@
 # Project status — M1 consolidated, acceptance pending
 
+## 2026-11-23 — M1 responsive navigation and automated acceptance follow-up
+
+- **User governance clarification:** the sole developer has delegated routine development decisions and eligible `develop` merges; do not repeatedly request personal milestone approval. The existing independent-review/branch-protection/assistive-technology gates are not silently marked passed. Preserve team-ready governance for future contributors.
+- **Code:** existing M1 PR #46 adds mobile drawer keyboard containment (including programmatically displaced focus), excludes the scrim from tab/AX navigation, closes stale drawer state on the desktop breakpoint, and restores focus to the visible menu trigger on the mobile breakpoint.
+- **Tests:** Chrome browser smoke now exercises both responsive transitions and keyboard focus recovery; it retains 320px narrow-reflow, viewport snapshots and AX button-name checks. Do not label this real 200% browser-zoom or screen-reader acceptance.
+- **Observed CI:** https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45091601256 had successful Go checks but UI failed because headless Chrome did not report an applied CSS zoom value. The nonrepresentative assertion was removed; updated code head `d7bab0505fa23a789d4972d2dc0eccc881a51063` has **unverified exact-head CI** at the time of this handoff. Check newer documentation-only commits and the resulting final-head CI before merge.
+- **Integration:** `develop` remained `60fb41ed034ad86fe401623472d3d81b67d116bf` before these PR changes, PR #46 remains open and unmerged. No trading, credentials, `main`, or production deployment.
+
+
 ## 2026-11-21 — M1 author-side review and expanded accessibility verification
 
 - PR #46 latest audited code SHA `6747cd825a1645f13beaa0ef7d499fa9546df081` passed both CI jobs: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44905852868. Checks: Go format, module integrity, vet, race suite and build; UI pinned dependencies, npm ci, audit, schema, typecheck, browser viewport and keyboard tests.
