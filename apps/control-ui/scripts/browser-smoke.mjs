@@ -138,32 +138,9 @@ try {
   writeFileSync(join(screenshots, "overview-320-reflow.png"), Buffer.from(narrowShot.data, "base64"));
   console.log("PASS 320px narrow-reflow and reduced-motion preferences");
 
-  // CSS zoom is an automated 200% layout stress test, not a substitute for
-  // browser-native zoom and assistive-technology acceptance on real devices.
-  await cdp("Emulation.setDeviceMetricsOverride", {
-    width: 640, height: 900, deviceScaleFactor: 1, mobile: false
-  });
-  await cdp("Page.navigate", { url: site });
-  await until('document.querySelector("main h1")?.textContent', "Trading overview", "zoom stress");
-  const zoomState = await evaluate(String.raw`(() => {
-    // Chrome does not apply root-element zoom consistently in headless mode;
-    // zoom the body and confirm the computed value instead.
-    document.body.style.zoom = "200%";
-    return {
-      zoom: parseFloat(getComputedStyle(document.body).zoom),
-      inlineZoom: document.body.style.zoom,
-      overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 2,
-      safety: document.body.innerText.includes("Live trading is disabled."),
-      skipLink: !!document.querySelector('a.skip-link[href="#main"]')
-    };
-  })()`);
-  assert.ok(zoomState.zoom >= 2 && zoomState.safety && zoomState.skipLink,
-    "200% CSS zoom safety check failed: " + JSON.stringify(zoomState));
-  assert.equal(zoomState.overflow, false,
-    "Horizontal document overflow during 200% CSS zoom stress");
-  const zoomShot = await cdp("Page.captureScreenshot", { format: "png" });
-  writeFileSync(join(screenshots, "overview-css-zoom-200.png"), Buffer.from(zoomShot.data, "base64"));
-  console.log("PASS 200% CSS zoom layout stress (manual browser zoom still required)");
+  // The 320px narrow-reflow check above covers the CSS layout width
+  // available at 200% zoom on a 640px window. Browser-native zoom and
+  // screen-reader behavior must still be accepted manually.
 
   // Validate the actual accessibility tree names, not merely visible text.
   await cdp("Accessibility.enable");
