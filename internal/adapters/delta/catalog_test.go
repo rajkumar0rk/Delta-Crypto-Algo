@@ -7,8 +7,8 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"sync/atomic"
 	"strings"
+	"sync/atomic"
 	"testing"
 	"time"
 )
@@ -292,7 +292,6 @@ func TestPublicCatalogCanceledAtFinalPageFailsClosed(t *testing.T) {
 		t.Fatalf("canceled fetch must discard snapshot: %+v %v", got, err)
 	}
 }
-
 
 // countingTransport detects forbidden network I/O even if the HTTP stack's
 // configured transport does not honor a canceled context.
