@@ -57,7 +57,7 @@ func (c PublicCatalog) Fetch(ctx context.Context) (RawSnapshot, error) {
 		return empty, fmt.Errorf("%w: nil context", ErrCatalogIncomplete)
 	}
 	base, err := url.Parse(c.BaseURL)
-	if err != nil || base == nil || base.Scheme != "https" || base.Host == "" || base.User != nil || base.RawQuery != "" || base.Fragment != "" || (base.Path != "" && base.Path != "/") {
+	if err != nil || base == nil || base.Scheme != "https" || base.Opaque != "" || base.Host == "" || base.User != nil || base.RawQuery != "" || base.Fragment != "" || (base.Path != "" && base.Path != "/") {
 		return empty, fmt.Errorf("%w: expected HTTPS origin without path or query", ErrCatalogIncomplete)
 	}
 	if c.Client == nil || c.Client.Timeout <= 0 {
@@ -78,6 +78,11 @@ func (c PublicCatalog) Fetch(ctx context.Context) (RawSnapshot, error) {
 	seen := map[string]struct{}{}
 	cursor := ""
 	for page := 0; page < pageLimit; page++ {
+		// Fail before the next network request even if a custom RoundTripper
+		// would ignore an already canceled context.
+		if err := ctx.Err(); err != nil {
+			return empty, fmt.Errorf("%w: canceled: %v", ErrCatalogIncomplete, err)
+		}
 		endpoint := *base
 		endpoint.Path = "/v2/products"
 		q := url.Values{}
