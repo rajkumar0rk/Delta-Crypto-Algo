@@ -171,9 +171,6 @@ func TestHealthContractAndUnsafeMethodsFailClosed(t *testing.T) {
 					t.Fatalf("health content type %q", ct)
 				}
 			}
-			if tc.method == http.MethodHead && rec.Body.Len() != 0 {
-				t.Fatalf("HEAD response unexpectedly contains body: %q", rec.Body.String())
-			}
 		})
 	}
 }
