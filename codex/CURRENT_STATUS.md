@@ -16,6 +16,12 @@
 - **First combined CI failed Go test fixtures:** [run #45215879440](https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45215879440); Go formatting and vet passed, UI passed. New strict content-representation guard exposed synthetic successful JSON handlers with Go's implicit text/plain sniffing; they failed before reaching cursor/timestamp assertions. JSON test fixtures now explicitly declare application/json; fresh exact-head CI remains required. No authoritative Delta India product contract fixtures, full REST mapping, account eligibility, real margin/fee rates, or durable refresh/cache are claimed. Transport safeguards from PRs #48/#50/#51 have now been reconciled into this draft: cursor validation, timestamp/cancellation atomicity, nested JSON key rejection, and HTTP content representation validation. Original PRs remain open until combined-head CI and integration review. No M2 merge before further acceptance.
 - Metadata-only tests, no credentials, orders, live-trading enablement, production deployment, `main` changes or other automation modifications.
 
+## 2026-11-24 — M2 Go formatting CI follow-up
+
+- PR #54 exact head `a6231e75fa0027c4c3cca1e10045ac108b31d13a` failed Go formatting (`internal/domain/catalog/store_rejection_test.go`) in [run #45249421975](https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45249421975); UI passed, Go vet/race/build skipped. This is the **second** formatting failure, not a passing validation.
+- Expanded the two duplicate-product fixture closures into gofmt-compatible multiline bodies in commit `deb0d78c8f1ca1b47f1f8e669682beefb2bb090e` on existing M2 consolidation PR #54. Exact new-head CI is pending; no claim of passing tests.
+- M1 independent review, `develop` protection and manual screen-reader/native zoom acceptance remain unverified. M2 still lacks authoritative venue contract/fee/margin/eligibility fixtures. No merge, `main`, live orders, secrets or deployment.
+
 # Project status — M1 consolidated, acceptance pending
 
 ## 2026-11-24 — M2 catalog transport preflight hardening (draft PR #54)
