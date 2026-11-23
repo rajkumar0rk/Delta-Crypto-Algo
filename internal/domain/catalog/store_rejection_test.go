@@ -16,8 +16,16 @@ func TestStoreRejectedRefreshPreservesPublishedCatalog(t *testing.T) {
 	}{
 		{"incomplete pagination", func(s *Snapshot) { s.Complete = false }},
 		{"missing source", func(s *Snapshot) { s.Source = "" }},
-		{"duplicate id", func(s *Snapshot) { duplicate := s.Products[0]; duplicate.Symbol = "OTHER-PERP"; s.Products = append(s.Products, duplicate) }},
-		{"duplicate symbol", func(s *Snapshot) { duplicate := s.Products[0]; duplicate.ID = 2; s.Products = append(s.Products, duplicate) }},
+		{"duplicate id", func(s *Snapshot) {
+			duplicate := s.Products[0]
+			duplicate.Symbol = "OTHER-PERP"
+			s.Products = append(s.Products, duplicate)
+		}},
+		{"duplicate symbol", func(s *Snapshot) {
+			duplicate := s.Products[0]
+			duplicate.ID = 2
+			s.Products = append(s.Products, duplicate)
+		}},
 		{"unknown product kind", func(s *Snapshot) { s.Products[0].Kind = Kind("unrecognized") }},
 		{"unknown product status", func(s *Snapshot) { s.Products[0].Status = Status("unrecognized") }},
 		{"nondecimal tick", func(s *Snapshot) { s.Products[0].TickSize = "1/10" }},
