@@ -15,7 +15,7 @@ Credential theft; malicious config or strategies; unauthorized sessions; price f
 9. Audit append-only events, trustworthy clock, alerts, metrics and signed releases. Regular verified backups and restore drills.
 10. Vendor risk: monitor Delta India API/terms, RWA eligibility and jurisdictional compliance changes. RWA derivatives can have distinct legal and availability constraints.
 11. Feature branches + PR approvals, protected main, least-privilege CI, code scanning and dependency reviews.
-12. No automation can merge, deploy, connect real keys, enable live or send real orders without the user's explicit approval.
+12. The repository owner already delegates routine **development-only** merges to `develop` when independent review, exact-head CI, required rules and low-risk checks pass. This standing delegation is not authority to bypass a review gate, merge into `main`, deploy to production, connect real keys, enable live mode or submit real orders; those higher-risk actions require separate current explicit approval.
 
 ## Mandatory release gates
 [ ] Fault injection / recovery pass
