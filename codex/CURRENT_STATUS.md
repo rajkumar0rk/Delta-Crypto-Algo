@@ -1,4 +1,47 @@
-# Project status — verified integration
+# Project status — M1 consolidated, acceptance pending
+
+## 2026-11-23 — M1 accessibility, review governance and current CI
+
+- Existing PR #46: https://github.com/rajkumar0rk/Delta-Crypto-Algo/pull/46 targeting `develop`, not merged.
+- Implemented drawer `role=dialog`/`aria-modal`, inert background/skip link, deferred focus restoration and Chrome regression tests for keyboard containment, modal state and viewport transitions.
+- Added `.github/CODEOWNERS`, PR template, `docs/CONTRIBUTING.md`; clarified delegated development-only merge authority versus separate live/main permissions in `docs/SECURITY.md`.
+- Verified automated Go+UI CI **passed** at code/governance head `7b4320fe91c73cdc28a3d8cde48af9ae8c4e7c5f`: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45092813051. Revalidate exact final HEAD after these documentation commits.
+- External acceptance gates unresolved: zero independent reviews on PR #46, `develop` observed unprotected and rulesets absent, protection administration unavailable to GitHub integration, human screen-reader/native 200% zoom evidence absent.
+- `develop` checked at `60fb41ed034ad86fe401623472d3d81b67d116bf`. No merge attempted; no main, real credentials, orders or deployment.
+- **Decision:** PR ready for independent acceptance, not M1-complete. Resume M2 independently testable preparation if external acceptance gates remain unavailable; do not call M1 complete or waive required review under solo-maintainer delegation.
+
+
+## 2026-11-23 — M1 responsive navigation and automated acceptance follow-up
+
+- **User governance clarification:** the sole developer has delegated routine development decisions and eligible `develop` merges; do not repeatedly request personal milestone approval. The existing independent-review/branch-protection/assistive-technology gates are not silently marked passed. Preserve team-ready governance for future contributors.
+- **Code:** existing M1 PR #46 adds mobile drawer keyboard containment (including programmatically displaced focus), excludes the scrim from tab/AX navigation, closes stale drawer state on the desktop breakpoint, and restores focus to the visible menu trigger on the mobile breakpoint.
+- **Tests:** Chrome browser smoke now exercises both responsive transitions and keyboard focus recovery; it retains 320px narrow-reflow, viewport snapshots and AX button-name checks. Do not label this real 200% browser-zoom or screen-reader acceptance.
+- **Observed CI:** https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45091601256 had successful Go checks but UI failed because headless Chrome did not report an applied CSS zoom value. The nonrepresentative assertion was removed; updated code head `d7bab0505fa23a789d4972d2dc0eccc881a51063` has **unverified exact-head CI** at the time of this handoff. Check newer documentation-only commits and the resulting final-head CI before merge.
+- **Integration:** `develop` remained `60fb41ed034ad86fe401623472d3d81b67d116bf` before these PR changes, PR #46 remains open and unmerged. No trading, credentials, `main`, or production deployment.
+
+
+## 2026-11-21 — M1 author-side review and expanded accessibility verification
+
+- PR #46 latest audited code SHA `6747cd825a1645f13beaa0ef7d499fa9546df081` passed both CI jobs: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44905852868. Checks: Go format, module integrity, vet, race suite and build; UI pinned dependencies, npm ci, audit, schema, typecheck, browser viewport and keyboard tests.
+- Browser tests now check 320px narrow reflow as a **zoom-equivalent approximation** (not a direct manual 200% browser zoom test), 360/768/1280/1920 widths, reduced-motion preference, accessibility-tree button names, skip-link keyboard focus, mobile drawer Enter open / Shift+Tab containment / Escape close / focus restoration. Six screenshots collected. This **does not constitute manual screen-reader acceptance**.
+- Author-side code review found and fixed a broken literal README newline, hidden mobile navigation remaining focusable, missing mobile drawer keyboard/focus affordances, and absent hardening headers on an unlikely RNG-error response path. This **is not an independent human approval**.
+- Branch governance: repository rulesets GET returned `[]`; classic protection GET returned HTTP 403 to this GitHub integration, so `develop` protection cannot be confirmed or configured in this connection.
+- No independent PR reviewer is assigned or has approved. Therefore M1 **remains open**, PR #46 unmerged, `develop` unchanged; require independent reviewer, repository owner protection setup, and manual screen-reader/zoom acceptance. Do not bypass these gates or touch `main`/live.
+
+**2026-11-21 (IST) verified handoff:** `develop` remains `60fb41ed034ad86fe401623472d3d81b67d116bf`; this document on feature branch is not yet integrated. `main` has not been touched.
+
+## M1 integrated work proposed for develop
+- Consolidated foundation PR **#46**: https://github.com/rajkumar0rk/Delta-Crypto-Algo/pull/46 (the **sole** M1 integration candidate; PRs #35–#42 and #45 overlap/superseded).
+- Verified green full CI for code head `39c028d80249c71b52c25a6279ffe029becaca67`: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44904413027 — Go module verify/tidy, formatting, vet, race tests, build; UI exact-version guard, lockfile npm ci, high-severity production dependency audit, JSON schema/TS build, Chrome viewport checks and screenshot artifact.
+- Browser smoke successfully checked 360, 768, 1280, 1920 widths: safety messaging, skip link, visible button labels, no document horizontal overflow; also Strategies navigation and Configure Strategy CTA. The screenshots were downloaded and manually inspected for obvious alignment/clipping. This is **not** full screen-reader, 200% zoom or keyboard-only acceptance.
+- Backend remains loopback-only, paper/demo-only, readiness 503, no trading routes or exchange credentials. API adds strict browser headers and random request IDs; no live trading enablement.
+- Additional 2026-11-21 M1 CI hardening: checkout, setup-go, setup-node and artifact upload are pinned to verified upstream action commit SHAs. The preceding green full CI on updated browser runner head `c8c0551fb9aee7a53feec80b1b18227ae22bbb21` is https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44904755562. Immutable-action pin update passed exact-head Go+UI CI at `1f041d407dff179886a680a708001ffa69f2c246`: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/44904889053.
+- M1 acceptance ledger: [docs/M1_ACCEPTANCE.md](../docs/M1_ACCEPTANCE.md).
+- **Not complete:** PR #46 still needs an independent human security/code review and the owner to configure/verify `develop` branch-protection/rulesets with required reviews and checks. Github API read of protection returned HTTP 403; no proof it is configured. Combined code CI is green; final docs-only head CI still needs checking before merge.
+- M2 next after M1 acceptance: reconcile #29/#30 and verify authoritative Delta India crypto/futures/options/RWA catalog mapping, margin/fees/expiry/capabilities; M5 remains deferred.
+- Do not push/merge main, deploy VPS, add production keys, or send any real orders.
+
+## Historical handoff (2026-11-19)
 
 **Date:** 2026-11-19 (IST), M2 catalog domain merge. This file is a handoff snapshot; always check GitHub `develop`, new PRs and Actions before acting.
 
@@ -62,3 +105,43 @@
 - Public catalog now measures the entire HTTP response body before JSON decoding and rejects bodies exceeding 4 MiB, including valid JSON followed by excess whitespace. Incomplete fetches return no partial products.
 - Added regression fixture for valid JSON plus excessive whitespace. CI must verify Go formatting, tests/race/vet/build and UI/schema before merge; no local test execution claimed.
 - M2 still needs authoritative venue field mapping, margin/fee/capability verification, atomic refresh/freshness and UI integration. No private API, credentials, live orders or deployment.
+
+## 2026-11-21 — consolidated M1 acceptance batch (PR #46, not merged)
+- Integration baseline: develop at 60fb41ed034ad86fe401623472d3d81b67d116bf. PR: https://github.com/rajkumar0rk/Delta-Crypto-Algo/pull/46
+- Combined overlapping M1 proposals #35–#42/#45 into one feature branch: strict canonical loopback TCP port parsing, deny-trading-route regression tests, server-generated request IDs, CSP/CORP API headers, Go module integrity/tidy checks, Go toolchain from go.mod, no persisted checkout credentials, pinned UI dependency guard, committed npm lockfile and npm ci.
+- At handoff exact-head CI results were not yet returned by GitHub; local tests could not run in this environment because the GitHub host was not reachable for cloning. Do not merge without Go formatting/vet/race/build and UI schema/build success plus independent review.
+- M1 remains OPEN: independent review and branch governance, actual browser responsive/keyboard/a11y visual acceptance, further security verification and clean CI evidence. Branch protection endpoint returned 403 (integration permission); no rulesets were returned. Owner must configure/enforce governance outside this connector.
+- No real orders, credentials, live enablement, production deploy or main branch change. M2 remains next after M1 acceptance.
+
+## 2026-11-23 — M1 numeric loopback hardening (PR #46, pending exact-head CI)
+- Foundation listener now accepts only literal `127.0.0.1` or `::1`, rejecting `localhost`/case aliases because resolver/hosts mappings are not guaranteed loopback. Demo IPv6 acceptance and alias rejection covered in deterministic configuration tests.
+- Implementation commits `bdd9d584dc77cc486aa1631cfb9de480394b9db9`, `5c3547dbf9013fef3eaae6c63fe84e3029a61c4f`, acceptance docs `420d8853281758cab04c847384b49156cf017964`.
+- GitHub Actions lookup returned **no runs** for documentation head at inspection time; no local Go tests were executed. Do not treat previous green runs as validation of these changes.
+- M1 remains blocked by independent review, owner-only `develop` governance, manual screen-reader and 200% zoom acceptance. No merge, `main` changes, credentials, live orders or deployment.
+
+## 2026-11-23 — M1 HTTP response security regression (PR #46; not merged)
+- Added deterministic table-driven tests on the M1 consolidation branch covering CSP, CORP, nosniff, frame denial, referrer policy, cache disabling, generated request IDs, and no CORS grant across liveness, unready, denied-method, missing-order and preflight paths. Commit `6bb80c4d72344afcc1b6ef74c5d474da62966607`.
+- Prior PR head `c8a6ab4ed221ffb128285a908c74ab44fc885b4d` has successful Actions run https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45067324239. New test commit had no workflow run returned at inspection; do not call it validated or merge until exact-head CI passes.
+- M1 acceptance still requires independent review, owner-verified develop branch governance, and manual screen-reader/200% zoom acceptance. No live access, orders, deployment, or main changes.
+
+## M1 CI formatting repair (2026-11-23)
+- PR #46 exact prior head `39b26cd6d248ba54d491216f3df1ef9cd5bfbd54` failed Go formatting (only `internal/httpapi/server_test.go`); UI succeeded: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45072767981
+- Commit `3c7f6c1b35d3f3389c1c0f60c04f8e8f3ceed864` aligns the security-header test table with gofmt. **Fresh exact-head CI remains required**; the failed run does not validate Go tests/race/vet/build.
+- M1 remains unaccepted until independent review, owner-confirmed `develop` governance and manual screen-reader/200% zoom acceptance. Do not merge or begin M2 integration on green CI alone.
+
+## M1 health contract regression batch (2026-11-23)
+- PR #46: added table-driven coverage for JSON health state/trade_enabled=false, liveness/readiness statuses, HEAD routing, unsafe method denials, unknown order paths, no-store and denied cross-origin responses.
+- Code head `5f454852446b081c3b3d20974696fa12412bf6b3` was pushed; no exact-head workflow returned immediately after push. Go tests were NOT run locally. This is pending CI and independent review, not accepted M1.
+- Owner-only branch protection verification and manual screen-reader/200%-zoom acceptance remain outstanding. No `develop`, `main`, credentials, orders or production changes.
+
+
+## M1 security regression batch — 2026-11-23
+- PR #46 remains the M1 integration candidate; new commits add a deny-by-default browser Permissions-Policy and Go regression tests for server-generated unique request IDs across successful/denied/unknown routes, client-supplied request ID spoofing, denied unsafe methods and absence of permissive CORS preflight headers.
+- **Exact new-head CI not yet verified.** Prior green run #45092945033 validates an older head only and MUST NOT be used to merge this update. Local Go/UI test execution was not performed through the GitHub connector.
+- M1 remains blocked by independent qualified review, develop governance/protection verification, manual screen-reader/200% zoom acceptance and exact-head CI. Do not merge until gates are satisfied.
+- M2 PRs #29/#30/#47–#51 require consolidation after M1; authoritative Delta India contract/margin/fee/expiry fixtures remain missing. No live credentials, orders, production or main changes.
+
+## M1 exact-head CI diagnosis — 2026-11-23
+- PR #46 head `1e29961dc3eafcd7779499b33296074d0ba128be` failed Go formatting while UI passed: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45106026995. The Go job explicitly reported `internal/httpapi/server_security_test.go` from `gofmt -l`; no Go tests were reached.
+- Corrected the `Permissions-Policy` map literal's one-column alignment in commit `95762feb4550c50670ca81fef3eb830a3a463364`; this is a targeted formatting fix, not evidence of successful CI. The latest head must be rechecked after this status commit.
+- Independent review count remains zero; branch governance and native screen-reader/200%-zoom manual acceptance remain external gates. M1 not accepted and no merge authorized until all gates pass. M2 integration remains deferred.

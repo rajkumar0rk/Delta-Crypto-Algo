@@ -1,5 +1,5 @@
 import StrategyWorkspace from "./strategy/StrategyWorkspace";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Activity, AlertTriangle, BarChart3, BookOpenCheck, Boxes, ChevronDown,
   ChevronRight, ClipboardList, Database, FileText, Gauge, LayoutDashboard,
@@ -57,6 +57,72 @@ export default function App() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [marketType, setMarketType] = useState<(typeof marketTypes)[number]>("All instruments");
   const [marketSearch, setMarketSearch] = useState("");
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const closeMenuButtonRef = useRef<HTMLButtonElement>(null);
+  const mobileNavRef = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (!menuOpen) return;
+    // Focus after the mobile drawer becomes visible and its slide transition ends.
+    // Moving focus while the element is still translated off-screen is unreliable.
+    const focusHandle = window.setTimeout(() => closeMenuButtonRef.current?.focus(), 220);
+    function handleNavigationKeys(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        setMenuOpen(false);
+        // Inert background is cleared by the React render before focus returns.
+        window.requestAnimationFrame(() => menuButtonRef.current?.focus());
+      }
+      if (event.key !== "Tab") return;
+      const buttons = Array.from(mobileNavRef.current?.querySelectorAll<HTMLButtonElement>("button:not(:disabled)") ?? [])
+        .filter(button => getComputedStyle(button).display !== "none");
+      const first = buttons[0];
+      const last = buttons[buttons.length - 1];
+      if (!first || !last) return;
+      // A focusable element outside the drawer must never become a keyboard
+      // escape route while the mobile navigation is acting as an overlay.
+      if (!mobileNavRef.current?.contains(document.activeElement)) {
+        event.preventDefault();
+        (event.shiftKey ? last : first).focus();
+      } else if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+    document.addEventListener("keydown", handleNavigationKeys);
+    return () => {
+      window.clearTimeout(focusHandle);
+      document.removeEventListener("keydown", handleNavigationKeys);
+    };
+  }, [menuOpen]);
+  useEffect(() => {
+    // A viewport resize or zoom-induced breakpoint change must not leave
+    // a stale mobile backdrop or drawer state over the desktop navigation.
+    const desktop = window.matchMedia("(min-width: 981px)");
+    function handleBreakpointChange() {
+      if (desktop.matches) {
+        setMenuOpen(false);
+        if (document.activeElement === closeMenuButtonRef.current) {
+          mobileNavRef.current?.querySelector<HTMLButtonElement>(".nav-link.selected")?.focus();
+        }
+      } else if (mobileNavRef.current?.contains(document.activeElement)) {
+        // Moving from the desktop sidebar to the hidden mobile drawer must
+        // not strand keyboard focus inside invisible navigation controls.
+        setMenuOpen(false);
+        // Inert background is cleared by the React render before focus returns.
+        window.requestAnimationFrame(() => menuButtonRef.current?.focus());
+      }
+    }
+    desktop.addEventListener("change", handleBreakpointChange);
+    return () => desktop.removeEventListener("change", handleBreakpointChange);
+  }, []);
+  function closeMenu() {
+    setMenuOpen(false);
+    // Do not focus an element while its ancestor remains inert.
+    window.requestAnimationFrame(() => menuButtonRef.current?.focus());
+  }
   useEffect(() => {
     document.title = `${page} · Delta Crypto Algo`;
   }, [page]);
@@ -64,16 +130,17 @@ export default function App() {
     setPage(next);
     setMenuOpen(false);
     window.scrollTo({ top: 0, behavior: "instant" });
+    window.requestAnimationFrame(() => document.getElementById("main")?.focus());
   }
   return (
     <div className="app">
-      <a className="skip-link" href="#main">Skip to main content</a>
-      {menuOpen && <button aria-label="Close navigation" className="mobile-scrim" onClick={() => setMenuOpen(false)} />}
-      <aside className={`sidebar ${menuOpen ? "sidebar-open" : ""}`} aria-label="Primary navigation">
+      <a className="skip-link" href="#main" inert={menuOpen}>Skip to main content</a>
+      {menuOpen && <button aria-label="Close navigation" aria-hidden="true" tabIndex={-1} className="mobile-scrim" onClick={closeMenu} />}
+      <aside className={`sidebar ${menuOpen ? "sidebar-open" : ""}`} ref={mobileNavRef} id="primary-navigation" aria-label="Primary navigation" role={menuOpen ? "dialog" : undefined} aria-modal={menuOpen || undefined}>
         <div className="brand">
           <div className="brand-mark" aria-hidden="true">D</div>
           <div className="brand-word"><strong>delta<span>crypto</span></strong><small>ALGO PLATFORM</small></div>
-          <button className="close-nav" onClick={() => setMenuOpen(false)} aria-label="Close menu"><X size={19} /></button>
+          <button ref={closeMenuButtonRef} className="close-nav" onClick={closeMenu} aria-label="Close menu"><X size={19} /></button>
         </div>
         <div className="sidebar-scroll">
           <div className="workspace-tile">
@@ -99,10 +166,10 @@ export default function App() {
           <small>Foundation v0.1 · No accounts connected</small>
         </div>
       </aside>
-      <div className="workspace">
+      <div className="workspace" inert={menuOpen}>
         <header className="topbar">
           <div className="top-left">
-            <button className="hamburger" aria-label="Open navigation" onClick={() => setMenuOpen(true)}><Menu size={21} /></button>
+            <button ref={menuButtonRef} className="hamburger" aria-controls="primary-navigation" aria-expanded={menuOpen} aria-label="Open navigation" onClick={() => setMenuOpen(true)}><Menu size={21} /></button>
             <span className="top-location">Control Center</span><ChevronRight size={15} className="muted" />
             <strong>{page}</strong>
           </div>

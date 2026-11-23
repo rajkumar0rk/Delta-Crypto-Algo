@@ -1,6 +1,8 @@
 package httpapi
 
 import (
+	"crypto/rand"
+	"encoding/hex"
 	"encoding/json"
 	"net/http"
 )
@@ -20,9 +22,18 @@ func NewHandler() http.Handler {
 	})
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "no-store")
+		w.Header().Set("Content-Security-Policy", "default-src 'none'; frame-ancestors 'none'; base-uri 'none'; form-action 'none'")
+		w.Header().Set("Cross-Origin-Resource-Policy", "same-origin")
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.Header().Set("X-Frame-Options", "DENY")
 		w.Header().Set("Referrer-Policy", "no-referrer")
+		w.Header().Set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=()")
+		var requestID [16]byte
+		if _, err := rand.Read(requestID[:]); err != nil {
+			http.Error(w, "request unavailable", http.StatusServiceUnavailable)
+			return
+		}
+		w.Header().Set("X-Request-ID", hex.EncodeToString(requestID[:]))
 		mux.ServeHTTP(w, r)
 	})
 }
