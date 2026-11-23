@@ -1,9 +1,9 @@
 package catalog
 
 import (
-"errors"
-"testing"
-"time"
+	"errors"
+	"testing"
+	"time"
 )
 
 // A failed venue refresh must never replace a previously validated snapshot.
@@ -11,7 +11,7 @@ import (
 func TestStoreRejectedRefreshPreservesPublishedCatalog(t *testing.T) {
 	base := time.Date(2026, 11, 23, 12, 0, 0, 0, time.UTC)
 	cases := []struct {
-		name string
+		name   string
 		mutate func(*Snapshot)
 	}{
 		{"incomplete pagination", func(s *Snapshot) { s.Complete = false }},
@@ -28,14 +28,18 @@ func TestStoreRejectedRefreshPreservesPublishedCatalog(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			var store Store
 			original := testSnapshot(base)
-			if err := store.Publish(original); err != nil { t.Fatal(err) }
+			if err := store.Publish(original); err != nil {
+				t.Fatal(err)
+			}
 			rejected := testSnapshot(base.Add(time.Second))
 			tc.mutate(&rejected)
 			if err := store.Publish(rejected); !errors.Is(err, ErrCatalogUnavailable) {
 				t.Fatalf("expected unavailable refresh rejection, got %v", err)
 			}
 			got, err := store.Snapshot()
-			if err != nil { t.Fatal(err) }
+			if err != nil {
+				t.Fatal(err)
+			}
 			if got.AsOf != base || len(got.Products) != 1 || got.Products[0].Symbol != original.Products[0].Symbol {
 				t.Fatalf("failed refresh mutated published snapshot: %+v", got)
 			}
