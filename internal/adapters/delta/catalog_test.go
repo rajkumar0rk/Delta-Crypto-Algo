@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"sync/atomic"
 	"strings"
 	"testing"
 	"time"
@@ -289,5 +290,41 @@ func TestPublicCatalogCanceledAtFinalPageFailsClosed(t *testing.T) {
 	got, err := (PublicCatalog{BaseURL: srv.URL, Client: httpClient}).Fetch(ctx)
 	if !errors.Is(err, ErrCatalogIncomplete) || len(got.Products) != 0 || got.Pages != 0 {
 		t.Fatalf("canceled fetch must discard snapshot: %+v %v", got, err)
+	}
+}
+
+
+// countingTransport detects forbidden network I/O even if the HTTP stack's
+// configured transport does not honor a canceled context.
+type countingTransport struct{ calls atomic.Int32 }
+
+func (c *countingTransport) RoundTrip(*http.Request) (*http.Response, error) {
+	c.calls.Add(1)
+	return nil, errors.New("network must not be reached")
+}
+
+func TestPublicCatalogCanceledContextNeverReachesTransport(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	cancel()
+	transport := &countingTransport{}
+	client := &http.Client{Timeout: time.Second, Transport: transport}
+	got, err := (PublicCatalog{BaseURL: "https://example.invalid", Client: client}).Fetch(ctx)
+	if !errors.Is(err, ErrCatalogIncomplete) || len(got.Products) != 0 || got.Pages != 0 || !got.AsOf.IsZero() {
+		t.Fatalf("canceled request did not fail closed: %+v %v", got, err)
+	}
+	if n := transport.calls.Load(); n != 0 {
+		t.Fatalf("canceled request reached transport %d times", n)
+	}
+}
+
+func TestPublicCatalogRejectsOpaqueHTTPSOriginBeforeNetwork(t *testing.T) {
+	transport := &countingTransport{}
+	client := &http.Client{Timeout: time.Second, Transport: transport}
+	got, err := (PublicCatalog{BaseURL: "https:opaque-origin", Client: client}).Fetch(context.Background())
+	if !errors.Is(err, ErrCatalogIncomplete) || len(got.Products) != 0 {
+		t.Fatalf("opaque origin accepted: %+v %v", got, err)
+	}
+	if n := transport.calls.Load(); n != 0 {
+		t.Fatalf("invalid origin reached transport %d times", n)
 	}
 }
