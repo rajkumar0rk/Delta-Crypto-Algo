@@ -249,6 +249,7 @@ func TestPublicCatalogSnapshotTimestampAfterFinalPage(t *testing.T) {
 	started := make(chan struct{})
 	release := make(chan struct{})
 	srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
 		close(started)
 		<-release
 		fmt.Fprint(w, `{"success":true,"result":[{"id":1}],"meta":{"after":null}}`)
@@ -278,6 +279,7 @@ func TestPublicCatalogCanceledAtFinalPageFailsClosed(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
 		cancel()
 		fmt.Fprint(w, `{"success":true,"result":[{"id":1}],"meta":{"after":null}}`)
 	}))

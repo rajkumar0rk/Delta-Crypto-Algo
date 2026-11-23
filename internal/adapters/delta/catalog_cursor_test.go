@@ -28,6 +28,7 @@ func TestPublicCatalogRejectsUnsafeCursorsBeforeNextRequest(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			requests := 0
 			srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
 				requests++
 				fmt.Fprintf(w, `{"success":true,"result":[{"id":1}],"meta":{"after":%s}}`, tc.cursor)
 			}))
@@ -50,6 +51,7 @@ func TestPublicCatalogSecondPageFailureDiscardsFirstPage(t *testing.T) {
 		t.Run(fmt.Sprint(status), func(t *testing.T) {
 			requests := 0
 			srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
 				requests++
 				if requests == 1 {
 					fmt.Fprint(w, `{"success":true,"result":[{"id":1}],"meta":{"after":"page2"}}`)
@@ -74,6 +76,7 @@ func TestPublicCatalogSecondPageFailureDiscardsFirstPage(t *testing.T) {
 func TestPublicCatalogCanceledContextNeverPublishes(t *testing.T) {
 	requests := 0
 	srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
 		requests++
 		fmt.Fprint(w, `{"success":true,"result":[{"id":1}],"meta":{"after":null}}`)
 	}))
@@ -99,6 +102,7 @@ func TestPublicCatalogMissingCursorFailsClosed(t *testing.T) {
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			srv := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.Header().Set("Content-Type", "application/json")
 				fmt.Fprint(w, tc.response)
 			}))
 			defer srv.Close()
