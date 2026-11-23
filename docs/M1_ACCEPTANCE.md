@@ -47,3 +47,22 @@ CI investigation:
 - Updated code head `d7bab0505fa23a789d4972d2dc0eccc881a51063` requires fresh CI; no green result is claimed here.
 
 M1 remains pending independent code-review evidence, repository governance and manual assistive-technology acceptance. No live trading, production credentials, VPS deployment or `main` changes are authorized by this development delegation.
+
+## 2026-11-23 — code-controlled governance and modal accessibility batch
+
+The development-only delegation is already in effect; no further routine maintainer authorization is needed. This is distinct from the required evidence for independent review, GitHub branch protection and manual assistive technology acceptance.
+
+Implemented in M1 PR #46:
+- While the mobile navigation drawer is open, the underlying workspace and skip-link are inert, the drawer has modal-dialog semantics, and keyboard focus is trapped and restored after close.
+- Browser regressions exercise modal roles, background inert state, keyboard focus, narrow reflow, and desktop/mobile breakpoint transitions.
+- Added `.github/CODEOWNERS` for owner routing, a PR evidence/review checklist, and `docs/CONTRIBUTING.md` for future team onboarding. They do **not** enforce GitHub server-side protected-branch settings.
+- Clarified `docs/SECURITY.md` to distinguish authorized development merges from separately authorized production/live actions.
+
+Verification: Go and UI jobs passed on code/governance SHA `7b4320fe91c73cdc28a3d8cde48af9ae8c4e7c5f`: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45092813051. This is not final-head CI after this documentation update.
+
+Actual remaining blockers:
+1. PR #46 recorded **zero** independent reviews. Self-inspection and the owner routing file are not an independent approval.
+2. GitHub reported `develop.protected = false` and no active rulesets; this integration's classic protection read is HTTP 403 and it cannot configure administrative branch settings.
+3. Human screen-reader walkthrough and native 200% browser zoom review are not yet evidenced. Automated accessibility-tree, keyboard and narrow-reflow tests are not equivalent.
+
+Exit decision: **NO-GO for declaring M1 complete or merging PR #46** until these evidence gates are met. Continue independently testable M2 preparation without bypassing milestone order or enabling live trading.
