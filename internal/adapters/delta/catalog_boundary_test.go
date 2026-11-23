@@ -28,7 +28,9 @@ func TestPublicCatalogRequiresVerifiedMappingBeforeTradeability(t *testing.T) {
 	}))
 	defer server.Close()
 
-	raw, err := (delta.PublicCatalog{BaseURL: server.URL, Client: server.Client()}).Fetch(context.Background())
+	client := server.Client()
+	client.Timeout = 5 * time.Second
+	raw, err := (delta.PublicCatalog{BaseURL: server.URL, Client: client}).Fetch(context.Background())
 	if err != nil {
 		t.Fatalf("public fetch: %v", err)
 	}
@@ -70,7 +72,9 @@ func TestPublicCatalogSecondPageFailureIsAtomic(t *testing.T) {
 	}))
 	defer server.Close()
 
-	raw, err := (delta.PublicCatalog{BaseURL: server.URL, Client: server.Client()}).Fetch(context.Background())
+	client := server.Client()
+	client.Timeout = 5 * time.Second
+	raw, err := (delta.PublicCatalog{BaseURL: server.URL, Client: client}).Fetch(context.Background())
 	if !errors.Is(err, delta.ErrCatalogIncomplete) {
 		t.Fatalf("expected incomplete error, got %v", err)
 	}
