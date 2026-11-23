@@ -1,0 +1,9 @@
+# Owner routing, not evidence of independent peer review.
+# Future team maintainers should replace the broad default with reviewed
+# domain-specific ownership before assigning additional write permissions.
+* @rajkumar0rk
+/.github/ @rajkumar0rk
+/internal/ @rajkumar0rk
+/cmd/ @rajkumar0rk
+/apps/control-ui/ @rajkumar0rk
+/schemas/ @rajkumar0rk
