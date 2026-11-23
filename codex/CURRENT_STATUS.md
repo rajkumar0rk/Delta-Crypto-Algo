@@ -1,5 +1,16 @@
 # Project status — M1 consolidated, acceptance pending
 
+## 2026-11-23 — M1 accessibility, review governance and current CI
+
+- Existing PR #46: https://github.com/rajkumar0rk/Delta-Crypto-Algo/pull/46 targeting `develop`, not merged.
+- Implemented drawer `role=dialog`/`aria-modal`, inert background/skip link, deferred focus restoration and Chrome regression tests for keyboard containment, modal state and viewport transitions.
+- Added `.github/CODEOWNERS`, PR template, `docs/CONTRIBUTING.md`; clarified delegated development-only merge authority versus separate live/main permissions in `docs/SECURITY.md`.
+- Verified automated Go+UI CI **passed** at code/governance head `7b4320fe91c73cdc28a3d8cde48af9ae8c4e7c5f`: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45092813051. Revalidate exact final HEAD after these documentation commits.
+- External acceptance gates unresolved: zero independent reviews on PR #46, `develop` observed unprotected and rulesets absent, protection administration unavailable to GitHub integration, human screen-reader/native 200% zoom evidence absent.
+- `develop` checked at `60fb41ed034ad86fe401623472d3d81b67d116bf`. No merge attempted; no main, real credentials, orders or deployment.
+- **Decision:** PR ready for independent acceptance, not M1-complete. Resume M2 independently testable preparation if external acceptance gates remain unavailable; do not call M1 complete or waive required review under solo-maintainer delegation.
+
+
 ## 2026-11-23 — M1 responsive navigation and automated acceptance follow-up
 
 - **User governance clarification:** the sole developer has delegated routine development decisions and eligible `develop` merges; do not repeatedly request personal milestone approval. The existing independent-review/branch-protection/assistive-technology gates are not silently marked passed. Preserve team-ready governance for future contributors.
