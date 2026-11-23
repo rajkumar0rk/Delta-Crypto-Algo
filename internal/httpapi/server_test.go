@@ -2,6 +2,7 @@ package httpapi
 
 import (
 	"encoding/hex"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -119,6 +120,59 @@ func TestSecurityHeadersOnEveryResponse(t *testing.T) {
 			}
 			if len(rec.Header().Get("X-Request-ID")) != 32 {
 				t.Error("missing generated request ID")
+			}
+		})
+	}
+}
+
+func TestHealthContractAndUnsafeMethodsFailClosed(t *testing.T) {
+	handler := NewHandler()
+	for _, tc := range []struct {
+		method string
+		path   string
+		want   int
+		state  string
+	}{
+		{http.MethodGet, "/health/live", http.StatusOK, "alive"},
+		{http.MethodGet, "/health/ready", http.StatusServiceUnavailable, "foundation_only"},
+		{http.MethodHead, "/health/live", http.StatusOK, ""},
+		{http.MethodHead, "/health/ready", http.StatusServiceUnavailable, ""},
+		{http.MethodPost, "/health/ready", http.StatusMethodNotAllowed, ""},
+		{http.MethodPut, "/health/live", http.StatusMethodNotAllowed, ""},
+		{http.MethodDelete, "/health/live", http.StatusMethodNotAllowed, ""},
+		{http.MethodPatch, "/health/ready", http.StatusMethodNotAllowed, ""},
+		{http.MethodPost, "/api/v1/orders", http.StatusNotFound, ""},
+		{http.MethodDelete, "/api/v1/orders/123", http.StatusNotFound, ""},
+		{http.MethodGet, "/health/live/extra", http.StatusNotFound, ""},
+	} {
+		t.Run(tc.method+"_"+tc.path, func(t *testing.T) {
+			req := httptest.NewRequest(tc.method, tc.path, nil)
+			req.Header.Set("Origin", "https://untrusted.example")
+			rec := httptest.NewRecorder()
+			handler.ServeHTTP(rec, req)
+			if rec.Code != tc.want {
+				t.Fatalf("status %d, want %d", rec.Code, tc.want)
+			}
+			if rec.Header().Get("Cache-Control") != "no-store" {
+				t.Error("response may be cached")
+			}
+			if rec.Header().Get("Access-Control-Allow-Origin") != "" {
+				t.Error("unexpected cross-origin grant")
+			}
+			if tc.state != "" {
+				var got health
+				if err := json.Unmarshal(rec.Body.Bytes(), &got); err != nil {
+					t.Fatalf("invalid health JSON: %v", err)
+				}
+				if got.State != tc.state || got.TradeEnabled {
+					t.Fatalf("unsafe health response: %+v", got)
+				}
+				if ct := rec.Header().Get("Content-Type"); ct != "application/json; charset=utf-8" {
+					t.Fatalf("health content type %q", ct)
+				}
+			}
+			if tc.method == http.MethodHead && rec.Body.Len() != 0 {
+				t.Fatalf("HEAD response unexpectedly contains body: %q", rec.Body.String())
 			}
 		})
 	}
