@@ -1,3 +1,10 @@
+## 2026-11-24 — M2 atomic financial metadata cache and eligibility checks
+
+- Previous mapping/refresh implementation head `7df86e2a02bba781ebc71b7ff6d2b00ff11b8b2d` passed exact Go/UI CI at https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45393761353.
+- Added CatalogCache that publishes mapped products and raw fee/margin terms under a single lock, rejects invalid and nonmonotonic refreshes and returns detached read views. TLS tests exercise successive publications, audit changes, caller mutation and failed refresh preservation.
+- Added independent account-scope/product/catalog-observation metadata admission, requiring current capabilities and explicit eligibility evidence. Fixed a capability freshness bug: individual evidence age is measured against time of use, not merely set publication. Synthetic tests cover wrong account/environment, stale/future evidence, delisting, missing capability and stale individual evidence.
+- New head CI pending. No real account eligibility data, live venue fixture or verified product-specific fee/margin normalization has been obtained. Public endpoint retrieval in this environment was unavailable; only documented field names and synthetic fixtures are used. M1 manual accessibility remains unverified. No main, credentials, orders, production or deployment.
+
 ## 2026-11-24 — M2 documented product mapping and audited refresh
 
 - Prior exact head `637d23d6ad69529d4d406d66a04a1536ae398ac5` passed both Go/UI CI: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45298028013. New head CI is pending.

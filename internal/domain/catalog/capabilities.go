@@ -45,7 +45,7 @@ func (s CapabilitySet) VerifiedFor(p Product, now time.Time, maxAge time.Duratio
 		return denied, fmt.Errorf("%w: missing or stale capability set", ErrCapabilityUnverified)
 	}
 	c, ok := s.Products[p.ID]
-	if !ok || c.ProductID != p.ID || c.Source == "" || c.Source != s.Source || c.VerifiedAt.IsZero() || c.VerifiedAt.After(now) || c.VerifiedAt.After(s.AsOf) || s.AsOf.Sub(c.VerifiedAt) > maxAge {
+	if !ok || c.ProductID != p.ID || c.Source == "" || c.Source != s.Source || c.VerifiedAt.IsZero() || c.VerifiedAt.After(now) || c.VerifiedAt.After(s.AsOf) || now.Sub(c.VerifiedAt) > maxAge {
 		return denied, fmt.Errorf("%w: missing or stale product evidence", ErrCapabilityUnverified)
 	}
 	if !c.AllowMarket && !c.AllowLimit {
