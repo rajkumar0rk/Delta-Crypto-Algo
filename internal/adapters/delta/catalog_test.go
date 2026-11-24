@@ -327,6 +327,7 @@ func TestPublicCatalogRejectsOpaqueHTTPSOriginBeforeNetwork(t *testing.T) {
 		t.Fatalf("invalid origin reached transport %d times", n)
 	}
 }
+
 // A missing or empty cursor cannot prove that every venue page was fetched.
 // Only an explicit JSON null terminates a complete catalog.
 func TestPublicCatalogRequiresExplicitTerminalCursor(t *testing.T) {
