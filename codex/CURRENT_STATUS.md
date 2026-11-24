@@ -1,3 +1,9 @@
+## 2026-11-24 — M2 public venue evidence probe
+
+- Atomic cache and independent eligibility implementation at `66fcf813858bb6dabfd750b51de30a0e95ca462c` passed both Go/UI CI in https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45394033353.
+- Direct read-only request to https://api.india.delta.exchange/v2/products?page_size=1 was unavailable in this environment (curl error 6, DNS resolution). Added a separate bounded public-evidence workflow to observe two records per documented derivative type using only unauthenticated HTTPS GET. Logs expose a restricted set of public fields, no account data, and distinguish failures/empty pages. This is a sampling probe, not a complete venue inventory or authorization source.
+- New exact-head foundation and evidence workflow results pending. Authoritative lot rules, full inventory mapping, normalized financial evidence and actual account eligibility remain unverified. No main, real credentials, orders, deployment or live activation.
+
 ## 2026-11-24 — M2 atomic financial metadata cache and eligibility checks
 
 - Previous mapping/refresh implementation head `7df86e2a02bba781ebc71b7ff6d2b00ff11b8b2d` passed exact Go/UI CI at https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45393761353.
