@@ -3,6 +3,7 @@ package catalog
 import (
 	"errors"
 	"fmt"
+	"sort"
 	"sync"
 	"time"
 )
@@ -38,17 +39,36 @@ func copySnapshot(s Snapshot) Snapshot {
 // A failed refresh never replaces the last good snapshot; consumers MUST still
 // check freshness on every use.
 func (s *Store) Publish(next Snapshot) error {
+	_, err := s.PublishWithChanges(next)
+	return err
+}
+
+// PublishWithChanges computes the audit transition and publishes under the
+// same lock. An invalid, older or cross-source refresh changes neither state
+// nor audit result. Initial publication reports every product as listed.
+func (s *Store) PublishWithChanges(next Snapshot) ([]ClassifiedChange, error) {
 	if err := next.Validate(); err != nil {
-		return fmt.Errorf("%w: %v", ErrCatalogUnavailable, err)
+		return nil, fmt.Errorf("%w: %v", ErrCatalogUnavailable, err)
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
-	if s.ready && !next.AsOf.After(s.current.AsOf) {
-		return fmt.Errorf("%w: non-monotonic as_of", ErrCatalogUnavailable)
+	var changes []ClassifiedChange
+	if s.ready {
+		var err error
+		changes, err = ClassifyChanges(s.current, next)
+		if err != nil {
+			return nil, fmt.Errorf("%w: %v", ErrCatalogUnavailable, err)
+		}
+	} else {
+		changes = make([]ClassifiedChange, 0, len(next.Products))
+		for _, p := range next.Products {
+			changes = append(changes, ClassifiedChange{Change: Change{ID: p.ID, After: copyProduct(p)}, Kind: ProductListed})
+		}
+		sort.Slice(changes, func(i, j int) bool { return changes[i].ID < changes[j].ID })
 	}
 	s.current = copySnapshot(next)
 	s.ready = true
-	return nil
+	return changes, nil
 }
 
 // Snapshot returns an independent copy of the latest complete snapshot.

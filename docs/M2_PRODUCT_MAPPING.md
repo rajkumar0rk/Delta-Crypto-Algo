@@ -1,0 +1,7 @@
+# M2 public product mapping and refresh
+
+The public Product contract is documented at https://docs.delta.exchange/ (India API). The adapter recognizes the four documented futures/options types, maps nested asset symbols, tick size, contract value, settlement time and strike. Unknown or unsupported contract value models are rejected. Unknown/non-operational/reduce-only states cannot admit new risk. Per-product lot evidence is required; the documented Product schema does not establish a lot-step field. Synthetic tests are not captured exchange records.
+
+PublicTerms preserves published fee/margin strings verbatim. It is not a fee calculator, a normalized margin ratio, account permission or execution authorization. Do not populate CapabilitySet from this alone. Lot evidence must be supplied from a trusted per-product source, tied to ID, symbol, contract value, observation time and lot increment. Refresh is read-only, returns terms and audit changes for the published observation, and does not establish durable storage. Invalid fetch/mapping leaves the last-good snapshot untouched; consumers must check age before using it. No private API or order endpoint is called.
+
+Remaining acceptance: authoritative actual responses and product-specific size constraints; validate margin units, tiering, option writing and account eligibility, inverse/quanto models where supported, and durable refresh/reconciliation. No live trading allowed.

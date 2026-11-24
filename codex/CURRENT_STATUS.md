@@ -1,3 +1,10 @@
+## 2026-11-24 — M2 documented product mapping and audited refresh
+
+- Prior exact head `637d23d6ad69529d4d406d66a04a1536ae398ac5` passed both Go/UI CI: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45298028013. New head CI is pending.
+- Implemented documented India Product mapping for vanilla non-quanto futures and call/put options, without symbol-specific rules. Public margin and commission values are retained verbatim, not normalized or interpreted as account fees. Required per-product lot evidence is external to the documented Product schema; missing/stale/mismatched evidence denies publication.
+- Added atomic Store.PublishWithChanges and read-only Fetch → MapSnapshot → PublishWithChanges orchestration with synthetic TLS/contract regression fixtures. Source changes, stale observations and invalid mappings fail closed. New local full Go/format checks not performed in this connector call; exact-head CI required. Synthetic tests are not live venue captures.
+- Official reference: https://docs.delta.exchange/ (Products and Product schema). Outstanding: real venue captures incl. RWA, verified lot/margin units, inverse/quanto handling, actual fee tiers and account eligibility, durable refresh/cache integration, M1 manual accessibility. Independent human review/protection waived. No main, production, credentials or orders.
+
 ## 2026-11-24 — Exact-head CI formatting recovery
 
 - PR #54 head `1ea0e6e5b280f2eb1ea839ee3ec7c5da6598cd38` failed Go formatting in `internal/adapters/delta/catalog_test.go` at [run #45270309502](https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45270309502); UI passed. The Go test/build stages did not run.
