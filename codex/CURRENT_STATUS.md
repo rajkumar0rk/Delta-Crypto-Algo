@@ -1,3 +1,10 @@
+## 2026-11-24 — M2 captured public contract fixtures and terms audit
+
+- Prior head `bc87d6da199f2c21e7b6232937682ef32a89b876` passed foundation CI https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45394267661 and public evidence https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45394267767. The successful probe observed six public records at 2026-11-24T12:31:09.289471+00:00: two xStock-tagged perpetuals, two calls, two puts. The live dated-futures query returned zero records and a null terminal cursor. Samples are selected field projections, not a full venue inventory.
+- Preserved those observed records as a provenance-tagged regression fixture. The fixture test supplies explicitly synthetic lot evidence; public data alone remains insufficient for eligibility. Preserved venue tags, price band and raw position-size limit without interpreting unverified units.
+- Cache now returns audited term-only changes (fees, margins and other preserved terms) separately from product transitions; tags are defensively copied. Tests exercise fee-only transitions and mutation/failure isolation.
+- New final-head foundation and probe CI pending; full inventory traversal/coverage, authoritative lot and normalized fee/margin/account evidence, durable audit/runtime/UI wiring and M1 manual accessibility remain unverified. No production, main, credentials or live trading.
+
 ## 2026-11-24 — M2 public venue evidence probe
 
 - Atomic cache and independent eligibility implementation at `66fcf813858bb6dabfd750b51de30a0e95ca462c` passed both Go/UI CI in https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45394033353.

@@ -20,6 +20,9 @@ type PublicTerms struct {
 	MaintenanceMargin    string
 	MakerCommission      string
 	TakerCommission      string
+	PriceBand            string
+	PositionSizeLimit    string
+	Tags                 []string
 }
 
 // LotEvidence is separate from the Products response, which does not document
@@ -75,8 +78,12 @@ func decodeProduct(raw json.RawMessage, lot LotEvidence, observed time.Time, max
 			Symbol string `json:"symbol"`
 		} `json:"settling_asset"`
 		ProductSpecs struct {
-			ReduceOnly *bool `json:"only_reduce_only_orders_allowed"`
+			ReduceOnly *bool    `json:"only_reduce_only_orders_allowed"`
+			Tags       []string `json:"tags"`
 		} `json:"product_specs"`
+
+		PriceBand         string          `json:"price_band"`
+		PositionSizeLimit json.RawMessage `json:"position_size_limit"`
 	}
 	if err := json.Unmarshal(raw, &v); err != nil {
 		return out, fmt.Errorf("invalid product: %w", err)
@@ -138,6 +145,9 @@ func decodeProduct(raw json.RawMessage, lot LotEvidence, observed time.Time, max
 		MaintenanceMargin:    v.MaintenanceMargin,
 		MakerCommission:      v.MakerCommission,
 		TakerCommission:      v.TakerCommission,
+		PriceBand:            v.PriceBand,
+		PositionSizeLimit:    string(v.PositionSizeLimit),
+		Tags:                 v.ProductSpecs.Tags,
 	}
 	return out, nil
 }
