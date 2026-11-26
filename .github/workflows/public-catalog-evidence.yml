@@ -1,0 +1,24 @@
+name: public-catalog-evidence
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/delta_catalog_probe.py'
+      - '.github/workflows/public-catalog-evidence.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  public-samples:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Compile probe
+        run: python3 -m py_compile scripts/delta_catalog_probe.py
+      - name: Observe public product pages
+        run: python3 scripts/delta_catalog_probe.py

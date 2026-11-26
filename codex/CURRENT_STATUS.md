@@ -1,4 +1,76 @@
+## 2026-11-24 — M2 captured public contract fixtures and terms audit
+
+- Prior head `bc87d6da199f2c21e7b6232937682ef32a89b876` passed foundation CI https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45394267661 and public evidence https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45394267767. The successful probe observed six public records at 2026-11-24T12:31:09.289471+00:00: two xStock-tagged perpetuals, two calls, two puts. The live dated-futures query returned zero records and a null terminal cursor. Samples are selected field projections, not a full venue inventory.
+- Preserved those observed records as a provenance-tagged regression fixture. The fixture test supplies explicitly synthetic lot evidence; public data alone remains insufficient for eligibility. Preserved venue tags, price band and raw position-size limit without interpreting unverified units.
+- Cache now returns audited term-only changes (fees, margins and other preserved terms) separately from product transitions; tags are defensively copied. Tests exercise fee-only transitions and mutation/failure isolation.
+- New final-head foundation and probe CI pending; full inventory traversal/coverage, authoritative lot and normalized fee/margin/account evidence, durable audit/runtime/UI wiring and M1 manual accessibility remain unverified. No production, main, credentials or live trading.
+
+## 2026-11-24 — M2 public venue evidence probe
+
+- Atomic cache and independent eligibility implementation at `66fcf813858bb6dabfd750b51de30a0e95ca462c` passed both Go/UI CI in https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45394033353.
+- Direct read-only request to https://api.india.delta.exchange/v2/products?page_size=1 was unavailable in this environment (curl error 6, DNS resolution). Added a separate bounded public-evidence workflow to observe two records per documented derivative type using only unauthenticated HTTPS GET. Logs expose a restricted set of public fields, no account data, and distinguish failures/empty pages. This is a sampling probe, not a complete venue inventory or authorization source.
+- New exact-head foundation and evidence workflow results pending. Authoritative lot rules, full inventory mapping, normalized financial evidence and actual account eligibility remain unverified. No main, real credentials, orders, deployment or live activation.
+
+## 2026-11-24 — M2 atomic financial metadata cache and eligibility checks
+
+- Previous mapping/refresh implementation head `7df86e2a02bba781ebc71b7ff6d2b00ff11b8b2d` passed exact Go/UI CI at https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45393761353.
+- Added CatalogCache that publishes mapped products and raw fee/margin terms under a single lock, rejects invalid and nonmonotonic refreshes and returns detached read views. TLS tests exercise successive publications, audit changes, caller mutation and failed refresh preservation.
+- Added independent account-scope/product/catalog-observation metadata admission, requiring current capabilities and explicit eligibility evidence. Fixed a capability freshness bug: individual evidence age is measured against time of use, not merely set publication. Synthetic tests cover wrong account/environment, stale/future evidence, delisting, missing capability and stale individual evidence.
+- New head CI pending. No real account eligibility data, live venue fixture or verified product-specific fee/margin normalization has been obtained. Public endpoint retrieval in this environment was unavailable; only documented field names and synthetic fixtures are used. M1 manual accessibility remains unverified. No main, credentials, orders, production or deployment.
+
+## 2026-11-24 — M2 documented product mapping and audited refresh
+
+- Prior exact head `637d23d6ad69529d4d406d66a04a1536ae398ac5` passed both Go/UI CI: https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45298028013. New head CI is pending.
+- Implemented documented India Product mapping for vanilla non-quanto futures and call/put options, without symbol-specific rules. Public margin and commission values are retained verbatim, not normalized or interpreted as account fees. Required per-product lot evidence is external to the documented Product schema; missing/stale/mismatched evidence denies publication.
+- Added atomic Store.PublishWithChanges and read-only Fetch → MapSnapshot → PublishWithChanges orchestration with synthetic TLS/contract regression fixtures. Source changes, stale observations and invalid mappings fail closed. New local full Go/format checks not performed in this connector call; exact-head CI required. Synthetic tests are not live venue captures.
+- Official reference: https://docs.delta.exchange/ (Products and Product schema). Outstanding: real venue captures incl. RWA, verified lot/margin units, inverse/quanto handling, actual fee tiers and account eligibility, durable refresh/cache integration, M1 manual accessibility. Independent human review/protection waived. No main, production, credentials or orders.
+
+## 2026-11-24 — Exact-head CI formatting recovery
+
+- PR #54 head `1ea0e6e5b280f2eb1ea839ee3ec7c5da6598cd38` failed Go formatting in `internal/adapters/delta/catalog_test.go` at [run #45270309502](https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45270309502); UI passed. The Go test/build stages did not run.
+- Reproduced the missing blank line between the preceding test and the terminal-cursor test's documentation comment with actual local Go 1.23.2 `gofmt -d` on the exact affected test-function excerpt. Applied the resulting one-line whitespace change to the fetched repository file. The complete repository formatting and test suite still require exact-head CI; do not claim local full-suite validation.
+- Independent human review and server-side develop protection were explicitly waived by the maintainer for routine development integration on 2026-11-23. They are not completed checks or outstanding approval requests. M1 native 200% zoom and manual screen-reader acceptance remain unverified; M2 official venue product mapping and fee/margin/eligibility/cache acceptance remain incomplete. No merge, live credentials, orders, main or production deployment.
+
+## 2026-11-24 — M2 explicit pagination terminal cursor hardening (PR #54)
+
+- Verified prior exact-head `9b71955f17b9e778274b05a112f241a517d2cf0d` passed GitHub Actions Go/UI at https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45260837908. This does **not** validate subsequent commits.
+- Fixed public catalog transport to reject an empty JSON-string pagination cursor rather than treating it as terminal. Only explicit JSON `null` proves completion; an empty string must fail closed without publishing partial records.
+- Added deterministic HTTPS fixture tests for empty, whitespace, absent and empty-metadata terminal markers. No live venue call or authoritative contract mapping claimed.
+- Implementation commits: `31af4c4bb0f6fb7c6b305ab5e8d279f5eadd82e4`, `9090dcb404908175ac3c080a3801da5da22590a0`. **Exact-new-head CI not yet verified** at this handoff; PR remains draft and unmerged. `develop` unchanged. M1 manual governance/accessibility and M2 venue product fee/margin/expiry/account eligibility remain blocked.
+
+## 2026-11-24 — M2 exact-head CI failure triage and formatting repair (draft PR #54)
+
+- Inspected exact-head GitHub Actions for prior commit `a29d53b78915f2529c95a987910d4cd8e7fc99b8`: [run #45240094938](https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45240094938) **failed** Go formatting (step 5); Go vet/race/build skipped. UI job succeeded. Previous green CI was for an older commit and does not validate this head.
+- Repaired Go formatting in `internal/domain/catalog/store_rejection_test.go` and `internal/adapters/delta/catalog_test.go` on the existing M2 consolidation branch. Final formatting-repair code commit: [ee816582](https://github.com/rajkumar0rk/Delta-Crypto-Algo/commit/ee816582d34509573168f65e2db091a32385ee11). No new functional capability or venue-authoritative fixture is claimed.
+- **Current head tests/CI unverified** at handoff; inspect the new workflow, fix remaining failures, then extend M2 contract mapping and fixture coverage. Do not merge PR #54 while M2 acceptance is incomplete. `develop` unchanged. M1 manual assistive-technology acceptance and governance evidence still unresolved. No live credentials, orders, production deployment or `main` changes.
+
+## 2026-11-23 — M2 refresh rejection regression batch (unmerged)
+- Added `internal/domain/catalog/store_rejection_test.go` at commit `ea959bf913f70a612e29b00469e1b22b5049f635` on the existing consolidated M2 branch / PR #54. Nine table-driven malformed refresh scenarios assert that the previously published catalog remains intact, stays usable only while fresh, and becomes non-tradeable when stale.
+- Tests and exact-head CI for this commit are **not yet verified**; do not treat the new tests as passed or merge M2. No exchange-authoritative contract fixture, account-specific eligibility, fee/margin rates, or full M2 acceptance established.
+- M1 PR #46 is already merged into `develop`, but formal manual screen-reader/200% zoom and independent governance acceptance evidence remains missing. Earlier historical entries below describe previous states and must not be read as current.
+
+## 2026-11-23 M1 merge and M2 consolidated preparation
+- **M1 PR #46 merged into `develop`** at `e3a24aca6b6b870bb0bcccf06ed7066786e5207a`: https://github.com/rajkumar0rk/Delta-Crypto-Algo/pull/46 . PR source head `7f2d86c` passed Go and UI CI https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45111951903 . Post-merge CI has not yet been verified in this status entry.
+- Maintainer expressly waived **independent review** and **server-side branch protection** for development integration on 2026-11-23. These controls are NOT configured/verified. Manual screen-reader and native browser 200% zoom acceptance remain **unverified**; M1 is integrated with partial acceptance.
+- **M2 consolidation branch** from this exact develop commit incorporates PR #29 (atomic validated store), #30 (plain exact decimals), #47 (audited snapshot transitions), #49 (fee/margin/order capability evidence) and PR #53 (synthetic TLS cross-layer fail-closure and pagination atomicity tests).
+- **First combined CI failed Go test fixtures:** [run #45215879440](https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45215879440); Go formatting and vet passed, UI passed. New strict content-representation guard exposed synthetic successful JSON handlers with Go's implicit text/plain sniffing; they failed before reaching cursor/timestamp assertions. JSON test fixtures now explicitly declare application/json; fresh exact-head CI remains required. No authoritative Delta India product contract fixtures, full REST mapping, account eligibility, real margin/fee rates, or durable refresh/cache are claimed. Transport safeguards from PRs #48/#50/#51 have now been reconciled into this draft: cursor validation, timestamp/cancellation atomicity, nested JSON key rejection, and HTTP content representation validation. Original PRs remain open until combined-head CI and integration review. No M2 merge before further acceptance.
+- Metadata-only tests, no credentials, orders, live-trading enablement, production deployment, `main` changes or other automation modifications.
+
+## 2026-11-24 — M2 Go formatting CI follow-up
+
+- PR #54 exact head `a6231e75fa0027c4c3cca1e10045ac108b31d13a` failed Go formatting (`internal/domain/catalog/store_rejection_test.go`) in [run #45249421975](https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45249421975); UI passed, Go vet/race/build skipped. This is the **second** formatting failure, not a passing validation.
+- Expanded the two duplicate-product fixture closures into gofmt-compatible multiline bodies in commit `deb0d78c8f1ca1b47f1f8e669682beefb2bb090e` on existing M2 consolidation PR #54. Exact new-head CI is pending; no claim of passing tests.
+- M1 independent review, `develop` protection and manual screen-reader/native zoom acceptance remain unverified. M2 still lacks authoritative venue contract/fee/margin/eligibility fixtures. No merge, `main`, live orders, secrets or deployment.
+
 # Project status — M1 consolidated, acceptance pending
+
+## 2026-11-24 — M2 catalog transport preflight hardening (draft PR #54)
+
+- On existing consolidation branch `feature/m2-catalog-domain-consolidated-20261123`, reject opaque HTTPS origins and reject already-canceled contexts before each pagination request. Added deterministic counting-transport regression tests proving no network I/O for canceled requests or malformed origins.
+- Code commit: https://github.com/rajkumar0rk/Delta-Crypto-Algo/commit/7cf6b93fdc1b2499bcb74e67cf4447276048acc2 ; tests commit: https://github.com/rajkumar0rk/Delta-Crypto-Algo/commit/54d187c2bf9bac4a71bba69b3d6aa2cb2d0a5f16 .
+- **CI for these new commits not yet verified at this handoff**; older green run #45216268002 covers an earlier head only. No local test execution claimed.
+- M1 code merged via #46 but formal independent review, protection and manual assistive-tech/zoom acceptance remain unverified. M2 still lacks authoritative venue contract/fee/margin/expiry mapping and eligibility proof. Do not merge #54 or enable trading on this evidence.
+
 
 ## 2026-11-23 — M1 accessibility, review governance and current CI
 

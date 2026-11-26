@@ -2,6 +2,7 @@ package catalog
 
 import (
 	"errors"
+	"strings"
 	"testing"
 	"time"
 )
@@ -39,6 +40,14 @@ func TestSnapshotAndTradeability(t *testing.T) {
 		{"invalid tick", func(s *Snapshot) { s.Products[0].TickSize = "0" }},
 		{"exponent rejected", func(s *Snapshot) { s.Products[0].LotSize = "1e-8" }},
 		{"negative multiplier", func(s *Snapshot) { s.Products[0].ContractMultiplier = "-1" }},
+		{"hexadecimal quantity", func(s *Snapshot) { s.Products[0].LotSize = "0x10" }},
+		{"binary quantity", func(s *Snapshot) { s.Products[0].LotSize = "0b10" }},
+		{"underscored quantity", func(s *Snapshot) { s.Products[0].LotSize = "1_000" }},
+		{"signed quantity", func(s *Snapshot) { s.Products[0].LotSize = "+1" }},
+		{"leading decimal point", func(s *Snapshot) { s.Products[0].LotSize = ".5" }},
+		{"trailing decimal point", func(s *Snapshot) { s.Products[0].LotSize = "5." }},
+		{"multiple decimal points", func(s *Snapshot) { s.Products[0].LotSize = "1.2.3" }},
+		{"overlong decimal", func(s *Snapshot) { s.Products[0].LotSize = strings.Repeat("1", 129) }},
 		{"missing option expiry", func(s *Snapshot) { s.Products[1].Expiry = nil }},
 		{"missing option strike", func(s *Snapshot) { s.Products[1].Strike = "" }},
 		{"unknown product type", func(s *Snapshot) { s.Products[0].Kind = "mystery" }},
@@ -95,5 +104,18 @@ func TestProductKinds(t *testing.T) {
 	p.Kind = Perpetual
 	if err := p.Validate(); err == nil {
 		t.Fatal("perpetual with expiry accepted")
+	}
+}
+
+func TestPositiveDecimalPlainBase10(t *testing.T) {
+	for _, value := range []string{"1", "0.00000001", "001.2500", "1000000000000000000000000"} {
+		if !positiveDecimal(value) {
+			t.Errorf("rejected valid decimal %q", value)
+		}
+	}
+	for _, value := range []string{"", "0", "0.000", "0x10", "0b10", "1_000", "1/2", "1e3", "+1", "-1", ".5", "5.", "1.2.3", "NaN", "Inf", " 1", "1 ", "１２"} {
+		if positiveDecimal(value) {
+			t.Errorf("accepted non-positive or non-decimal quantity %q", value)
+		}
 	}
 }

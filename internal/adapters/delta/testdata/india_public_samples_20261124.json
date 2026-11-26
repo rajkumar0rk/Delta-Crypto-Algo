@@ -1,0 +1,228 @@
+{
+  "source": "https://api.india.delta.exchange/v2/products",
+  "observed_at": "2026-11-24T12:31:09.289471+00:00",
+  "actions_run": "https://github.com/rajkumar0rk/Delta-Crypto-Algo/actions/runs/45394267767",
+  "note": "Selected public field projections captured by the probe, not full pages or a complete catalog. No lot-step, account or risk evidence.",
+  "pages": [
+    {
+      "type": "perpetual_futures",
+      "records": 2,
+      "after_type": "str"
+    },
+    {
+      "type": "futures",
+      "records": 0,
+      "after_type": "NoneType"
+    },
+    {
+      "type": "call_options",
+      "records": 2,
+      "after_type": "str"
+    },
+    {
+      "type": "put_options",
+      "records": 2,
+      "after_type": "str"
+    }
+  ],
+  "products": [
+    {
+      "id": 165399,
+      "symbol": "ANTBUSD",
+      "contract_type": "perpetual_futures",
+      "state": "live",
+      "trading_status": "operational",
+      "notional_type": "vanilla",
+      "is_quanto": false,
+      "contract_value": "0.1",
+      "contract_unit_currency": "ANTB",
+      "tick_size": "0.01",
+      "initial_margin": "4",
+      "maintenance_margin": "2",
+      "maker_commission_rate": "0.0002",
+      "taker_commission_rate": "0.0002",
+      "settlement_time": null,
+      "strike_price": null,
+      "position_size_limit": 80000,
+      "price_band": "10",
+      "underlying_asset": {
+        "symbol": "ANTB"
+      },
+      "quoting_asset": {
+        "symbol": "USD"
+      },
+      "settling_asset": {
+        "symbol": "USD"
+      },
+      "product_specs": {
+        "only_reduce_only_orders_allowed": false,
+        "tags": [
+          "xStock"
+        ]
+      }
+    },
+    {
+      "id": 164709,
+      "symbol": "COINBUSD",
+      "contract_type": "perpetual_futures",
+      "state": "live",
+      "trading_status": "operational",
+      "notional_type": "vanilla",
+      "is_quanto": false,
+      "contract_value": "0.01",
+      "contract_unit_currency": "COINB",
+      "tick_size": "0.01",
+      "initial_margin": "4",
+      "maintenance_margin": "2",
+      "maker_commission_rate": "0.0002",
+      "taker_commission_rate": "0.0002",
+      "settlement_time": null,
+      "strike_price": null,
+      "position_size_limit": 80000,
+      "price_band": "10",
+      "underlying_asset": {
+        "symbol": "COINB"
+      },
+      "quoting_asset": {
+        "symbol": "USD"
+      },
+      "settling_asset": {
+        "symbol": "USD"
+      },
+      "product_specs": {
+        "only_reduce_only_orders_allowed": false,
+        "tags": [
+          "xStock"
+        ]
+      }
+    },
+    {
+      "id": 166626,
+      "symbol": "C-ETH-1650-251126",
+      "contract_type": "call_options",
+      "state": "live",
+      "trading_status": "operational",
+      "notional_type": "vanilla",
+      "is_quanto": false,
+      "contract_value": "0.01",
+      "contract_unit_currency": "ETH",
+      "tick_size": "0.01",
+      "initial_margin": "1",
+      "maintenance_margin": "0.5",
+      "maker_commission_rate": "0.0001",
+      "taker_commission_rate": "0.0001",
+      "settlement_time": "2026-11-25T12:00:00Z",
+      "strike_price": "1650",
+      "position_size_limit": 120000,
+      "price_band": "2",
+      "underlying_asset": {
+        "symbol": "ETH"
+      },
+      "quoting_asset": {
+        "symbol": "USD"
+      },
+      "settling_asset": {
+        "symbol": "USD"
+      },
+      "product_specs": {
+        "only_reduce_only_orders_allowed": false
+      }
+    },
+    {
+      "id": 166625,
+      "symbol": "C-ETH-1670-251126",
+      "contract_type": "call_options",
+      "state": "live",
+      "trading_status": "operational",
+      "notional_type": "vanilla",
+      "is_quanto": false,
+      "contract_value": "0.01",
+      "contract_unit_currency": "ETH",
+      "tick_size": "0.01",
+      "initial_margin": "1",
+      "maintenance_margin": "0.5",
+      "maker_commission_rate": "0.0001",
+      "taker_commission_rate": "0.0001",
+      "settlement_time": "2026-11-25T12:00:00Z",
+      "strike_price": "1670",
+      "position_size_limit": 120000,
+      "price_band": "2",
+      "underlying_asset": {
+        "symbol": "ETH"
+      },
+      "quoting_asset": {
+        "symbol": "USD"
+      },
+      "settling_asset": {
+        "symbol": "USD"
+      },
+      "product_specs": {
+        "only_reduce_only_orders_allowed": false
+      }
+    },
+    {
+      "id": 166621,
+      "symbol": "P-ETH-1650-251126",
+      "contract_type": "put_options",
+      "state": "live",
+      "trading_status": "operational",
+      "notional_type": "vanilla",
+      "is_quanto": false,
+      "contract_value": "0.01",
+      "contract_unit_currency": "ETH",
+      "tick_size": "0.01",
+      "initial_margin": "1",
+      "maintenance_margin": "0.5",
+      "maker_commission_rate": "0.0001",
+      "taker_commission_rate": "0.0001",
+      "settlement_time": "2026-11-25T12:00:00Z",
+      "strike_price": "1650",
+      "position_size_limit": 120000,
+      "price_band": "2",
+      "underlying_asset": {
+        "symbol": "ETH"
+      },
+      "quoting_asset": {
+        "symbol": "USD"
+      },
+      "settling_asset": {
+        "symbol": "USD"
+      },
+      "product_specs": {
+        "only_reduce_only_orders_allowed": false
+      }
+    },
+    {
+      "id": 166620,
+      "symbol": "P-ETH-1670-251126",
+      "contract_type": "put_options",
+      "state": "live",
+      "trading_status": "operational",
+      "notional_type": "vanilla",
+      "is_quanto": false,
+      "contract_value": "0.01",
+      "contract_unit_currency": "ETH",
+      "tick_size": "0.01",
+      "initial_margin": "1",
+      "maintenance_margin": "0.5",
+      "maker_commission_rate": "0.0001",
+      "taker_commission_rate": "0.0001",
+      "settlement_time": "2026-11-25T12:00:00Z",
+      "strike_price": "1670",
+      "position_size_limit": 120000,
+      "price_band": "2",
+      "underlying_asset": {
+        "symbol": "ETH"
+      },
+      "quoting_asset": {
+        "symbol": "USD"
+      },
+      "settling_asset": {
+        "symbol": "USD"
+      },
+      "product_specs": {
+        "only_reduce_only_orders_allowed": false
+      }
+    }
+  ]
+}
